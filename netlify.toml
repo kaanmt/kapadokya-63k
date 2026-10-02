@@ -1,0 +1,4 @@
+# Kapadokya 63K: statik site, derleme yok. Dosyalar depo kökünden yayınlanır.
+[build]
+  publish = "."
+  command = ""
