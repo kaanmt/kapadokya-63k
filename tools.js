@@ -19,6 +19,7 @@
     { name: '100 kg, çok, 25 °C, kafeinsiz, hareket 525 dk (üst sınır)', p: { kg: 100, sweat: 'high', temp: 25, caf: 'none', health: false, M: 525 }, exp: [750, 560, 65, 0] }
   ];
   function near(a, b, tol) { return Math.abs(a - b) <= tol; }
+  function f2(x) { return (Math.round(x * 1000) / 1000).toString(); }
   function runSelfTest() {
     var res = [];
     function check(name, ok, detail) { res.push({ name: name, ok: !!ok, detail: detail || '' }); }
@@ -52,10 +53,33 @@
       var ids = {}; var dup = P.filter(function (p) { if (ids[p.id]) return true; ids[p.id] = 1; return false; });
       check('Ürün kimlikleri tekil', !dup.length, dup.length ? dup.map(function (p) { return p.id; }).join(', ') : P.length + ' tekil');
       check('Yiyecek listesi (17 yiyecek)', F.length === 17, F.length + ' yiyecek');
+      if (K.calib) {
+        // Sentetik koşu: 201 nokta, her adım ~11,1 m kuzeye, 4 sn; ilk 100 adımda +1 m rakım; 150-159 arası 40 sn durma
+        var g = '<?xml version="1.0"?><gpx xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg>', t0 = Date.UTC(2026, 9, 4, 7, 0, 0), lat = 38.6, idx = 0, tt = t0;
+        for (var q = 0; q < 211; q++) {
+          if (q > 0) { if (q >= 151 && q <= 160) {} else lat += 0.0001; tt += 4000; }
+          var ele = 1000 + Math.min(q, 100);
+          g += '<trkpt lat="' + lat.toFixed(6) + '" lon="34.9"><ele>' + ele + '</ele><time>' + new Date(tt).toISOString() + '</time></trkpt>';
+        }
+        g += '</trkseg></trk></gpx>';
+        var a = K.calib.analyze(K.calib.parseGpx(g), { wUp: 1, wDn: 0 });
+        check('GPX kalibrasyonu (sentetik koşu)', near(a.km, 2.224, 0.02) && near(a.moving, 800, 1) && near(a.elapsed, 840, 1) && a.up > 95 && a.up <= 101,
+          f2(a.km) + ' km, hareket ' + Math.round(a.moving) + ' sn, toplam ' + Math.round(a.elapsed) + ' sn, tırmanış ' + Math.round(a.up) + ' m');
+        var bad = false; try { K.calib.parseGpx('<gpx><trk><trkseg><trkpt lat="1" lon="1"></trkpt></trkseg></trk></gpx>'); } catch (e) { bad = true; }
+        check('Zamansız/eksik GPX reddedilir', bad, String(bad));
+      }
       var ev1 = K.nutrition.evaluate('onthego-progel-mocha-150', '', '');
       if (ev1.valid) check('Üretici günlük sınırı: kafeinli jel en fazla 2', ev1.tot.gels <= 2, ev1.tot.gels + ' adet');
       var ev2 = K.nutrition.evaluate('', '', 'bigjoy-sodium-plus');
       if (ev2.valid) check('Üretici günlük sınırı: Sodium Plus en fazla 1', ev2.tot.salts <= 1, ev2.tot.salts + ' adet');
+      var ev3 = K.nutrition.evaluate('wup-neo3-elma', 'onthego-elektrolit-limon', 'wup-salt-tablet');
+      if (ev3.valid) {
+        check('Seçilen tuz tableti planda kullanılır', ev3.tot.salts >= 1 && !!ev3.sched.saltMin, ev3.tot.salts + ' adet, her ' + ev3.sched.saltMin + ' dk');
+        var mg = K.nutrition.state().maxGels, sd3 = ev3.sched;
+        check('Takvim uygulanabilir (jel aralığı listeden ve sınır içinde, flask başına 0 / 0,5 / 1 tablet)',
+          K.nutrition.GEL_STEPS.indexOf(sd3.gelMin) >= 0 && 60 / sd3.gelMin <= mg + 1e-9 && [0, 0.5, 1].indexOf(sd3.dose) >= 0 && sd3.flaskMin % 5 === 0,
+          'jel ' + sd3.gelMin + ' dk, doz ' + sd3.dose + ', flask ' + sd3.flaskMin + ' dk');
+      }
     } catch (e) { check('Beklenmeyen hata', false, e.message); }
     return res;
   }

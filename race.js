@@ -393,6 +393,14 @@
     if (n.tab && row.tabs) take.push(row.tabs + ' tablet (her biri ' + n.tabVol + ' mL suya)');
     if (n.salt && row.salts) take.push(row.salts + ' tuz tableti');
     out += '<div class="rline"><b>Yanına al:</b> ' + (take.length ? esc(take.join(', ')) : 'ürün seçilmemiş (Beslenme sekmesi)') + '</div>';
+    if (n.sched) {
+      var sd = n.sched, rule = [];
+      rule.push('flask başına ' + sd.flaskMin + ' dk');
+      if (n.gel && sd.gelMin) rule.push('jel her ' + sd.gelMin + ' dk');
+      if (n.salt && sd.saltMin) rule.push('tuz tableti her ' + sd.saltMin + ' dk');
+      if (n.tab) rule.push(sd.dose === 1 ? 'her flaska 1 tablet' : sd.dose === 0.5 ? 'iki flasktan birine 1 tablet' : 'tablet yok');
+      out += '<div class="rline"><b>Takvim:</b> ' + esc(rule.join(', ')) + '</div>';
+    }
     out += '<div class="rline"><b>Sonraki:</b> ' + esc(cps[d.nextCi].name) + '</div>';
     c.innerHTML += out;
     return c;

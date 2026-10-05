@@ -87,49 +87,71 @@
     var r = planResult(key);
     return targetsFrom({ kg: st.kg, sweat: st.sweat, temp: st.temp, caf: st.caf, health: st.health, M: r.valid ? r.M : 0 });
   }
+  // Uygulanabilir takvim: kesirli "saatte 1,3 jel" yerine aralıklar ve flask kuralları.
+  // Su: her flask X dakikada bitsin. Elektrolit: her flaska 1 / iki flasktan birine 1 / hiç. Jel: her X dakikada 1.
+  // Tuz tableti seçildiyse KULLANILIR (her 30-120 dakikada 1); diğerleri ona göre ayarlanır.
+  var GEL_STEPS = [20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90, 120];
+  var SALT_STEPS = [30, 45, 60, 75, 90, 120];
+  var DOSES = [1, 0.5, 0];
+  function round5(x) { return Math.max(10, Math.round(x / 5) * 5); }
+  function events(T, t0, t1) { return T ? Math.floor(t1 / T + 1e-9) - Math.floor(t0 / T + 1e-9) : 0; }
   function evaluate(gelId, drinkId, saltId, key) {
     var tg = targets(key), r = planResult(key);
     if (!r.valid) return { valid: false, tg: tg };
     var hours = r.finish / 60, gel = byId(gelId), tab = byId(drinkId), salt = byId(saltId || '');
-    var saltNa = salt ? (salt.na || 0) : 0, saltK = salt ? (salt.k || 0) : 0, saltMg = salt ? (salt.mg || 0) : 0;
-    var gelCarb = gel ? (gel.carb || 0) : 0, gelNa = gel ? (gel.na || 0) : 0, gelCaf = gel ? (gel.caf || 0) : 0, gelK = gel ? (gel.k || 0) : 0, gelMg = gel ? (gel.mg || 0) : 0, gelKcal = gel ? (gel.kcal || 0) : 0;
-    var tabVol = tab ? (tab.vol || 500) : 500;
-    var tabNa = tab ? (tab.na || 0) : 0, tabCaf = tab ? (tab.caf || 0) : 0, tabCarb = tab ? (tab.carb || 0) : 0, tabK = tab ? (tab.k || 0) : 0, tabMg = tab ? (tab.mg || 0) : 0, tabKcal = tab ? (tab.kcal || 0) : 0;
+    function v(p, k) { return p ? (p[k] || 0) : 0; }
     var capL = st.flaskN * st.flaskMl / 1000;
-    var rows = [], prevDep = 0;
-    var tot = { gels: 0, tabs: 0, salts: 0, pCarb: 0, pNa: 0, pK: 0, pMg: 0, pCaf: 0, pKcal: 0, fCarb: 0, fNa: 0, fK: 0, fMg: 0, fCaf: 0, fKcal: 0 };
-    r.cp.forEach(function (c, i) {
-      var dur = (c.arr - prevDep) / 60, needL = dur * tg.fluid / 1000;
-      var fs = i > 0 ? mealAt(i - 1) : { carb: 0, na: 0 };   // önceki noktada yenenler bu bölümün yakıtına sayılır
-      var gels = (gel && gelCarb > 0) ? clamp(Math.round((dur * tg.carb - fs.carb) / gelCarb), 0, Math.max(1, Math.round(dur * st.maxGels))) : 0;
-      var tabs = 0, salts = 0;
-      if (tab && tg.na != null && tabNa > 0) tabs = clamp(Math.round((dur * tg.na - gels * gelNa - fs.na) / tabNa), 0, Math.max(1, Math.round(needL / (tabVol / 1000))));
-      if (salt && tg.na != null && saltNa > 0) salts = clamp(Math.round((dur * tg.na - gels * gelNa - tabs * tabNa - fs.na) / saltNa), 0, Math.round(dur * 2));
-      rows.push({ name: cps[i].name, hours: dur, needL: needL, extraMl: Math.max(0, Math.round((needL - capL) * 1000 / 50) * 50), gels: gels, tabs: tabs, salts: salts });
-      prevDep = c.dep;
+    // bölümlerin hareket süreleri (dakika) ve kümülatif saat
+    var secs = [], prevDep = 0, cum = 0;
+    r.cp.forEach(function (c, i) { var dur = (c.arr - prevDep); secs.push({ i: i, t0: cum, t1: cum + dur, dur: dur / 60 }); cum += dur; prevDep = c.dep; });
+    var movH = cum / 60 || hours;
+    // yiyecekler (saatlik ortalama, seçim için)
+    var food = { carb: 0, na: 0, k: 0, mg: 0, kcal: 0, caf: 0 };
+    for (var q = 0; q < NSTOP; q++) { var m = mealAt(q); food.carb += m.carb; food.na += m.na; food.k += m.k; food.mg += m.mg; food.kcal += m.kcal; food.caf += m.caf; }
+    // su takvimi
+    var flaskMin = round5(st.flaskMl / tg.fluid * 60), flasksH = 60 / flaskMin;
+    var doses = tab ? DOSES : [0], salts = (salt && v(salt, 'na') > 0) ? SALT_STEPS : [null];
+    var gels = (gel && v(gel, 'carb') > 0) ? GEL_STEPS.filter(function (T) { return 60 / T <= st.maxGels + 1e-9; }) : [null];
+    if (gel && v(gel, 'carb') > 0 && !gels.length) gels = [GEL_STEPS[GEL_STEPS.length - 1]];
+    function perH(p, T) { if (!p || !T) return 0; var x = 60 / T; return p.maxPerDay ? Math.min(x, p.maxPerDay / movH) : x; }
+    var best = null;
+    doses.forEach(function (d) { salts.forEach(function (sT) { gels.forEach(function (gT) {
+      var g = perH(gel, gT), sl = perH(salt, sT), td = flasksH * d;
+      var carbH = food.carb / movH + g * v(gel, 'carb') + td * v(tab, 'carb') + sl * v(salt, 'carb');
+      var naH = food.na / movH + g * v(gel, 'na') + td * v(tab, 'na') + sl * v(salt, 'na');
+      var err = Math.abs(carbH - tg.carb) / tg.carb;
+      if (tg.na != null && tg.na > 0) err += Math.abs(naH - tg.na) / tg.na;
+      else if (sT || d) err += 0.5;               // sağlık işareti: sodyum ekleme
+      err += 0.002 * (sT ? 60 / sT : 0);           // eşitlikte daha az hap
+      if (!best || err < best.err - 1e-9) best = { err: err, d: d, sT: sT, gT: gT };
+    }); }); });
+    var sched = { flaskMin: flaskMin, dose: best.d, gelMin: best.gT, saltMin: best.sT, fluidEff: st.flaskMl * 60 / flaskMin };
+    // bölüm sayıları takvimden
+    var rows = secs.map(function (sc) {
+      var needL = sc.dur * tg.fluid / 1000, flasks = needL * 1000 / st.flaskMl;
+      return { name: cps[sc.i].name, hours: sc.dur, needL: needL, extraMl: Math.max(0, Math.round((needL - capL) * 1000 / 50) * 50),
+        flasks: flasks, gels: events(best.gT, sc.t0, sc.t1), tabs: tab ? Math.round(flasks * best.d) : 0, salts: events(best.sT, sc.t0, sc.t1) };
     });
-    // Üretici günlük sınırı (ör. kafeinli jel günde 2, Sodium Plus günde 1): toplam bu sayıyı aşamaz; fazlası son bölümlerden düşülür.
     var limited = [];
     function capTotal(field, p) {
       if (!p || !p.maxPerDay) return;
-      var total = rows.reduce(function (a, r) { return a + r[field]; }, 0);
+      var total = rows.reduce(function (a, x) { return a + x[field]; }, 0);
       if (total <= p.maxPerDay) return;
       for (var j = rows.length - 1; j >= 0 && total > p.maxPerDay; j--) { var cut = Math.min(rows[j][field], total - p.maxPerDay); rows[j][field] -= cut; total -= cut; }
       limited.push({ p: p, max: p.maxPerDay });
     }
     capTotal('gels', gel); capTotal('tabs', tab); capTotal('salts', salt);
-    rows.forEach(function (r) {
-      tot.gels += r.gels; tot.tabs += r.tabs; tot.salts += r.salts;
-      tot.pCarb += r.gels * gelCarb + r.tabs * tabCarb; tot.pNa += r.gels * gelNa + r.tabs * tabNa + r.salts * saltNa; tot.pK += r.gels * gelK + r.tabs * tabK + r.salts * saltK; tot.pMg += r.gels * gelMg + r.tabs * tabMg + r.salts * saltMg;
-      tot.pCaf += r.gels * gelCaf + r.tabs * tabCaf; tot.pKcal += r.gels * gelKcal + r.tabs * tabKcal;
+    var tot = { gels: 0, tabs: 0, salts: 0, pCarb: 0, pNa: 0, pK: 0, pMg: 0, pCaf: 0, pKcal: 0, fCarb: food.carb, fNa: food.na, fK: food.k, fMg: food.mg, fCaf: food.caf, fKcal: food.kcal };
+    rows.forEach(function (x) {
+      tot.gels += x.gels; tot.tabs += x.tabs; tot.salts += x.salts;
+      ['carb', 'na', 'k', 'mg', 'caf', 'kcal'].forEach(function (k) {
+        var key2 = 'p' + k.charAt(0).toUpperCase() + k.slice(1);
+        tot[key2] += x.gels * v(gel, k) + x.tabs * v(tab, k) + x.salts * v(salt, k);
+      });
     });
-    for (var i = 0; i < NSTOP; i++) { var m = mealAt(i); tot.fCarb += m.carb; tot.fNa += m.na; tot.fK += m.k; tot.fMg += m.mg; tot.fKcal += m.kcal; tot.fCaf += m.caf; }
-    // Saatlik ortalamalar HAREKET süresine göre (yakıt hesabı bölüm hareket sürelerinden yapılıyor; durmalar dahil edilirse ortalama yapay olarak düşer).
-    var movH = rows.reduce(function (a, r) { return a + r.hours; }, 0) || hours;
-    var carbH = (tot.pCarb + tot.fCarb) / movH, naH = (tot.pNa + tot.fNa) / movH;
-    var cafTotal = tot.pCaf + tot.fCaf;
+    var carbH = (tot.pCarb + tot.fCarb) / movH, naH = (tot.pNa + tot.fNa) / movH, cafTotal = tot.pCaf + tot.fCaf;
     var cafUnknown = !!((gel && gel.cafUnknown) || (tab && tab.cafUnknown) || (salt && salt.cafUnknown));
-    return { limited: limited, cafUnknown: cafUnknown, valid: true, tg: tg, hours: hours, movH: movH, gel: gel, tab: tab, salt: salt, tabVol: tabVol, rows: rows, capL: capL, tot: tot, finish: r.finish,
+    return { sched: sched, limited: limited, cafUnknown: cafUnknown, valid: true, tg: tg, hours: hours, movH: movH, gel: gel, tab: tab, salt: salt, tabVol: tab ? (tab.vol || 500) : 500, rows: rows, capL: capL, tot: tot, finish: r.finish,
       gelsH: tot.gels / movH, tabsH: tot.tabs / movH, saltsH: tot.salts / movH, carbH: carbH, naH: tg.na == null ? null : naH, cafTotal: cafTotal, cafOver: cafTotal > tg.cafCap + 1 };
   }
   function mealList(ci) {
@@ -143,8 +165,8 @@
     if (!e.valid) return null;
     function nm(p) { return p ? (p.brand ? p.brand + ' ' : '') + p.name : ''; }
     var meals = []; for (var i = 0; i < NSTOP; i++) meals.push(mealList(i));
-    return { gel: nm(e.gel), tab: nm(e.tab), salt: nm(e.salt), tabVol: e.tabVol, fluid: e.tg.fluid, capL: e.capL,
-      rows: e.rows.map(function (r) { return { name: r.name, hours: r.hours, needL: r.needL, extraMl: r.extraMl, gels: r.gels, tabs: r.tabs, salts: r.salts }; }), meals: meals };
+    return { sched: e.sched, flaskMl: st.flaskMl, gel: nm(e.gel), tab: nm(e.tab), salt: nm(e.salt), tabVol: e.tabVol, fluid: e.tg.fluid, capL: e.capL,
+      rows: e.rows.map(function (r) { return { name: r.name, hours: r.hours, needL: r.needL, flasks: r.flasks, extraMl: r.extraMl, gels: r.gels, tabs: r.tabs, salts: r.salts }; }), meals: meals };
   }
 
   // Hesabın tüm girdilerini ve ara değerlerini döker; sonuçları elle doğrulamak için.
@@ -468,7 +490,7 @@
     var c = card(elRes, 'Saatlik hedefler');
     var dl = h('dl', 'sumlist');
     function row(a, b) { dl.appendChild(h('dt', '', esc(a))); dl.appendChild(h('dd', '', esc(b))); }
-    row('Sıvı', tg.fluid + ' mL/saat');
+    row('Sıvı', tg.fluid + ' mL/saat (her ' + st.flaskMl + ' mL flask yaklaşık ' + round5(st.flaskMl / tg.fluid * 60) + ' dk)');
     row('Sodyum (tüm kaynaklardan)', tg.na == null ? 'Hedef yok (sağlık durumu)' : tg.na + ' mg/saat');
     row('Karbonhidrat', tg.carb + ' g/saat');
     row('Kafein (yarış toplamı üst sınırı)', tg.cafCap + ' mg');
@@ -479,18 +501,22 @@
     if (!e.valid) { var w = card(elRes, ''); w.appendChild(h('p', 'warnbox', 'Seçili planda durma süreleri hedef süreden uzun. Plan sekmesinde düzelt.')); return; }
     if (!e.gel && !e.tab && !e.salt) { var n = card(elRes, ''); n.appendChild(h('p', 'note', 'Plan için bir jel veya tablet seç ya da "karmayı öner"e dokun.')); }
 
-    var pc = card(elRes, 'Saat başına plan (' + scKey() + ', ' + hm(e.finish) + ')');
-    pc.appendChild(h('p', 'note', 'Saat başına değerler hareket süresine göre (' + hm(e.movH * 60) + '); noktalardaki durmalar hariç.'));
-    var items = '';
-    if (e.gel) items += '<div class="rline"><b>' + num(e.gelsH, 1) + '</b> jel/saat (' + esc((e.gel.brand ? e.gel.brand + ' ' : '') + e.gel.name) + ')</div>';
-    if (e.tab) items += '<div class="rline"><b>' + num(e.tabsH, 1) + '</b> tablet/saat (her biri ' + e.tabVol + ' mL suda)</div>';
-    if (e.salt) items += '<div class="rline"><b>' + num(e.saltsH, 1) + '</b> tuz tableti/saat (' + esc((e.salt.brand ? e.salt.brand + ' ' : '') + e.salt.name) + ')</div>';
-    items += '<div class="rline"><b>' + tg.fluid + '</b> mL sıvı/saat</div>';
+    var pc = card(elRes, 'Uygulama planı (' + scKey() + ', ' + hm(e.finish) + ')');
+    var sd = e.sched, items = '';
+    function dk(m) { return m >= 60 && m % 60 === 0 ? (m / 60) + ' saatte' : m + ' dakikada'; }
+    function nm(p) { return esc((p.brand ? p.brand + ' ' : '') + p.name); }
+    var bothMin = sd.flaskMin * st.flaskN;
+    items += '<div class="rline"><b>Su:</b> her flask (' + st.flaskMl + ' mL) yaklaşık <b>' + sd.flaskMin + ' dakikada</b> bitsin' + (st.flaskN > 1 ? '; ' + st.flaskN + ' flask yaklaşık ' + hm(bothMin) + ' saatte' : '') + '</div>';
+    if (e.tab) items += '<div class="rline"><b>Elektrolit:</b> ' + (sd.dose === 1 ? '<b>her flaska 1</b>' : sd.dose === 0.5 ? '<b>iki flasktan birine 1</b>' : '<b>kullanma</b> (hedef başka ürünlerle tutuyor)') + ' (' + nm(e.tab) + (e.tab.vol && e.tab.vol !== st.flaskMl ? '; üretici ' + e.tab.vol + ' mL öneriyor' : '') + ')</div>';
+    if (e.gel) items += '<div class="rline"><b>Jel:</b> ' + (sd.gelMin ? '<b>her ' + dk(sd.gelMin) + ' 1</b>' : 'yok') + ' (' + nm(e.gel) + ')</div>';
+    if (e.salt) items += '<div class="rline"><b>Tuz tableti:</b> ' + (e.salt.maxPerDay && e.tot.salts <= e.salt.maxPerDay ? '<b>yarışta toplam ' + e.tot.salts + '</b> (üretici sınırı)' : '<b>her ' + dk(sd.saltMin) + ' 1</b>') + ' (' + nm(e.salt) + ')</div>';
     pc.appendChild(h('div', '', items));
+    pc.appendChild(h('p', 'note', 'Süreler yarışın hareket süresine göre (' + hm(e.movH * 60) + '; noktalardaki duraklamalar hariç). Seçtiğin her ürün planda kullanılır; miktarlar hedefe en yakın uygulanabilir takvime göre seçilir. Saatin tekrarlayan zaman uyarısını jel aralığına kur' + (sd.saltMin && sd.gelMin && sd.saltMin !== sd.gelMin ? '; tuz tableti için ikinci bir uyarı kullan' : '') + '.'));
     var dl2 = h('dl', 'sumlist');
     function row2(a, b, cls) { dl2.appendChild(h('dt', '', esc(a))); dl2.appendChild(h('dd', cls || '', esc(b))); }
-    row2('Karbonhidrat', num(e.carbH) + ' g/saat (hedef ' + tg.carb + ')', Math.abs(e.carbH - tg.carb) <= 8 ? 'ok' : 'warn');
-    if (tg.na != null) row2('Sodyum', num(e.naH) + ' mg/saat (hedef ' + tg.na + ')', Math.abs(e.naH - tg.na) <= 75 ? 'ok' : 'warn');
+    row2('Bu takvimle karbonhidrat', num(e.carbH) + ' g/saat (hedef ' + tg.carb + ')', Math.abs(e.carbH - tg.carb) <= 8 ? 'ok' : 'warn');
+    if (tg.na != null) row2('Bu takvimle sodyum', num(e.naH) + ' mg/saat (hedef ' + tg.na + ')', Math.abs(e.naH - tg.na) <= 75 ? 'ok' : 'warn');
+    row2('Bu takvimle sıvı', Math.round(sd.fluidEff) + ' mL/saat (hedef ' + tg.fluid + ')', 'ok');
     row2('Kafein toplamı', num(e.cafTotal) + ' mg (sınır ' + tg.cafCap + ')', e.cafOver ? 'bad' : 'ok');
     pc.appendChild(dl2);
     e.limited.forEach(function (l) { pc.appendChild(h('p', 'warnbox', esc((l.p.brand ? l.p.brand + ' ' : '') + l.p.name) + ': üretici günde en fazla ' + l.max + ' adet öneriyor, planda ' + l.max + ' adetle sınırlandı. Hedefe ulaşmak için başka bir ürün ekle.')); });
@@ -498,13 +524,12 @@
     if (e.cafOver) pc.appendChild(h('p', 'warnbox', 'Kafein toplamı sınırını aşıyor. Kafeinsiz bir tablet veya jel seç, kolayı azalt ya da kafein sınırını bilerek yükselt.'));
     if (tg.na != null && e.naH - tg.na < -75) pc.appendChild(h('p', 'note', 'Sodyum hedefin altında kaldı. Daha çok sodyumlu bir tablet, tuz kapsülü veya noktalarda tuzlu yiyecekler (çorba, peynir, tuz) bu açığı kapatabilir.'));
     if (tg.na != null && e.naH - tg.na > 150) pc.appendChild(h('p', 'note', 'Sodyum hedefin üstüne çıktı; miktarı azaltmayı düşün.'));
-    pc.appendChild(h('p', 'note', 'Garmin\'de 30 dakikada bir tekrarlayan zaman uyarısı kur: her uyarıda yaklaşık ' + num(e.gelsH / 2, 1) + ' jel ve ' + Math.round(tg.fluid / 2) + ' mL sıvı.'));
 
     var sc = card(elRes, 'Bölüm bölüm taşı');
     var rows = '';
     e.rows.forEach(function (r) {
       var ex = r.extraMl > 0;
-      rows += '<tr><td><b>' + esc(r.name) + '</b><div class="sub2">' + num(r.hours, 1) + ' saat</div></td><td class="r"><b>' + num(r.needL, 2) + ' L</b><div class="sub2 ' + (ex ? 'bad' : 'ok') + '">' + (ex ? '+' + r.extraMl + ' mL eksik' : 'yeter') + '</div></td><td class="r">' + (e.gel ? r.gels + ' jel' : '') + (e.tab ? '<div class="sub2">' + r.tabs + ' tablet</div>' : '') + (e.salt ? '<div class="sub2">' + r.salts + ' tuz tableti</div>' : '') + '</td></tr>';
+      rows += '<tr><td><b>' + esc(r.name) + '</b><div class="sub2">' + num(r.hours, 1) + ' saat</div></td><td class="r"><b>' + num(r.needL, 2) + ' L</b><div class="sub2">' + num(r.flasks, 1) + ' flask</div><div class="sub2 ' + (ex ? 'bad' : 'ok') + '">' + (ex ? '+' + r.extraMl + ' mL eksik' : 'yeter') + '</div></td><td class="r">' + (e.gel ? r.gels + ' jel' : '') + (e.tab ? '<div class="sub2">' + r.tabs + ' tablet</div>' : '') + (e.salt ? '<div class="sub2">' + r.salts + ' tuz tableti</div>' : '') + '</td></tr>';
     });
     sc.appendChild(h('div', 'tablewrap', '<table class="plantable"><thead><tr><th>Bölüm sonu</th><th class="r">Sıvı</th><th class="r">Taşı</th></tr></thead><tbody>' + rows + '</tbody></table>'));
     var short = e.rows.filter(function (r) { return r.extraMl > 0; });
@@ -521,6 +546,6 @@
   }
 
   function onTab(name) { if (name === 'nutrition') render(); }
-  K.nutrition = { catMatch: catMatch, saltToNa: saltToNa, parseWeather: parseWeather, E_STD: E_STD, targetsFrom: targetsFrom, raceSnapshot: raceSnapshot, mealList: mealList, render: render, onTab: onTab, evaluate: evaluate, targets: targets, breakdown: breakdown, state: function () { return st; }, autoPick: autoPick, mealAt: mealAt };
+  K.nutrition = { GEL_STEPS: GEL_STEPS, SALT_STEPS: SALT_STEPS, catMatch: catMatch, saltToNa: saltToNa, parseWeather: parseWeather, E_STD: E_STD, targetsFrom: targetsFrom, raceSnapshot: raceSnapshot, mealList: mealList, render: render, onTab: onTab, evaluate: evaluate, targets: targets, breakdown: breakdown, state: function () { return st; }, autoPick: autoPick, mealAt: mealAt };
   if (!$('tab-nutrition').hidden) render();
 })();

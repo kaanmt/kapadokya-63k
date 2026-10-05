@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  var BUILD = '0.12.1';
+  var BUILD = '0.14-test-1';
   var C = window.COURSE;
   var N = C.n, STEP = C.step, TOTAL = C.total, K = C.k;
   var ele = C.ele;
@@ -238,7 +238,7 @@
   if (standalone) setSt('tStand', 'Evet', 'ok'); else setSt('tStand', 'Hayır, tarayıcıda açık. Ana ekrana ekleyip oradan aç.', 'warn');
 
   // service worker + cache
-  var EXPECTED = 16;
+  var EXPECTED = 17;
   function checkCache(tries) {
     if (!('caches' in window)) { setSt('tCache', 'Bu tarayıcıda desteklenmiyor', 'bad'); return; }
     caches.keys().then(function (keys) {

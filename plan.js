@@ -16,7 +16,7 @@
     K.store('k63tab', name);
     window.scrollTo(0, 0);
     if (name === 'profile') K.drawChart();
-    if (name === 'plan') renderAll();
+    if (name === 'plan') { renderAll(); if (K.calib) K.calib.render(); }
     if (K.race) K.race.onTab(name);
     if (K.nutrition) K.nutrition.onTab(name);
   }
@@ -219,13 +219,14 @@
 
   /* ---------- build plan tab ---------- */
   var root = $('tab-plan');
-  var elSeg, elEditor, elSummary, elResults, elCompare, elWhat, elAid, elGarmin, elAdv;
+  var elCalib, elSeg, elEditor, elSummary, elResults, elCompare, elWhat, elAid, elGarmin, elAdv;
   (function build() {
     root.appendChild(h('h2', 'tabtitle', 'Plan'));
     root.appendChild(h('p', 'note', 'Bu bir tahmin değil. Uygulama, girdiğin hedefi veya temponu parkura dağıtır. Gerçek süreler hava, yorgunluk ve mide durumuna göre farklı olur. Başlangıç değerleri örnektir, kendi değerlerinle değiştir.'));
     elSeg = h('div', 'seg'); root.appendChild(elSeg);
     root.appendChild(h('p', 'settingsline'));
     elEditor = h('section', 'card'); root.appendChild(elEditor);
+    elCalib = h('section', 'card calib'); root.appendChild(elCalib);
     elSummary = h('section', 'card'); root.appendChild(elSummary);
     elResults = h('section', 'card'); root.appendChild(elResults);
     elCompare = h('section', 'card'); root.appendChild(elCompare);
@@ -532,7 +533,13 @@
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (!$('tab-plan').hidden) renderCompare(); }, 150); });
 
   window.K63.showTab = showTab;
-  window.K63.plan = { compute: compute, buildSectors: buildSectors, state: function () { return st; }, steep: steep, cps: cps, defaults: clone(DEF), settingsInfo: settingsInfo };
+  // Kalibrasyon: bir senaryoyu düz tempo moduna alıp başlangıç temposunu ayarlar
+  function applyPace(key, p0) {
+    var s = st.sc[key]; if (!s) return;
+    s.mode = 'pace'; s.p0 = clamp(Math.round(p0), 180, 720); save(); renderAll();
+  }
+  window.K63.plan = { compute: compute, buildSectors: buildSectors, state: function () { return st; }, steep: steep, cps: cps, defaults: clone(DEF), settingsInfo: settingsInfo,
+    applyPace: applyPace, calibEl: function () { return elCalib; } };
   var last = K.store('k63tab');
   showTab(tabs.indexOf(last) >= 0 ? last : 'profile');
 })();
