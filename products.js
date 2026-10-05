@@ -26,7 +26,7 @@ window.PRODUCTS = [
     src: [{ vendor: 'bigjoy.com.tr (satış sayfası; tuz değeri hatalı)', url: 'https://www.bigjoy.com.tr/onthego-progel-24x60', values: false }, ev('https://enduranlar.com/en/products/onthego-progel-orange-box-24-pieces'), ev('https://www.decathlon.com.tr/p/on-the-go-progel-enerji-jeli-elma/_/R-p-X8762613', D)], checked: '2026-10-02', conf: 'Ambalaj etiketiyle doğrulandı (kullanıcı); BigJoy sayfasındaki 0,03 g hatalı' },
   { id: 'onthego-progel-mocha-150', brand: 'On The Go', name: 'Kafeinli Progel, Caffe Mocha', type: 'gel', unit: 'saşe', size: '60 mL',
     kcal: 96, carb: 24, na: 24, k: null, mg: null, caf: 150, vol: null, naNote: 'Etikette TUZ 0,06 g; sodyum = 0,06 g / 2,5 = 24 mg (hesaplandı). Progel jellerindeki ondalık hatası görüldüğü için bu değerin ambalajdan kontrol edilmesi iyi olur (henüz doğrulanmadı)',
-    note: 'Kafein 150 mg. Üretici günde en fazla 2 jel öneriyor (planda en fazla 2 adet kullanılır).', maxPerDay: 2, src: [ev('https://enduranlar.com/products/onthego-kafeinli-progel-caffe-mocha-aromali'), ev('https://www.decathlon.com.tr/p/on-the-go-progel-coffee-mocha/_/R-p-X8762614', D)], checked: '2026-10-02', conf: 'İki satıcı sayfası aynı (tuzdan hesaplandı)' },
+    note: 'Kafein 150 mg. Üretici günde en fazla 2 jel öneriyor (bilgi; planda sınırlanmaz, kafein toplamı kullanıcı sınırına göre kontrol edilir).', src: [ev('https://enduranlar.com/products/onthego-kafeinli-progel-caffe-mocha-aromali'), ev('https://www.decathlon.com.tr/p/on-the-go-progel-coffee-mocha/_/R-p-X8762614', D)], checked: '2026-10-02', conf: 'İki satıcı sayfası aynı (tuzdan hesaplandı)' },
   { id: 'sis-go-energy-caf-150', brand: 'SiS', name: 'GO Energy + Kafein Jeli, Espresso', type: 'gel', unit: 'saşe', size: '60 mL',
     kcal: 87, carb: 22, na: 16, k: null, mg: null, caf: 150, vol: null, naNote: 'Etikette TUZ 0,04 g; sodyum = 0,04 g / 2,5 = 16 mg (hesaplandı)',
     note: 'Kafein 150 mg; B6, folik asit, B12 içerir.', src: [ev('https://enduranlar.com/en/products/sis-go-energy-caffeine-energy-gel-espresso-flavored')], checked: '2026-10-01', conf: 'Satıcı sayfası (tuzdan hesaplandı)' },
@@ -93,8 +93,8 @@ window.PRODUCTS = [
     kcal: null, carb: 0, na: 100, k: 50, mg: 60, caf: 0, vol: null, naNote: 'Ürün açıklamasında tablet başına sodyum 100 mg',
     note: 'C vitamini 40 mg, D3 10 µg. Tatlandırıcı ve aroma içermez; suyla yutulur.', src: [ev('https://enduranlar.com/en/products/wup-electrolyte-boost-salt-tablet')], checked: '2026-10-01', conf: 'Satıcı sayfası (ürün açıklaması)' },
   { id: 'bigjoy-sodium-plus', brand: 'On The Go (BigJoy)', name: 'Sodium Plus Kapsül', type: 'salt', unit: 'kapsül', size: '1 kapsül',
-    kcal: null, carb: 0, na: 200, k: 30, mg: 30, caf: 0, vol: null, naNote: 'Üretici: kapsül başına sodyum 200 mg', maxPerDay: 1,
-    note: 'Kalsiyum 30 mg. ÜRETİCİ GÜNDE 1 KAPSÜL ÖNERİYOR: planda en fazla 1 adet kullanılır.', src: [{ vendor: 'bigjoy.com.tr (üretici)', url: 'https://www.bigjoy.com.tr/sodium-plus', values: true }], checked: '2026-10-02', conf: 'Üretici sayfası' }
+    kcal: null, carb: 0, na: 200, k: 30, mg: 30, caf: 0, vol: null, naNote: 'Üretici: kapsül başına sodyum 200 mg',
+    note: 'Kalsiyum 30 mg. Üretici günde 1 kapsül öneriyor (bilgi; planda sınırlanmaz).', src: [{ vendor: 'bigjoy.com.tr (üretici)', url: 'https://www.bigjoy.com.tr/sodium-plus', values: true }], checked: '2026-10-02', conf: 'Üretici sayfası' }
 ];
 })();
 

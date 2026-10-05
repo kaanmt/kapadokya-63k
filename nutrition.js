@@ -113,7 +113,7 @@
     var doses = tab ? DOSES : [0], salts = (salt && v(salt, 'na') > 0) ? SALT_STEPS : [null];
     var gels = (gel && v(gel, 'carb') > 0) ? GEL_STEPS.filter(function (T) { return 60 / T <= st.maxGels + 1e-9; }) : [null];
     if (gel && v(gel, 'carb') > 0 && !gels.length) gels = [GEL_STEPS[GEL_STEPS.length - 1]];
-    function perH(p, T) { if (!p || !T) return 0; var x = 60 / T; return p.maxPerDay ? Math.min(x, p.maxPerDay / movH) : x; }
+    function perH(p, T) { return (p && T) ? 60 / T : 0; }
     var best = null;
     doses.forEach(function (d) { salts.forEach(function (sT) { gels.forEach(function (gT) {
       var g = perH(gel, gT), sl = perH(salt, sT), td = flasksH * d;
@@ -132,15 +132,6 @@
       return { name: cps[sc.i].name, hours: sc.dur, needL: needL, extraMl: Math.max(0, Math.round((needL - capL) * 1000 / 50) * 50),
         flasks: flasks, gels: events(best.gT, sc.t0, sc.t1), tabs: tab ? Math.round(flasks * best.d) : 0, salts: events(best.sT, sc.t0, sc.t1) };
     });
-    var limited = [];
-    function capTotal(field, p) {
-      if (!p || !p.maxPerDay) return;
-      var total = rows.reduce(function (a, x) { return a + x[field]; }, 0);
-      if (total <= p.maxPerDay) return;
-      for (var j = rows.length - 1; j >= 0 && total > p.maxPerDay; j--) { var cut = Math.min(rows[j][field], total - p.maxPerDay); rows[j][field] -= cut; total -= cut; }
-      limited.push({ p: p, max: p.maxPerDay });
-    }
-    capTotal('gels', gel); capTotal('tabs', tab); capTotal('salts', salt);
     var tot = { gels: 0, tabs: 0, salts: 0, pCarb: 0, pNa: 0, pK: 0, pMg: 0, pCaf: 0, pKcal: 0, fCarb: food.carb, fNa: food.na, fK: food.k, fMg: food.mg, fCaf: food.caf, fKcal: food.kcal };
     rows.forEach(function (x) {
       tot.gels += x.gels; tot.tabs += x.tabs; tot.salts += x.salts;
@@ -151,7 +142,7 @@
     });
     var carbH = (tot.pCarb + tot.fCarb) / movH, naH = (tot.pNa + tot.fNa) / movH, cafTotal = tot.pCaf + tot.fCaf;
     var cafUnknown = !!((gel && gel.cafUnknown) || (tab && tab.cafUnknown) || (salt && salt.cafUnknown));
-    return { sched: sched, limited: limited, cafUnknown: cafUnknown, valid: true, tg: tg, hours: hours, movH: movH, gel: gel, tab: tab, salt: salt, tabVol: tab ? (tab.vol || 500) : 500, rows: rows, capL: capL, tot: tot, finish: r.finish,
+    return { sched: sched, cafUnknown: cafUnknown, valid: true, tg: tg, hours: hours, movH: movH, gel: gel, tab: tab, salt: salt, tabVol: tab ? (tab.vol || 500) : 500, rows: rows, capL: capL, tot: tot, finish: r.finish,
       gelsH: tot.gels / movH, tabsH: tot.tabs / movH, saltsH: tot.salts / movH, carbH: carbH, naH: tg.na == null ? null : naH, cafTotal: cafTotal, cafOver: cafTotal > tg.cafCap + 1 };
   }
   function mealList(ci) {
@@ -241,6 +232,7 @@
       })
       .catch(function (e) {
         btn.disabled = false;
+        msgEl.className = 'note bad';
         msgEl.textContent = 'Tahmin alınamadı (' + (e && e.message ? e.message : 'hata') + '). İnternet bağlantısını kontrol et. Tahmin en fazla 16 gün önceden verilir; yarış günü aralığa girince tekrar dene. Sıcaklık değişmedi.';
       });
   }
@@ -363,7 +355,7 @@
     if (p.kcal != null) parts.push(num(p.kcal) + ' kcal');
     var d = h('div', 'pinfo');
     d.innerHTML = '<div class="pvals">' + esc(parts.join(', ')) + ' (1 ' + esc(p.unit || 'porsiyon') + (p.vol ? ', ' + p.vol + ' mL suda' : '') + ')</div>' +
-      (p.maxPerDay ? '<div class="sub2 flag">Üretici günde en fazla ' + p.maxPerDay + ' adet öneriyor.</div>' : '') + (p.naNote ? '<div class="sub2' + (p.naUnknown ? ' flag' : '') + '">' + esc(p.naNote) + (p.naUnknown ? ' Bu ürün otomatik öneriye girmez.' : '') + '</div>' : '') + (p.note ? '<div class="sub2">' + esc(p.note) + '</div>' : '');
+      (p.naNote ? '<div class="sub2' + (p.naUnknown ? ' flag' : '') + '">' + esc(p.naNote) + (p.naUnknown ? ' Bu ürün otomatik öneriye girmez.' : '') + '</div>' : '') + (p.note ? '<div class="sub2">' + esc(p.note) + '</div>' : '');
     if (p.src && p.src.length) {
       var links = p.src.map(function (s) { return '<a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.vendor) + '</a>'; }).join(', ');
       d.innerHTML += '<div class="sub2">Kaynak: ' + links + '. Kontrol: ' + esc(p.checked || '') + ', ' + esc(p.conf || '') + '. Etiketten kontrol et.</div>';
@@ -390,7 +382,7 @@
     add.addEventListener('click', function () {
       function v(id) { var t = ($(id).value || '').replace(',', '.').trim(); var n = parseFloat(t); return isNaN(n) ? null : n; }
       var name = ($('cuName').value || '').trim();
-      if (!name) { msg.textContent = 'Önce ürün adını yaz.'; return; }
+      if (!name) { msg.textContent = 'Önce ürün adını yaz.'; msg.className = 'note bad'; return; }
       var type = $('cuType').value, na = v('cuNa'); if (na !== null && $('cuNaU').value === 'salt') na = saltToNa(na);
       var p = { id: 'c' + Date.now(), custom: true, brand: '', name: name, type: type, unit: type === 'gel' ? 'saşe' : 'tablet',
         carb: v('cuCarb') || 0, na: na || 0, k: v('cuK'), mg: v('cuMg'), caf: v('cuCaf') || 0, vol: (type === 'gel' || type === 'salt') ? null : (v('cuVol') || 500), kcal: null };
@@ -509,7 +501,7 @@
     items += '<div class="rline"><b>Su:</b> her flask (' + st.flaskMl + ' mL) yaklaşık <b>' + sd.flaskMin + ' dakikada</b> bitsin' + (st.flaskN > 1 ? '; ' + st.flaskN + ' flask yaklaşık ' + hm(bothMin) + ' saatte' : '') + '</div>';
     if (e.tab) items += '<div class="rline"><b>Elektrolit:</b> ' + (sd.dose === 1 ? '<b>her flaska 1</b>' : sd.dose === 0.5 ? '<b>iki flasktan birine 1</b>' : '<b>kullanma</b> (hedef başka ürünlerle tutuyor)') + ' (' + nm(e.tab) + (e.tab.vol && e.tab.vol !== st.flaskMl ? '; üretici ' + e.tab.vol + ' mL öneriyor' : '') + ')</div>';
     if (e.gel) items += '<div class="rline"><b>Jel:</b> ' + (sd.gelMin ? '<b>her ' + dk(sd.gelMin) + ' 1</b>' : 'yok') + ' (' + nm(e.gel) + ')</div>';
-    if (e.salt) items += '<div class="rline"><b>Tuz tableti:</b> ' + (e.salt.maxPerDay && e.tot.salts <= e.salt.maxPerDay ? '<b>yarışta toplam ' + e.tot.salts + '</b> (üretici sınırı)' : '<b>her ' + dk(sd.saltMin) + ' 1</b>') + ' (' + nm(e.salt) + ')</div>';
+    if (e.salt) items += '<div class="rline"><b>Tuz tableti:</b> <b>her ' + dk(sd.saltMin) + ' 1</b> (' + nm(e.salt) + ')</div>';
     pc.appendChild(h('div', '', items));
     pc.appendChild(h('p', 'note', 'Süreler yarışın hareket süresine göre (' + hm(e.movH * 60) + '; noktalardaki duraklamalar hariç). Seçtiğin her ürün planda kullanılır; miktarlar hedefe en yakın uygulanabilir takvime göre seçilir. Saatin tekrarlayan zaman uyarısını jel aralığına kur' + (sd.saltMin && sd.gelMin && sd.saltMin !== sd.gelMin ? '; tuz tableti için ikinci bir uyarı kullan' : '') + '.'));
     var dl2 = h('dl', 'sumlist');
@@ -519,7 +511,6 @@
     row2('Bu takvimle sıvı', Math.round(sd.fluidEff) + ' mL/saat (hedef ' + tg.fluid + ')', 'ok');
     row2('Kafein toplamı', num(e.cafTotal) + ' mg (sınır ' + tg.cafCap + ')', e.cafOver ? 'bad' : 'ok');
     pc.appendChild(dl2);
-    e.limited.forEach(function (l) { pc.appendChild(h('p', 'warnbox', esc((l.p.brand ? l.p.brand + ' ' : '') + l.p.name) + ': üretici günde en fazla ' + l.max + ' adet öneriyor, planda ' + l.max + ' adetle sınırlandı. Hedefe ulaşmak için başka bir ürün ekle.')); });
     if (e.cafUnknown) pc.appendChild(h('p', 'warnbox', 'Seçili ürünlerden birinin kafein miktarı bilinmiyor; kafein toplamı eksik gösterilebilir.'));
     if (e.cafOver) pc.appendChild(h('p', 'warnbox', 'Kafein toplamı sınırını aşıyor. Kafeinsiz bir tablet veya jel seç, kolayı azalt ya da kafein sınırını bilerek yükselt.'));
     if (tg.na != null && e.naH - tg.na < -75) pc.appendChild(h('p', 'note', 'Sodyum hedefin altında kaldı. Daha çok sodyumlu bir tablet, tuz kapsülü veya noktalarda tuzlu yiyecekler (çorba, peynir, tuz) bu açığı kapatabilir.'));

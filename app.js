@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  var BUILD = '0.14-test-1';
+  var BUILD = '0.15-test-1';
   var C = window.COURSE;
   var N = C.n, STEP = C.step, TOTAL = C.total, K = C.k;
   var ele = C.ele;

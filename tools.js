@@ -68,10 +68,11 @@
         var bad = false; try { K.calib.parseGpx('<gpx><trk><trkseg><trkpt lat="1" lon="1"></trkpt></trkseg></trk></gpx>'); } catch (e) { bad = true; }
         check('Zamansız/eksik GPX reddedilir', bad, String(bad));
       }
+      // Kafeinli jel ve Sodium Plus diğer ürünler gibi hesaplanır (günlük sınır yok): hedefi tutacak sayıda kullanılır
       var ev1 = K.nutrition.evaluate('onthego-progel-mocha-150', '', '');
-      if (ev1.valid) check('Üretici günlük sınırı: kafeinli jel en fazla 2', ev1.tot.gels <= 2, ev1.tot.gels + ' adet');
+      if (ev1.valid) check('Kafeinli jel sınırlanmaz (diğer jeller gibi hesaplanır)', ev1.tot.gels > 2, ev1.tot.gels + ' adet, her ' + ev1.sched.gelMin + ' dk');
       var ev2 = K.nutrition.evaluate('', '', 'bigjoy-sodium-plus');
-      if (ev2.valid) check('Üretici günlük sınırı: Sodium Plus en fazla 1', ev2.tot.salts <= 1, ev2.tot.salts + ' adet');
+      if (ev2.valid) check('Sodium Plus sınırlanmaz (diğer ürünler gibi hesaplanır)', ev2.tot.salts > 1, ev2.tot.salts + ' adet, her ' + ev2.sched.saltMin + ' dk');
       var ev3 = K.nutrition.evaluate('wup-neo3-elma', 'onthego-elektrolit-limon', 'wup-salt-tablet');
       if (ev3.valid) {
         check('Seçilen tuz tableti planda kullanılır', ev3.tot.salts >= 1 && !!ev3.sched.saltMin, ev3.tot.salts + ' adet, her ' + ev3.sched.saltMin + ' dk');
