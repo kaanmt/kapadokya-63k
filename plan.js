@@ -129,7 +129,7 @@
   function cur() { return { level: st.level, wUp: st.wUp, wDn: st.wDn }; }
   function efforts(o) {
     var secs = buildSectors(o.level);
-    return secs.map(function (x) { return x.km + x.up * o.wUp / 100 + x.down * o.wDn / 100; });
+    return secs.map(function (x) { return Math.max(0.05, x.km + x.up * o.wUp / 100 + x.down * o.wDn / 100); });
   }
   function shape(s, o) {
     var eff = efforts(o || cur()), E = eff.reduce(sum, 0), cum = 0, w = [];
@@ -499,17 +499,17 @@
     elAdv.appendChild(stepper('Tırmanış: 100 m kaç km düz sayılsın', '',
       function () { return f(st.wUp, 2) + ' km'; },
       function (d) { st.wUp = clamp(Math.round((st.wUp + d) * 100) / 100, 0.25, 2.5); save(); renderDerived(); renderAdvInfo(); }, [-0.25, 0.25], stepFmt));
-    elAdv.appendChild(chipRow([0.5, 0.75, 1, 1.5].map(function (v) { return { v: v, label: f(v, 2) }; }),
+    elAdv.appendChild(chipRow([0.5, 0.75, 0.88, 1, 1.5].map(function (v) { return { v: v, label: f(v, 2) }; }),
       function (it) { return Math.abs(st.wUp - it.v) < 0.001; },
       function (it) { st.wUp = it.v; save(); renderDerived(); renderAdv(); }));
     elAdv.appendChild(h('p', 'note', 'Varsayılan 1,00: ITRA tarzı km-efor kuralı (100 m tırmanış = 1 km). Eğim yüzdesi g ise yavaşlama çarpanı yaklaşık 1 + 10 x g (%10 eğimde 2 kat, %20 eğimde 3 kat).'));
     elAdv.appendChild(stepper('İniş: 100 m kaç km düz sayılsın', '',
       function () { return f(st.wDn, 2) + ' km'; },
-      function (d) { st.wDn = clamp(Math.round((st.wDn + d) * 100) / 100, 0, 1); save(); renderDerived(); renderAdvInfo(); }, [-0.05, 0.05], stepFmt));
-    elAdv.appendChild(chipRow([{ v: 0, label: 'Kapalı' }, { v: 0.25, label: '0,25' }, { v: 0.5, label: '0,50' }],
+      function (d) { st.wDn = clamp(Math.round((st.wDn + d) * 100) / 100, -0.5, 1); save(); renderDerived(); renderAdvInfo(); }, [-0.05, 0.05], stepFmt));
+    elAdv.appendChild(chipRow([{ v: -0.24, label: '−0,24 (kalibre)' }, { v: 0, label: 'Kapalı' }, { v: 0.25, label: '0,25' }, { v: 0.5, label: '0,50' }],
       function (it) { return Math.abs(st.wDn - it.v) < 0.001; },
       function (it) { st.wDn = it.v; save(); renderDerived(); renderAdv(); }));
-    elAdv.appendChild(h('p', 'note', 'Kapalı: ITRA formülü gibi inişi saymaz. 0,25 (400 m iniş = 1 km) ve 0,50 (200 m iniş = 1 km) bazı kaynaklarda kullanılan varyantlar.'));
+    elAdv.appendChild(h('p', 'note', 'Kapalı: ITRA formülü gibi inişi saymaz. 0,25 (400 m iniş = 1 km) ve 0,50 (200 m iniş = 1 km) bazı kaynaklarda kullanılan varyantlar. Negatif değer inişi düzden hızlı sayar: 4 Ekim koşusundan kalibre edilen −0,24, 100 m inişin 0,24 km kazandırdığı anlamına gelir (en az −0,50).'));
     var info = h('p', 'advinfo'); info.id = 'advInfo'; elAdv.appendChild(info);
     elAdv.appendChild(h('p', 'note', 'Hedef süre modunda bu ayarlar bitiş saatini değiştirmez, süreyi sektörlere dağıtımını değiştirir. Düz tempo modunda ise bitiş saatini de değiştirir.'));
     var b = h('button', 'btn wide', 'Varsayılan değerlere dön'); b.type = 'button';
@@ -526,8 +526,8 @@
     e.textContent = 'Parkurun toplam eforu: ' + f(E, 1) + ' km-efor (' + f(K.TOTAL / 1000, 1) + ' km mesafe, 2030 m tırmanış).';
   }
 
-  function renderDerived() { renderSeg(); renderSummary(); renderResults(); renderCompare(); renderWhat(); renderGarmin(); paintSettings(); }
-  function renderAll() { renderSeg(); renderEditor(); renderSummary(); renderResults(); renderCompare(); renderWhat(); renderAid(); renderGarmin(); renderAdv(); paintSettings(); }
+  function renderDerived() { renderSeg(); renderSummary(); renderResults(); renderCompare(); renderWhat(); renderGarmin(); paintSettings(); if (K.calib && K.calib.refresh) K.calib.refresh(); }
+  function renderAll() { renderSeg(); renderEditor(); renderSummary(); renderResults(); renderCompare(); renderWhat(); renderAid(); renderGarmin(); renderAdv(); paintSettings(); if (K.calib && K.calib.refresh) K.calib.refresh(); }
 
   var rt = null;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (!$('tab-plan').hidden) renderCompare(); }, 150); });

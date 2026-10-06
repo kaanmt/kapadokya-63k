@@ -10,13 +10,17 @@
   var PLAN_VECTORS = [
     { name: 'A varsayılan (10:00, %40, durmalar 2-4-3-4-2)', s: { mode: 'target', target: 600, fat: 40, stops: [2, 4, 3, 4, 2] }, arr: [91.34, 236.55, 330.53, 415.04, 494.53, 600] },
     { name: 'B varsayılan (11:00, %50, durmalar 3-6-5-6-3)', s: { mode: 'target', target: 660, fat: 50, stops: [3, 6, 5, 6, 3] }, arr: [96.32, 253.16, 357.26, 451.92, 541.55, 660] },
-    { name: 'C varsayılan (12:00, %70, durmalar 5-10-8-10-5)', s: { mode: 'target', target: 720, fat: 70, stops: [5, 10, 8, 10, 5] }, arr: [97.14, 262.86, 378.12, 483.84, 586.1, 720] }
+    { name: 'C varsayılan (12:00, %70, durmalar 5-10-8-10-5)', s: { mode: 'target', target: 720, fat: 70, stops: [5, 10, 8, 10, 5] }, arr: [97.14, 262.86, 378.12, 483.84, 586.1, 720] },
+    { name: 'A, kalibre ağırlıklar (tırmanış 0,88, iniş -0,24)', s: { mode: 'target', target: 600, fat: 40, stops: [2, 4, 3, 4, 2] }, o: { level: 'orta', wUp: 0.88, wDn: -0.24 }, arr: [93.82, 238.95, 332.16, 414.25, 492.62, 600] },
+    { name: 'B, kalibre ağırlıklar (tırmanış 0,88, iniş -0,24)', s: { mode: 'target', target: 660, fat: 50, stops: [3, 6, 5, 6, 3] }, o: { level: 'orta', wUp: 0.88, wDn: -0.24 }, arr: [98.95, 255.76, 359.05, 451.05, 539.42, 660] }
   ];
   var NUT_VECTORS = [
-    { name: '85 kg, çok terleme, 15 °C, kafein az, hareket 585 dk', p: { kg: 85, sweat: 'high', temp: 15, caf: 'low', health: false, M: 585 }, exp: [700, 530, 65, 128] },
-    { name: '75 kg, normal, 15 °C, kafein az, hareket 637 dk', p: { kg: 75, sweat: 'normal', temp: 15, caf: 'low', health: false, M: 637 }, exp: [500, 300, 60, 113] },
-    { name: '55 kg, az, 30 °C, kafein normal, hareket 700 dk', p: { kg: 55, sweat: 'low', temp: 30, caf: 'normal', health: false, M: 700 }, exp: [490, 250, 55, 165] },
-    { name: '100 kg, çok, 25 °C, kafeinsiz, hareket 525 dk (üst sınır)', p: { kg: 100, sweat: 'high', temp: 25, caf: 'none', health: false, M: 525 }, exp: [750, 560, 65, 0] }
+    { name: '85 kg, çok terleme, ter tuzluluğu bilmiyorum (825), 15 °C, kafein az, hareket 585 dk', p: { kg: 85, sweat: 'high', salty: 'unknown', temp: 15, caf: 'low', health: false, M: 585 }, exp: [700, 580, 65, 128] },
+    { name: 'Aynı kişi, az tuzlu ter (600 mg/L)', p: { kg: 85, sweat: 'high', salty: 'low', temp: 15, caf: 'low', health: false, M: 585 }, exp: [700, 420, 65, 128] },
+    { name: 'Aynı kişi, çok tuzlu ter (1100 mg/L)', p: { kg: 85, sweat: 'high', salty: 'high', temp: 15, caf: 'low', health: false, M: 585 }, exp: [700, 770, 65, 128] },
+    { name: '75 kg, normal terleme, az tuzlu ter, 15 °C, kafein az, hareket 637 dk', p: { kg: 75, sweat: 'normal', salty: 'low', temp: 15, caf: 'low', health: false, M: 637 }, exp: [500, 300, 60, 113] },
+    { name: '55 kg, az terleme, çok tuzlu ter, 30 °C, kafein normal, hareket 700 dk', p: { kg: 55, sweat: 'low', salty: 'high', temp: 30, caf: 'normal', health: false, M: 700 }, exp: [490, 540, 55, 165] },
+    { name: '100 kg, çok, bilmiyorum, 25 °C, kafeinsiz, hareket 525 dk (üst sınır)', p: { kg: 100, sweat: 'high', salty: 'unknown', temp: 25, caf: 'none', health: false, M: 525 }, exp: [750, 620, 65, 0] }
   ];
   function near(a, b, tol) { return Math.abs(a - b) <= tol; }
   function f2(x) { return (Math.round(x * 1000) / 1000).toString(); }
@@ -30,7 +34,7 @@
       check('Kontrol noktası kilometreleri', K.cps.every(function (c, i) { return near(c.km, cpkm[i], 0.011); }), K.cps.map(function (c) { return c.km; }).join(', '));
       if (K.plan) {
         PLAN_VECTORS.forEach(function (v) {
-          var r = K.plan.compute(v.s, PLAN_DEFAULTS);
+          var r = K.plan.compute(v.s, v.o || PLAN_DEFAULTS);
           var ok = r.valid && r.cp.length === v.arr.length && r.cp.every(function (c, i) { return near(c.arr, v.arr[i], 0.02); });
           check('Plan modeli: ' + v.name, ok, r.cp.map(function (c) { return c.arr.toFixed(2); }).join(', '));
         });
@@ -62,11 +66,42 @@
           g += '<trkpt lat="' + lat.toFixed(6) + '" lon="34.9"><ele>' + ele + '</ele><time>' + new Date(tt).toISOString() + '</time></trkpt>';
         }
         g += '</trkseg></trk></gpx>';
-        var a = K.calib.analyze(K.calib.parseGpx(g), { wUp: 1, wDn: 0 });
+        var a = K.calib.analyze(K.calib.parseGpx(g), { wUp: 1, wDn: 0 }, { smoothSec: 0 });
         check('GPX kalibrasyonu (sentetik koşu)', near(a.km, 2.224, 0.02) && near(a.moving, 800, 1) && near(a.elapsed, 840, 1) && a.up > 95 && a.up <= 101,
           f2(a.km) + ' km, hareket ' + Math.round(a.moving) + ' sn, toplam ' + Math.round(a.elapsed) + ' sn, tırmanış ' + Math.round(a.up) + ' m');
         var bad = false; try { K.calib.parseGpx('<gpx><trk><trkseg><trkpt lat="1" lon="1"></trkpt></trkseg></trk></gpx>'); } catch (e) { bad = true; }
         check('Zamansız/eksik GPX reddedilir', bad, String(bad));
+        // 9 sn konum yumuşatma: düz 3 m/sn giden, konumu rastgele ±8 m titreyen koşu (gerçek mesafe 1,8 km)
+        var zz = '<?xml version="1.0"?><gpx xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg>', dm = 8 / 111195, nz = function (k) { var v = Math.sin(k * 12.9898) * 43758.5453; return (v - Math.floor(v)) * 2 - 1; };
+        for (var z = 0; z < 600; z++) zz += '<trkpt lat="' + (38.6 + (z * 3 + 8 * nz(z)) / 111195).toFixed(7) + '" lon="' + (34.9 + dm * nz(z + 7919) / Math.cos(38.6 * Math.PI / 180)).toFixed(7) + '"><ele>1000</ele><time>' + new Date(t0 + z * 1000).toISOString() + '</time></trkpt>';
+        zz += '</trkseg></trk></gpx>';
+        var zr = K.calib.analyze(K.calib.parseGpx(zz), { wUp: 1, wDn: 0 }, { smoothSec: 0 }), zs = K.calib.analyze(K.calib.parseGpx(zz), { wUp: 1, wDn: 0 });
+        check('Konum yumuşatma 9 sn: titreşimli kayıtta mesafe gerçeğe yaklaşır', zr.km > 3.6 && near(zs.km, 1.8, 0.09), 'ham ' + f2(zr.km) + ' km, yumuşatılmış ' + f2(zs.km) + ' km (gerçek 1,8)');
+        // Tahmin: kısa koşuda tahmin yok; uzun, tırmanışlı ve ikinci yarısı %10 yavaş koşuda yavaşlama ölçülür, alt < orta < üst
+        check('Tahmin kapısı: kısa koşu (2,2 km) yetersiz sayılır, tahmin üretilmez', a.fc && a.fc.ok === false && a.fc.level === 'bad', a.fc ? a.fc.level + ', ' + a.fc.reasons.length + ' neden' : 'yok');
+        // 24 km: ilk 12 km 2,5 m/sn, ikinci 12 km 2,5/1,10 m/sn; her km'de 40 m'lik tırmanış ve iniş (iki yarıda aynı), 5 sn aralıklı kayıt
+        var lg = '<?xml version="1.0"?><gpx xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg>', tL = t0, posM = 0;
+        while (posM < 24000) {
+          var eleL = 1000 + 40 * Math.sin(2 * Math.PI * (posM % 1000) / 1000) + 0.004 * posM;
+          lg += '<trkpt lat="' + (38.6 + posM / 111195).toFixed(7) + '" lon="34.9"><ele>' + eleL.toFixed(2) + '</ele><time>' + new Date(tL).toISOString() + '</time></trkpt>';
+          posM += (posM < 12000 ? 2.5 : 2.5 / 1.10) * 5; tL += 5000;
+        }
+        lg += '</trkseg></trk></gpx>';
+        var lr = K.calib.analyze(K.calib.parseGpx(lg), { wUp: 1, wDn: 0 }), lf = lr.fc, last = lf && lf.ok ? K.cps.length - 1 : -1;
+        check('Tahmin: uzun koşuda yavaşlama ölçülür (kurgu %10), alt < orta < üst, varışlar artar',
+          !!lf && lf.ok && lf.measured && near(lf.slow, 10, 1.5) && lf.lo[last] < lf.mid[last] && lf.mid[last] < lf.hi[last] && lf.mid.every(function (v, i) { return i === 0 || v > lf.mid[i - 1]; }),
+          lf ? (lf.ok ? 'yavaşlama %' + f2(lf.slow) + ', bitiş hareket ' + Math.round(lf.lo[last]) + ' / ' + Math.round(lf.mid[last]) + ' / ' + Math.round(lf.hi[last]) + ' dk, düzey ' + lf.level : 'tahmin yok: ' + lf.reasons.join('; ')) : 'yok');
+      }
+      // %90 / %125 eşikleri (tam sınırlar)
+      if (K.nutrition && K.nutrition.grade) {
+        var G = K.nutrition.grade;
+        check('Yeterlilik eşikleri: %89 yetersiz, %90 ve %125 uygun, %126 fazla', G(89) === 'bad' && G(90) === 'ok' && G(125) === 'ok' && G(126) === 'warn', [89, 90, 125, 126].map(G).join(', '));
+        var ap = K.nutrition.autoPick();
+        if (ap) {
+          var evp = K.nutrition.evaluate(ap.g ? ap.g.id : '', ap.t ? ap.t.id : '', ap.s ? ap.s.id : ''), tgp = K.nutrition.targets();
+          var rp = K.nutrition.ratios(evp, tgp), okp = K.nutrition.pct(rp.carb) >= 90 && (rp.na == null || K.nutrition.pct(rp.na) >= 90);
+          check('Karmayı öner: %90 sağlanıyorsa gerçekten sağlar, sağlanamıyorsa neden yazar', ap.ok === okp && (ap.ok || ap.reasons.length > 0), 'karbonhidrat %' + K.nutrition.pct(rp.carb) + ', sodyum ' + (rp.na == null ? '-' : '%' + K.nutrition.pct(rp.na)) + (ap.ok ? '' : ', ' + ap.reasons.length + ' neden'));
+        }
       }
       // Kafeinli jel ve Sodium Plus diğer ürünler gibi hesaplanır (günlük sınır yok): hedefi tutacak sayıda kullanılır
       var ev1 = K.nutrition.evaluate('onthego-progel-mocha-150', '', '');

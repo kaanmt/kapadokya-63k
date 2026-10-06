@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  var BUILD = '0.15-test-1';
+  var BUILD = '0.16-test-1';
   var C = window.COURSE;
   var N = C.n, STEP = C.step, TOTAL = C.total, K = C.k;
   var ele = C.ele;
@@ -440,8 +440,8 @@
       }
       if (K && K.nutrition) {
         var b = K.nutrition.breakdown(), ns = K.nutrition.state();
-        lines.push('Beslenme girdileri: ' + ns.kg + ' kg, terleme ' + ns.sweat + ', ' + ns.temp + ' °C, suluk ' + ns.flaskN + 'x' + ns.flaskMl + ', en fazla jel ' + ns.maxGels + ', kafein ' + ns.caf + ', sağlık işareti ' + ns.health + ', plan ' + b.key);
-        lines.push('Beslenme hesabı: bitiş ' + Math.round(b.finish) + ' dk, hareket ' + Math.round(b.M) + ' dk, hız ' + b.speed.toFixed(3) + ', tempo ç. ' + b.intF.toFixed(3) + ', terleme ç. ' + b.sweatF + ', sıcaklık ç. ' + b.tempF + ', beden ç. ' + b.kgF.toFixed(3) + ', ham sıvı ' + b.raw.toFixed(1) + ' => sıvı ' + b.fluid + ', sodyum ' + b.na + ', karbonhidrat ' + b.carb + ', kafein sınırı ' + b.cafCap);
+        lines.push('Beslenme girdileri: ' + ns.kg + ' kg, terleme ' + ns.sweat + ', ter tuzluluğu ' + ns.salty + ', ' + ns.temp + ' °C, suluk ' + ns.flaskN + 'x' + ns.flaskMl + ', en fazla jel ' + ns.maxGels + ', kafein ' + ns.caf + ', sağlık işareti ' + ns.health + ', plan ' + b.key);
+        lines.push('Beslenme hesabı: bitiş ' + Math.round(b.finish) + ' dk, hareket ' + Math.round(b.M) + ' dk, hız ' + b.speed.toFixed(3) + ', tempo ç. ' + b.intF.toFixed(3) + ', terleme ç. ' + b.sweatF + ', sıcaklık ç. ' + b.tempF + ', beden ç. ' + b.kgF.toFixed(3) + ', ham sıvı ' + b.raw.toFixed(1) + ' => sıvı ' + b.fluid + ', ter tuzluluğu ' + b.conc + ' mg/L => sodyum ' + b.na + ', karbonhidrat ' + b.carb + ', kafein sınırı ' + b.cafCap);
       }
     } catch (e) { lines.push('Plan/beslenme verisi alınamadı: ' + e.message); }
     if (window.K63 && window.K63.lastSelfTest) { var ls = window.K63.lastSelfTest; lines.push('Kendini sına: ' + ls.passed + ' / ' + ls.items.length + ' geçti' + (ls.cacheOk === null ? '' : ', önbellek ' + (ls.cacheOk ? 'tamam' : 'SORUNLU')) + (ls.passed < ls.items.length ? ' | kalanlar: ' + ls.items.filter(function (r) { return !r.ok; }).map(function (r) { return r.name; }).join('; ') : '')); }
