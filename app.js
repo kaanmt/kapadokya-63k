@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  var BUILD = '0.12.1';
+  var BUILD = '0.17';
   var C = window.COURSE;
   var N = C.n, STEP = C.step, TOTAL = C.total, K = C.k;
   var ele = C.ele;
@@ -44,6 +44,27 @@
     return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
   }
   function $(id) { return document.getElementById(id); }
+  // ⓘ düğmesi: dokununca başlığın hemen altında açıklama notu açılır / kapanır (basılı tutma yerine; her yerde aynı yardımcı).
+  // head: başlık elementi (h2 veya .stp-head); html: açıklama metni (güvenilir, kod içi metin)
+  function infoBtn(head, html) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'tipbtn'; b.textContent = 'ⓘ';
+    b.setAttribute('aria-label', 'Açıklama'); b.setAttribute('aria-expanded', 'false');
+    b.addEventListener('click', function () {
+      var nx = head.nextElementSibling;
+      if (nx && nx.classList.contains('tipbody') && nx.getAttribute('data-for') === b.id) { nx.remove(); b.setAttribute('aria-expanded', 'false'); return; }
+      var p = document.createElement('p'); p.className = 'note tipbody'; p.innerHTML = html; p.setAttribute('data-for', b.id);
+      head.parentNode.insertBefore(p, head.nextSibling); b.setAttribute('aria-expanded', 'true');
+    });
+    b.id = 'tip' + (infoBtn.n = (infoBtn.n || 0) + 1);
+    (head.querySelector('b') || head).appendChild(b);
+    return b;
+  }
+  // index.html'deki açıklama notları (data-tip) bölüm başlığındaki ⓘ'ye taşınır
+  Array.prototype.forEach.call(document.querySelectorAll('p.note[data-tip]'), function (p) {
+    var sec = p.closest('section'), hd = sec && sec.querySelector('h2');
+    if (!hd) return; infoBtn(hd, p.innerHTML); p.remove();
+  });
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 
   /* ---------- theme ---------- */
@@ -238,7 +259,7 @@
   if (standalone) setSt('tStand', 'Evet', 'ok'); else setSt('tStand', 'Hayır, tarayıcıda açık. Ana ekrana ekleyip oradan aç.', 'warn');
 
   // service worker + cache
-  var EXPECTED = 16;
+  var EXPECTED = 17;
   function checkCache(tries) {
     if (!('caches' in window)) { setSt('tCache', 'Bu tarayıcıda desteklenmiyor', 'bad'); return; }
     caches.keys().then(function (keys) {
@@ -436,12 +457,13 @@
           var sc = ps.sc[k], r = K.plan.compute(sc);
           lines.push('Plan ' + k + ': mod ' + sc.mode + ', hedef ' + sc.target + ' dk, yavaşlama %' + sc.fat + ', durmalar ' + sc.stops.join('+') + ' dk, bitiş ' + (r.valid ? Math.round(r.finish) + ' dk' : 'geçersiz') + ', hareket ' + (r.valid ? Math.round(r.M) + ' dk' : '-') + ', efor ' + (r.valid ? r.E.toFixed(2) : '-'));
         });
+        if (K.plan.selected) lines.push('Uygulama seçimi: ' + K.plan.selected().label);
         lines.push('Plan ayarları: seçili ' + ps.sel + ', tırmanış ağırlığı ' + ps.wUp + ', iniş ağırlığı ' + ps.wDn + ', ayrıntı ' + ps.level);
       }
       if (K && K.nutrition) {
         var b = K.nutrition.breakdown(), ns = K.nutrition.state();
-        lines.push('Beslenme girdileri: ' + ns.kg + ' kg, terleme ' + ns.sweat + ', ' + ns.temp + ' °C, suluk ' + ns.flaskN + 'x' + ns.flaskMl + ', en fazla jel ' + ns.maxGels + ', kafein ' + ns.caf + ', sağlık işareti ' + ns.health + ', plan ' + b.key);
-        lines.push('Beslenme hesabı: bitiş ' + Math.round(b.finish) + ' dk, hareket ' + Math.round(b.M) + ' dk, hız ' + b.speed.toFixed(3) + ', tempo ç. ' + b.intF.toFixed(3) + ', terleme ç. ' + b.sweatF + ', sıcaklık ç. ' + b.tempF + ', beden ç. ' + b.kgF.toFixed(3) + ', ham sıvı ' + b.raw.toFixed(1) + ' => sıvı ' + b.fluid + ', sodyum ' + b.na + ', karbonhidrat ' + b.carb + ', kafein sınırı ' + b.cafCap);
+        lines.push('Beslenme girdileri: ' + ns.kg + ' kg, terleme ' + ns.sweat + ', ter tuzluluğu ' + ns.salty + ', ' + ns.temp + ' °C, suluk ' + ns.flaskN + 'x' + ns.flaskMl + ', en fazla jel ' + ns.maxGels + ', sağlık işareti ' + ns.health + ', seçim ' + b.label);
+        lines.push('Beslenme hesabı: bitiş ' + Math.round(b.finish) + ' dk, hareket ' + Math.round(b.M) + ' dk, hız ' + b.speed.toFixed(3) + ', tempo ç. ' + b.intF.toFixed(3) + ', terleme ç. ' + b.sweatF + ', sıcaklık ç. ' + b.tempF + ', beden ç. ' + b.kgF.toFixed(3) + ', ham sıvı ' + b.raw.toFixed(1) + ' => sıvı ' + b.fluid + ', ter tuzluluğu ' + b.conc + ' mg/L => sodyum ' + b.na + ', karbonhidrat ' + b.carb);
       }
     } catch (e) { lines.push('Plan/beslenme verisi alınamadı: ' + e.message); }
     if (window.K63 && window.K63.lastSelfTest) { var ls = window.K63.lastSelfTest; lines.push('Kendini sına: ' + ls.passed + ' / ' + ls.items.length + ' geçti' + (ls.cacheOk === null ? '' : ', önbellek ' + (ls.cacheOk ? 'tamam' : 'SORUNLU')) + (ls.passed < ls.items.length ? ' | kalanlar: ' + ls.items.filter(function (r) { return !r.ok; }).map(function (r) { return r.name; }).join('; ') : '')); }
@@ -458,5 +480,5 @@
   window.addEventListener('resize', function () { clearTimeout(resizeT); resizeT = setTimeout(drawChart, 120); });
   drawChart();
   update();
-  window.K63 = { ENV: ENV, BUILD: BUILD, EXPECTED: EXPECTED, ele: ele, grade: grade, C: C, N: N, STEP: STEP, TOTAL: TOTAL, dist: dist, gain: gain, loss: loss, cps: cps, f: f, hhmm: hhmm, $: $, store: store, drawChart: drawChart, update: update };
+  window.K63 = { ENV: ENV, BUILD: BUILD, EXPECTED: EXPECTED, ele: ele, grade: grade, C: C, N: N, STEP: STEP, TOTAL: TOTAL, dist: dist, gain: gain, loss: loss, cps: cps, f: f, hhmm: hhmm, $: $, infoBtn: infoBtn, store: store, drawChart: drawChart, update: update };
 })();

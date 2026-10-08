@@ -1,4 +1,4 @@
-const VERSION = 'k63-0.12.1';
+const VERSION = 'k63-0.17';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './data.js',
   './nosleep.js',
   './plan.js',
+  './calib.js',
   './race.js',
   './tools.js',
   './products.js',

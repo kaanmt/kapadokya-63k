@@ -25,7 +25,7 @@
 <header class="top">
   <div>
     <h1>Kapadokya 63K</h1>
-    <p class="sub">Parkur ve plan, test sürümü <span id="ver"></span></p>
+    <p class="sub">Parkur ve plan, sürüm <span id="ver"></span></p>
   </div>
   <button type="button" id="themeBtn" class="btn small" aria-label="Tema değiştir">Tema: sistem</button>
 </header>
@@ -75,7 +75,7 @@
         <tbody id="cpRows"></tbody>
       </table>
     </div>
-    <p class="note">Start 07:00. Kesim saati, yarışın başlangıcından itibaren süredir. Kilometreler resmi 2026 GPX dosyasından hesaplandı.</p>
+    <p class="note" data-tip>Start 07:00. Kesim saati, yarışın başlangıcından itibaren süredir. Kilometreler resmi 2026 GPX dosyasından hesaplandı.</p>
   </section>
 
   </div>
@@ -89,7 +89,7 @@
 <div id="tab-test" class="tab" hidden>
 <section class="card" id="tests">
     <h2>Cihaz testi</h2>
-    <p class="note">Yarıştan önce telefonunda neyin çalıştığını görmek için. Sonra kaldırılacak.</p>
+    <p class="note" data-tip>Yarıştan önce telefonunda neyin çalıştığını görmek için. Sonra kaldırılacak.</p>
     <ul class="tests">
       <li>
         <div class="tl"><b>Çevrimdışı önbellek</b><span id="tCache" class="st">Kontrol ediliyor</span></div>
@@ -130,14 +130,14 @@
 
   <section class="card" id="selftest">
     <h2>Kendini sına</h2>
-    <p class="note">Uygulamanın hesaplarını, bağımsız olarak doğrulanmış bilinen girdi ve çıktılarla karşılaştırır. Kendi ayarlarını değiştirmez. Yeni sürüm yükledikten sonra çalıştır.</p>
+    <p class="note" data-tip>Uygulamanın hesaplarını, bağımsız olarak doğrulanmış bilinen girdi ve çıktılarla karşılaştırır. Kendi ayarlarını değiştirmez. Yeni sürüm yükledikten sonra çalıştır.</p>
     <button type="button" class="btn wide" id="selfBtn">Kendini sına</button>
     <div id="selfOut" class="selfout"></div>
   </section>
 
   <section class="card" id="backup">
     <h2>Yedekleme</h2>
-    <p class="note">Plan, beslenme, yarış ve tema ayarlarını yedekler. Tarayıcı verisi silinirse (özellikle iPhone'da) yedekten geri yükleyebilirsin.</p>
+    <p class="note" data-tip>Plan, beslenme, yarış ve tema ayarlarını yedekler. Tarayıcı verisi silinirse (özellikle iPhone'da) yedekten geri yükleyebilirsin.</p>
     <button type="button" class="btn wide" id="bkExport">Yedeği göster ve kopyala</button>
     <button type="button" class="btn wide" id="bkDownload">Yedeği dosya olarak indir</button>
     <textarea id="bkText" class="report" rows="6" placeholder="Yedek metni burada görünür; geri yüklemek için buraya yapıştır"></textarea>
@@ -149,7 +149,7 @@
 </main>
 
 <footer class="foot">
-  <p>Kapadokya 63K Planlayıcı, test sürümü. Parkur: CMT_2026_v1.0, 62,97 km, resmi tırmanış 2030 m.</p>
+  <p>Kapadokya 63K Planlayıcı. Parkur: CMT_2026_v1.0, 62,97 km, resmi tırmanış 2030 m.</p>
 </footer>
 
 <nav class="nav" id="nav" aria-label="Bölümler">
@@ -164,6 +164,7 @@
 <script src="nosleep.js"></script>
 <script src="app.js"></script>
 <script src="plan.js"></script>
+<script src="calib.js"></script>
 <script src="products.js"></script>
 <script src="nutrition.js"></script>
 <script src="race.js"></script>

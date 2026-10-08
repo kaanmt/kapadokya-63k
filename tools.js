@@ -10,15 +10,20 @@
   var PLAN_VECTORS = [
     { name: 'A varsayılan (10:00, %40, durmalar 2-4-3-4-2)', s: { mode: 'target', target: 600, fat: 40, stops: [2, 4, 3, 4, 2] }, arr: [91.34, 236.55, 330.53, 415.04, 494.53, 600] },
     { name: 'B varsayılan (11:00, %50, durmalar 3-6-5-6-3)', s: { mode: 'target', target: 660, fat: 50, stops: [3, 6, 5, 6, 3] }, arr: [96.32, 253.16, 357.26, 451.92, 541.55, 660] },
-    { name: 'C varsayılan (12:00, %70, durmalar 5-10-8-10-5)', s: { mode: 'target', target: 720, fat: 70, stops: [5, 10, 8, 10, 5] }, arr: [97.14, 262.86, 378.12, 483.84, 586.1, 720] }
+    { name: 'C varsayılan (12:00, %70, durmalar 5-10-8-10-5)', s: { mode: 'target', target: 720, fat: 70, stops: [5, 10, 8, 10, 5] }, arr: [97.14, 262.86, 378.12, 483.84, 586.1, 720] },
+    { name: 'A, kalibre ağırlıklar (tırmanış 0,88, iniş -0,24)', s: { mode: 'target', target: 600, fat: 40, stops: [2, 4, 3, 4, 2] }, o: { level: 'orta', wUp: 0.88, wDn: -0.24 }, arr: [93.82, 238.95, 332.16, 414.25, 492.62, 600] },
+    { name: 'B, kalibre ağırlıklar (tırmanış 0,88, iniş -0,24)', s: { mode: 'target', target: 660, fat: 50, stops: [3, 6, 5, 6, 3] }, o: { level: 'orta', wUp: 0.88, wDn: -0.24 }, arr: [98.95, 255.76, 359.05, 451.05, 539.42, 660] }
   ];
   var NUT_VECTORS = [
-    { name: '85 kg, çok terleme, 15 °C, kafein az, hareket 585 dk', p: { kg: 85, sweat: 'high', temp: 15, caf: 'low', health: false, M: 585 }, exp: [700, 530, 65, 128] },
-    { name: '75 kg, normal, 15 °C, kafein az, hareket 637 dk', p: { kg: 75, sweat: 'normal', temp: 15, caf: 'low', health: false, M: 637 }, exp: [500, 300, 60, 113] },
-    { name: '55 kg, az, 30 °C, kafein normal, hareket 700 dk', p: { kg: 55, sweat: 'low', temp: 30, caf: 'normal', health: false, M: 700 }, exp: [490, 250, 55, 165] },
-    { name: '100 kg, çok, 25 °C, kafeinsiz, hareket 525 dk (üst sınır)', p: { kg: 100, sweat: 'high', temp: 25, caf: 'none', health: false, M: 525 }, exp: [750, 560, 65, 0] }
+    { name: '85 kg, çok terleme, ter tuzluluğu bilmiyorum (825), 15 °C, hareket 585 dk', p: { kg: 85, sweat: 'high', salty: 'unknown', temp: 15, health: false, M: 585 }, exp: [700, 580, 65] },
+    { name: 'Aynı kişi, az tuzlu ter (600 mg/L)', p: { kg: 85, sweat: 'high', salty: 'low', temp: 15, health: false, M: 585 }, exp: [700, 420, 65] },
+    { name: 'Aynı kişi, çok tuzlu ter (1100 mg/L)', p: { kg: 85, sweat: 'high', salty: 'high', temp: 15, health: false, M: 585 }, exp: [700, 770, 65] },
+    { name: '75 kg, normal terleme, az tuzlu ter, 15 °C, hareket 637 dk', p: { kg: 75, sweat: 'normal', salty: 'low', temp: 15, health: false, M: 637 }, exp: [500, 300, 60] },
+    { name: '55 kg, az terleme, çok tuzlu ter, 30 °C, hareket 700 dk', p: { kg: 55, sweat: 'low', salty: 'high', temp: 30, health: false, M: 700 }, exp: [490, 540, 55] },
+    { name: '100 kg, çok, bilmiyorum, 25 °C, hareket 525 dk (üst sınır)', p: { kg: 100, sweat: 'high', salty: 'unknown', temp: 25, health: false, M: 525 }, exp: [750, 620, 65] }
   ];
   function near(a, b, tol) { return Math.abs(a - b) <= tol; }
+  function f2(x) { return (Math.round(x * 1000) / 1000).toString(); }
   function runSelfTest() {
     var res = [];
     function check(name, ok, detail) { res.push({ name: name, ok: !!ok, detail: detail || '' }); }
@@ -29,17 +34,32 @@
       check('Kontrol noktası kilometreleri', K.cps.every(function (c, i) { return near(c.km, cpkm[i], 0.011); }), K.cps.map(function (c) { return c.km; }).join(', '));
       if (K.plan) {
         PLAN_VECTORS.forEach(function (v) {
-          var r = K.plan.compute(v.s, PLAN_DEFAULTS);
+          var r = K.plan.compute(v.s, v.o || PLAN_DEFAULTS);
           var ok = r.valid && r.cp.length === v.arr.length && r.cp.every(function (c, i) { return near(c.arr, v.arr[i], 0.02); });
           check('Plan modeli: ' + v.name, ok, r.cp.map(function (c) { return c.arr.toFixed(2); }).join(', '));
         });
         var bad = K.plan.compute({ mode: 'pace', target: 600, p0: 0, fat: 40, stops: [2, 4, 3, 4, 2] }, PLAN_DEFAULTS);
         check('Düz tempo 0 iken plan geçersiz', !bad.valid, String(bad.valid));
+        var dlb = K.plan.dataLabel, mvx = { good: 600, mid: 630, bad: 680 };
+        check('Veriye göre etiketi: iddialı / iyimser / gerçekçi / çok temkinli sınırları', !!dlb && dlb(599, mvx).name === 'iddialı' && dlb(600, mvx).name === 'iyimser' && dlb(630, mvx).name === 'gerçekçi' && dlb(680, mvx).name === 'gerçekçi' && dlb(681, mvx).name === 'çok temkinli',
+          [599, 600, 630, 680, 681].map(function (m) { return dlb ? dlb(m, mvx).name : '-'; }).join(', '));
+        var holder = document.createElement('div'), hd0 = document.createElement('h2'); hd0.textContent = 'Deneme'; holder.appendChild(hd0);
+        var ib = K.infoBtn(hd0, 'açıklama'), op1 = false, op2 = false;
+        ib.click(); op1 = !!holder.querySelector('.tipbody') && ib.getAttribute('aria-expanded') === 'true';
+        ib.click(); op2 = !holder.querySelector('.tipbody') && ib.getAttribute('aria-expanded') === 'false';
+        check('ⓘ düğmesi: dokununca açıklama açılır, tekrar dokununca kapanır', op1 && op2, op1 + ' / ' + op2);
+        // Tek seçim: Beslenme Plan sekmesindeki seçimi kullanır (A / B / C ve Plan | Veri)
+        if (K.plan.selected && K.nutrition) {
+          var sl = K.plan.selected(), bk = K.nutrition.breakdown();
+          check('Tek seçim: Beslenme Plan sekmesindeki seçimi kullanır', bk.label === sl.label && near(bk.M, sl.r.M, 1e-9), bk.label + ' / ' + sl.label);
+        }
+        var leftTips = document.querySelectorAll('p.note[data-tip]').length, testHd = document.querySelector('#selftest h2 .tipbtn');
+        check('ⓘ tüm sekmelerde: sayfadaki açıklama notları başlıklara taşındı', leftTips === 0 && !!testHd, leftTips + ' not kaldı');
       } else check('Plan modülü yüklü', false);
       if (K.nutrition) {
         check('Sabit parkur eforu 83,26 km-efor', near(K.nutrition.E_STD, 83.265, 0.02), K.nutrition.E_STD.toFixed(3));
         NUT_VECTORS.forEach(function (v) {
-          var t = K.nutrition.targetsFrom(v.p), got = [t.fluid, t.na, t.carb, t.cafCap];
+          var t = K.nutrition.targetsFrom(v.p), got = [t.fluid, t.na, t.carb];
           check('Beslenme hedefi: ' + v.name, got.join('/') === v.exp.join('/'), 'beklenen ' + v.exp.join(' / ') + ', çıkan ' + got.join(' / '));
         });
         check('Tuz 0,9 g = sodyum 360 mg', K.nutrition.saltToNa(0.9) === 360, String(K.nutrition.saltToNa(0.9)));
@@ -52,10 +72,92 @@
       var ids = {}; var dup = P.filter(function (p) { if (ids[p.id]) return true; ids[p.id] = 1; return false; });
       check('Ürün kimlikleri tekil', !dup.length, dup.length ? dup.map(function (p) { return p.id; }).join(', ') : P.length + ' tekil');
       check('Yiyecek listesi (17 yiyecek)', F.length === 17, F.length + ' yiyecek');
-      var ev1 = K.nutrition.evaluate('onthego-progel-mocha-150', '', '');
-      if (ev1.valid) check('Üretici günlük sınırı: kafeinli jel en fazla 2', ev1.tot.gels <= 2, ev1.tot.gels + ' adet');
+      if (K.calib) {
+        // Sentetik koşu: 201 nokta, her adım ~11,1 m kuzeye, 4 sn; ilk 100 adımda +1 m rakım; 150-159 arası 40 sn durma
+        var g = '<?xml version="1.0"?><gpx xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg>', t0 = Date.UTC(2026, 9, 4, 7, 0, 0), lat = 38.6, idx = 0, tt = t0;
+        for (var q = 0; q < 211; q++) {
+          if (q > 0) { if (q >= 151 && q <= 160) {} else lat += 0.0001; tt += 4000; }
+          var ele = 1000 + Math.min(q, 100);
+          g += '<trkpt lat="' + lat.toFixed(6) + '" lon="34.9"><ele>' + ele + '</ele><time>' + new Date(tt).toISOString() + '</time></trkpt>';
+        }
+        g += '</trkseg></trk></gpx>';
+        var a = K.calib.analyze(K.calib.parseGpx(g), { wUp: 1, wDn: 0 }, { smoothSec: 0 });
+        check('GPX kalibrasyonu (sentetik koşu)', near(a.km, 2.224, 0.02) && near(a.moving, 800, 1) && near(a.elapsed, 840, 1) && a.up > 95 && a.up <= 101,
+          f2(a.km) + ' km, hareket ' + Math.round(a.moving) + ' sn, toplam ' + Math.round(a.elapsed) + ' sn, tırmanış ' + Math.round(a.up) + ' m');
+        var bad = false; try { K.calib.parseGpx('<gpx><trk><trkseg><trkpt lat="1" lon="1"></trkpt></trkseg></trk></gpx>'); } catch (e) { bad = true; }
+        check('Zamansız/eksik GPX reddedilir', bad, String(bad));
+        // 9 sn konum yumuşatma: düz 3 m/sn giden, konumu rastgele ±8 m titreyen koşu (gerçek mesafe 1,8 km)
+        var zz = '<?xml version="1.0"?><gpx xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg>', dm = 8 / 111195, nz = function (k) { var v = Math.sin(k * 12.9898) * 43758.5453; return (v - Math.floor(v)) * 2 - 1; };
+        for (var z = 0; z < 600; z++) zz += '<trkpt lat="' + (38.6 + (z * 3 + 8 * nz(z)) / 111195).toFixed(7) + '" lon="' + (34.9 + dm * nz(z + 7919) / Math.cos(38.6 * Math.PI / 180)).toFixed(7) + '"><ele>1000</ele><time>' + new Date(t0 + z * 1000).toISOString() + '</time></trkpt>';
+        zz += '</trkseg></trk></gpx>';
+        var zr = K.calib.analyze(K.calib.parseGpx(zz), { wUp: 1, wDn: 0 }, { smoothSec: 0 }), zs = K.calib.analyze(K.calib.parseGpx(zz), { wUp: 1, wDn: 0 });
+        check('Konum yumuşatma 9 sn: titreşimli kayıtta mesafe gerçeğe yaklaşır', zr.km > 3.6 && near(zs.km, 1.8, 0.09), 'ham ' + f2(zr.km) + ' km, yumuşatılmış ' + f2(zs.km) + ' km (gerçek 1,8)');
+        // Tahmin: kısa koşuda tahmin yok; uzun, tırmanışlı ve ikinci yarısı %10 yavaş koşuda yavaşlama ölçülür, iyi < ana < kötü
+        check('Tahmin kapısı: kısa koşu (2,2 km) yetersiz sayılır, tahmin üretilmez', a.fc && a.fc.ok === false && a.fc.level === 'bad', a.fc ? a.fc.level + ', ' + a.fc.reasons.length + ' neden' : 'yok');
+        // 24 km: ilk 12 km 2,5 m/sn, ikinci 12 km 2,5/1,10 m/sn; her km'de 40 m'lik tırmanış ve iniş (iki yarıda aynı), 5 sn aralıklı kayıt
+        var lg = '<?xml version="1.0"?><gpx xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg>', tL = t0, posM = 0;
+        while (posM < 24000) {
+          var eleL = 1000 + 40 * Math.sin(2 * Math.PI * (posM % 1000) / 1000) + 0.004 * posM;
+          lg += '<trkpt lat="' + (38.6 + posM / 111195).toFixed(7) + '" lon="34.9"><ele>' + eleL.toFixed(2) + '</ele><time>' + new Date(tL).toISOString() + '</time></trkpt>';
+          posM += (posM < 12000 ? 2.5 : 2.5 / 1.10) * 5; tL += 5000;
+        }
+        lg += '</trkseg></trk></gpx>';
+        var lr = K.calib.analyze(K.calib.parseGpx(lg), { wUp: 1, wDn: 0 }), lf = lr.fc, last = lf && lf.ok ? K.cps.length - 1 : -1;
+        check('Tahmin: uzun koşuda yavaşlama ölçülür (kurgu %10), iyi < ana < kötü gün, varışlar artar',
+          !!lf && lf.ok && lf.measured && near(lf.slow, 10, 1.5) && lf.good[last] < lf.mid[last] && lf.mid[last] < lf.bad[last] && lf.mid.every(function (v, i) { return i === 0 || v > lf.mid[i - 1]; }),
+          lf ? (lf.ok ? 'yavaşlama %' + f2(lf.slow) + ', bitiş hareket ' + Math.round(lf.good[last]) + ' / ' + Math.round(lf.mid[last]) + ' / ' + Math.round(lf.bad[last]) + ' dk, düzey ' + lf.level : 'tahmin yok: ' + lf.reasons.join('; ')) : 'yok');
+        if (lf && lf.ok && K.calib.cum && K.plan && K.plan.dataResult) {
+          // Parkur boyu tahmin (sektörler, yarış) noktalardaki tahminle birebir aynı
+          // Bağımsız döngü (v0.16'daki gibi, adım adım) ile karşılaştır
+          var cmid = K.calib.cum(lf, 'mid'), sp = lf.shp.mid, wu = K.calib.FC.wUp, wd = K.calib.FC.wDn, c2 = 0, ci2 = 0, mx = 0;
+          for (var i2 = 1; i2 < K.N && ci2 < K.cps.length; i2++) {
+            var e2 = Math.max(0.002, (K.dist[i2] - K.dist[i2 - 1]) / 1000 + (K.gain[i2] - K.gain[i2 - 1]) * wu / 100 + (K.loss[i2] - K.loss[i2 - 1]) * wd / 100);
+            c2 += sp.base * e2 * (1 + sp.kk * Math.pow(K.dist[i2] / 1000 / lf.runKm, sp.pw)) / 60;
+            if (K.cps[ci2].idx === i2) { mx = Math.max(mx, Math.abs(c2 - lf.mid[ci2]), Math.abs(cmid[i2] - c2)); ci2++; }
+          }
+          if (ci2 < K.cps.length) mx = Infinity;
+          check('Veri: parkur boyu tahmin noktalardaki tahminle aynı', mx < 1e-9, 'en büyük fark ' + mx.toExponential(1) + ' dk');
+          // Veri sonucu Plan biçiminde: sektörlerin toplamı hareket süresi, varış = tahmin + önceki durmalar, iyi < ana < kötü
+          var bS = { mode: 'target', target: 660, fat: 50, stops: [3, 6, 5, 6, 3] }, dr = K.plan.dataResult(bS, 'orta', lf), sumT = 0, okA = true, sb = 0;
+          dr.rows.forEach(function (x) { sumT += x.t; });
+          dr.cp.forEach(function (c, i) { okA = okA && near(c.arr, lf.mid[i] + sb, 1e-6) && c.good < c.arr && c.arr < c.bad; sb += c.stop; });
+          check('Veri sonucu Plan biçiminde (sektör toplamı = hareket süresi, varış = tahmin + durmalar, iyi < ana < kötü)', near(sumT, dr.M, 1e-6) && okA && near(dr.finish, lf.mid[last] + 23, 1e-6),
+            'sektör toplamı ' + f2(sumT) + ', hareket ' + f2(dr.M) + ' dk, bitiş ' + f2(dr.finish) + ' dk');
+          // Beslenme Veri sonucuyla çalışır: hareket süresi ve bölümler tahminden
+          var evd = K.nutrition && K.nutrition.evaluate('wup-neo3-elma', '', '', dr), secH = 0;
+          if (evd && evd.valid) evd.rows.forEach(function (x) { secH += x.hours; });
+          check('Beslenme Veri\'de: hareket süresi ve bölüm süreleri tahminden', !!evd && evd.valid && near(evd.movH * 60, dr.M, 1e-6) && near(secH * 60, dr.M, 1e-6) && evd.rows.length === K.cps.length,
+            evd && evd.valid ? 'hareket ' + f2(evd.movH * 60) + ' dk, bölümler ' + f2(secH * 60) + ' dk' : 'değerlendirilemedi');
+        }
+      }
+      // %90 / %125 eşikleri (tam sınırlar)
+      if (K.nutrition && K.nutrition.grade) {
+        var G = K.nutrition.grade;
+        check('Yeterlilik eşikleri: %89 yetersiz, %90 ve %125 uygun, %126 fazla', G(89) === 'bad' && G(90) === 'ok' && G(125) === 'ok' && G(126) === 'warn', [89, 90, 125, 126].map(G).join(', '));
+        var ap = K.nutrition.autoPick();
+        if (ap) {
+          var evp = K.nutrition.evaluate(ap.g ? ap.g.id : '', ap.t ? ap.t.id : '', ap.s ? ap.s.id : ''), tgp = K.nutrition.targets();
+          var rp = K.nutrition.ratios(evp, tgp), okp = K.nutrition.pct(rp.carb) >= 90 && (rp.na == null || K.nutrition.pct(rp.na) >= 90);
+          check('Karmayı öner kafein içeren veya kafeini bilinmeyen ürün seçmez',
+            [ap.g, ap.t, ap.s].every(function (p) { return !p || (!p.cafUnknown && !(p.caf > 0)); }), [ap.g, ap.t, ap.s].filter(Boolean).map(function (p) { return p.id; }).join(', '));
+          check('Karmayı öner: %90 sağlanıyorsa gerçekten sağlar, sağlanamıyorsa neden yazar', ap.ok === okp && (ap.ok || ap.reasons.length > 0), 'karbonhidrat %' + K.nutrition.pct(rp.carb) + ', sodyum ' + (rp.na == null ? '-' : '%' + K.nutrition.pct(rp.na)) + (ap.ok ? '' : ', ' + ap.reasons.length + ' neden'));
+        }
+      }
+      // Kafein uygulama tarafından kontrol edilmez: hedefte ve değerlendirmede kafein alanı yok; kafeinli jel diğer jeller gibi hesaplanır
+      var tcf = K.nutrition.targetsFrom({ kg: 85, sweat: 'high', salty: 'unknown', temp: 15, health: false, M: 585 }), ev1 = K.nutrition.evaluate('onthego-progel-mocha-150', '', '');
+      check('Kafein kontrolü yok (hedefte kafein sınırı ve değerlendirmede kafein toplamı yok; kafeinli jel sınırlanmaz)',
+        tcf.cafCap === undefined && (!ev1.valid || (ev1.cafOver === undefined && ev1.cafTotal === undefined && ev1.tot.gels > 2)), ev1.valid ? ev1.tot.gels + ' adet jel' : 'plan geçersiz');
+      // Sodium Plus diğer ürünler gibi hesaplanır (günlük sınır yok): hedefi tutacak sayıda kullanılır
       var ev2 = K.nutrition.evaluate('', '', 'bigjoy-sodium-plus');
-      if (ev2.valid) check('Üretici günlük sınırı: Sodium Plus en fazla 1', ev2.tot.salts <= 1, ev2.tot.salts + ' adet');
+      if (ev2.valid) check('Sodium Plus sınırlanmaz (diğer ürünler gibi hesaplanır)', ev2.tot.salts > 1, ev2.tot.salts + ' adet, her ' + ev2.sched.saltMin + ' dk');
+      var ev3 = K.nutrition.evaluate('wup-neo3-elma', 'onthego-elektrolit-limon', 'wup-salt-tablet');
+      if (ev3.valid) {
+        check('Seçilen tuz tableti planda kullanılır', ev3.tot.salts >= 1 && !!ev3.sched.saltMin, ev3.tot.salts + ' adet, her ' + ev3.sched.saltMin + ' dk');
+        var mg = K.nutrition.state().maxGels, sd3 = ev3.sched;
+        check('Takvim uygulanabilir (jel aralığı listeden ve sınır içinde, flask başına 0 / 0,5 / 1 tablet)',
+          K.nutrition.GEL_STEPS.indexOf(sd3.gelMin) >= 0 && 60 / sd3.gelMin <= mg + 1e-9 && [0, 0.5, 1].indexOf(sd3.dose) >= 0 && sd3.flaskMin % 5 === 0,
+          'jel ' + sd3.gelMin + ' dk, doz ' + sd3.dose + ', flask ' + sd3.flaskMin + ' dk');
+      }
     } catch (e) { check('Beklenmeyen hata', false, e.message); }
     return res;
   }
