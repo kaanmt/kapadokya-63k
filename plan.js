@@ -73,20 +73,6 @@
   var TYPE = { C: 'Çıkış', D: 'İniş', F: 'Düz' };
   var NSTOP = cps.length - 1;
 
-  /* ---------- aid station info (official 2026 rules) ---------- */
-  var AID = [
-    { food: 'Kek, kraker, portakal, muz, tuz', drink: 'Kola, su', hot: 'Yok', extra: 'Sağlık ekibi, tuvalet',
-      tip: 'Sonraki nokta 16 km uzakta ve burada ikmal sade. Suyu ve yiyeceği tam doldurup çıkmak gerekir.' },
-    { food: 'Kek, kraker, portakal, muz, elma, limon, tuz, ekmek, peynir, helva, züber', drink: 'Kola, su, maden suyu', hot: 'Çay, kahve, çorba', extra: 'Sağlık ekibi',
-      tip: 'Çorba olan iki noktadan biri.' },
-    { food: 'Kek, kraker, portakal, muz, elma, üzüm, ekmek, Nutella, cezerye, fındık-fıstık, haşlanmış patates, limon, tuz, züber', drink: 'Kola, su, maden suyu', hot: 'Çay, kahve', extra: 'Sağlık ekibi, tuvalet',
-      tip: 'Çorba yok; patates ve ekmek var.' },
-    { food: 'Kek, kraker, portakal, muz, elma, limon, tuz, ekmek, peynir, helva, çikolata', drink: 'Kola, su, maden suyu', hot: 'Çay, kahve, çorba', extra: 'Sağlık ekibi, tuvalet',
-      tip: 'Çorba olan son nokta. Hemen sonrasında, yaklaşık km 47-48 arasında çok dik bir tırmanış var.' },
-    { food: 'Kek, kraker, portakal, muz, elma, züber', drink: 'Kola, su', hot: 'Yok', extra: 'Sağlık ekibi',
-      tip: 'En sade nokta. Finişe kadar gereken beslenmeyi bir önceki noktada tamamlamak mantıklı olabilir.' }
-  ];
-
   /* ---------- state ---------- */
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   var DEF = {
@@ -120,6 +106,9 @@
     } catch (e) {}
   })();
   function save() { K.store('k63plan-v2', JSON.stringify(st)); }
+  // Tablo görünümü: 'plan' (A/B/C dağıtımı) veya 'data' (antrenman GPX'inden tahmin); seçim hatırlanır
+  var view = K.store('k63planview') === 'data' ? 'data' : 'plan';
+  function setView(v) { view = v; K.store('k63planview', v); }
 
   /* ---------- model ---------- */
   // Each sector gets an "effort" = km + climb/100 x wUp + descent/100 x wDn.
@@ -190,7 +179,9 @@
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function stepper(label, hint, getText, onStep, steps, fmtStep) {
     var wrap = h('div', 'stp');
-    wrap.appendChild(h('div', 'stp-head', '<b>' + esc(label) + '</b>' + (hint ? '<span class="note">' + esc(hint) + '</span>' : '')));
+    var head = h('div', 'stp-head', '<b>' + esc(label) + '</b>');
+    wrap.appendChild(head);
+    if (hint) K.infoBtn(head, esc(hint));
     var row = h('div', 'stp-row');
     var val = h('span', 'stp-val', esc(getText()));
     function mk(d) {
@@ -219,10 +210,11 @@
 
   /* ---------- build plan tab ---------- */
   var root = $('tab-plan');
-  var elCalib, elSeg, elEditor, elSummary, elResults, elCompare, elWhat, elAid, elGarmin, elAdv;
+  var elCalib, elSeg, elEditor, elSummary, elResults, elCompare, elWhat, elGarmin, elAdv;
   (function build() {
-    root.appendChild(h('h2', 'tabtitle', 'Plan'));
-    root.appendChild(h('p', 'note', 'Bu bir tahmin değil. Uygulama, girdiğin hedefi veya temponu parkura dağıtır. Gerçek süreler hava, yorgunluk ve mide durumuna göre farklı olur. Başlangıç değerleri örnektir, kendi değerlerinle değiştir.'));
+    var tt = h('h2', 'tabtitle', 'Plan'); root.appendChild(tt);
+    K.infoBtn(tt, 'Başlangıç değerleri örnektir, kendi değerlerinle değiştir. Antrenman GPX\'i yüklersen sonuç tablosundaki "Veri" düğmesi, plan yerine verinden hesaplanan varış saatlerini gösterir.');
+    root.appendChild(h('p', 'note', 'Plan bir tahmin değildir: girdiğin hedefi veya temponu parkura dağıtır. Gerçek süreler hava, yorgunluk ve mide durumuna göre farklı olur.'));
     elSeg = h('div', 'seg'); root.appendChild(elSeg);
     root.appendChild(h('p', 'settingsline'));
     elEditor = h('section', 'card'); root.appendChild(elEditor);
@@ -231,7 +223,6 @@
     elResults = h('section', 'card'); root.appendChild(elResults);
     elCompare = h('section', 'card'); root.appendChild(elCompare);
     elWhat = h('section', 'card'); root.appendChild(elWhat);
-    elAid = h('section', 'card'); root.appendChild(elAid);
     elGarmin = h('section', 'card'); root.appendChild(elGarmin);
     elAdv = h('section', 'card'); root.appendChild(elAdv);
   })();
@@ -274,7 +265,7 @@
     elEditor.appendChild(stepper('Yavaşlama', 'Yarışın sonunda başlangıca göre yüzde kaç yavaşlarsın', function () { return '%' + s.fat; },
       function (d) { s.fat = clamp(s.fat + d, 0, 150); save(); renderDerived(); }, [-5, -1, 1, 5]));
     var stops = h('div', 'stp');
-    stops.appendChild(h('div', 'stp-head', '<b>Durma süreleri</b><span class="note">Her noktada kaç dakika kalırsın</span>'));
+    var stopHead = h('div', 'stp-head', '<b>Durma süreleri</b>'); stops.appendChild(stopHead); K.infoBtn(stopHead, 'Her noktada kaç dakika kalırsın.');
     var stopTot = h('p', 'settingsline');
     cps.slice(0, NSTOP).forEach(function (c, i) {
       var row = h('div', 'stop-row');
@@ -311,10 +302,33 @@
     });
   }
 
+  /* ---------- Veri: antrenman GPX'inden tahmin (calib.js) ---------- */
+  // Seçili planın durmalarıyla, her nokta için iyi / ana / kötü gün varışı (dakika, yarış başından). iyi ve kötü uç tempo belirsizliğini (band) içerir;
+  // hareket süreleri (mov) çıplaktır. Kesim payı ana varışa göre; badBuf yalnızca kötü gün uyarısı için.
+  function dataFor(s) {
+    var cur = K.calib && K.calib.current && K.calib.current(); if (!cur) return null;
+    var r = compute(s); if (!r.valid) return null;
+    var fc = cur.fc, n = cps.length, out = { fc: fc, r: r, cp: [], stopTot: s.stops.reduce(sum, 0) }, sb = 0;
+    for (var ci = 0; ci < n; ci++) {
+      var good = fc.good[ci] * (1 - fc.band) + sb, mid = fc.mid[ci] + sb, bad = fc.bad[ci] * (1 + fc.band) + sb, cut = cps[ci].cut * 60;
+      out.cp.push({ good: good, mid: mid, bad: bad, buf: cut - mid, badBuf: cut - bad });
+      if (ci < s.stops.length) sb += s.stops[ci];
+    }
+    out.mov = { good: fc.good[n - 1], mid: fc.mid[n - 1], bad: fc.bad[n - 1] };
+    return out;
+  }
+  function dataLabel(M, mv) {
+    if (M < mv.good) return { name: 'iddialı', text: 'iyi günden ' + dur(mv.good - M) + ' hızlı' };
+    if (M < mv.mid) return { name: 'iyimser', text: 'ana tahminden ' + dur(mv.mid - M) + ' hızlı' };
+    if (M <= mv.bad) return { name: 'gerçekçi', text: 'ana tahminden ' + dur(M - mv.mid) + ' yavaş, kötü günden ' + dur(mv.bad - M) + ' hızlı' };
+    return { name: 'çok temkinli', text: 'kötü günden ' + dur(M - mv.bad) + ' yavaş' };
+  }
+
   function renderSummary() {
     var s = st.sc[st.sel], r = compute(s);
     elSummary.textContent = '';
-    elSummary.appendChild(h('h2', '', 'Özet'));
+    var sumHead = h('h2', '', 'Özet'); elSummary.appendChild(sumHead);
+    K.infoBtn(sumHead, 'Düz-eşdeğer tempo: tırmanış ve inişi düz yola çevirdikten sonra 1 km efor için gereken süre. Kendi antrenmandaki rahat ultra temponla karşılaştırıp gerçekçi mi diye bak.');
     if (!r.valid) { elSummary.appendChild(h('p', 'warnbox', 'Durma süreleri hedef süreden uzun. Hedef süreyi artır veya durma sürelerini azalt.')); return; }
     var sh = r.sh, pFirst = r.rows[0].t / sh.eff[0], pLast = r.rows[r.rows.length - 1].t / sh.eff[sh.eff.length - 1];
     var avgP = r.M / sh.E;
@@ -328,18 +342,38 @@
     var dl = h('dl', 'sumlist');
     lines.forEach(function (l) { dl.appendChild(h('dt', '', esc(l[0]))); dl.appendChild(h('dd', '', esc(l[1]))); });
     elSummary.appendChild(dl);
-    elSummary.appendChild(h('p', 'note', 'Düz-eşdeğer tempo: tırmanış ve inişi düz yola çevirdikten sonra 1 km efor için gereken süre. Kendi antrenmandaki rahat ultra temponla karşılaştırıp gerçekçi mi diye bak.'));
+    var dd = dataFor(s);
+    if (dd) {
+      var lb = dataLabel(r.M, dd.mov);
+      var box = h('div', 'databox'); elSummary.appendChild(box);
+      var dh = h('div', 'stp-head', '<b>Veriye göre</b>'); box.appendChild(dh);
+      K.infoBtn(dh, 'Antrenman GPX\'inden hesaplanan hareket süresiyle bu planın hareket süresi karşılaştırılır. iddialı: iyi günden hızlı; iyimser: iyi gün ile ana tahmin arası; gerçekçi: ana tahmin ile kötü gün arası; çok temkinli: kötü günden yavaş. Veriye denk hedef süre = ana tahmin + bu planın durmaları. Tahmin tek bir koşuya dayanır.');
+      box.appendChild(h('div', 'rline', '<b>İyi / ana / kötü gün:</b> ' + hm(dd.mov.good) + ' / ' + hm(dd.mov.mid) + ' / ' + hm(dd.mov.bad) + ' <span class="sub2">(hareket süresi)</span>'));
+      box.appendChild(h('div', 'rline', '<b>Bu plan:</b> ' + hm(r.M) + ' hareket, <b>' + lb.name + '</b> <span class="sub2">(' + esc(lb.text) + ')</span>'));
+      box.appendChild(h('div', 'rline', '<b>Veriye denk hedef süre:</b> ' + hm(dd.mov.mid + dd.stopTot) + ' <span class="sub2">(ana tahmin + ' + dd.stopTot + ' dk durma)</span>'));
+    }
   }
 
   function renderResults() {
-    var s = st.sc[st.sel], r = compute(s);
+    var s = st.sc[st.sel], r = compute(s), dd = dataFor(s);
+    var stat = K.calib && K.calib.status ? K.calib.status() : 'none';
     elResults.textContent = '';
-    elResults.appendChild(h('h2', '', 'Plan: ' + st.sel));
+    var dataMode = view === 'data' && !!dd;   // kayıtlı veri yoksa plan görünümü gösterilir (kayıtlı seçim silinmez)
+    var rh = h('h2', '', (dataMode ? 'Veri: ' : 'Plan: ') + st.sel);
+    elResults.appendChild(rh);
+    K.infoBtn(rh, dataMode
+      ? 'Varış saati ana tahmindir; altındaki aralık iyi gün (doğrusal yorulma) ile kötü gün (daha hızlı artan yorulma) arasıdır, tempo belirsizliği dahil. Kesim payı = kesim saati - gösterilen varış (ana tahmin). Durmalar seçili plandan (' + st.sel + ').'
+      : 'Parkuru kaç çıkış, iniş ve düz sektöre böleyim: Az, Orta, Çok. Noktalara dokunup sektörleri aç. Kesim payı: noktaya varış saatinin kesim saatinden ne kadar önce olduğu. Eşikler: 60 dk ve üstü güvende, 20-59 dk dikkat, 20 dk altı tehlike. Sektör süreleri ve tempoları tahmin değil, planın dağıtımıdır; dakika yuvarlandığı için toplamlar 1 dk oynayabilir.');
+    var sw = chipRow([{ id: 'plan', label: 'Plan' }, { id: 'data', label: dd ? 'Veri' : (stat === 'bad' ? 'Veri (koşu yetersiz)' : 'Veri (GPX yükle)') }],
+      function (it) { return (dataMode ? 'data' : 'plan') === it.id; },
+      function (it) { if (it.id === 'data' && !dd) return; setView(it.id); renderResults(); });
+    if (!dd) sw.children[1].disabled = true;
+    elResults.appendChild(sw);
+    if (!r.valid) { elResults.appendChild(h('p', 'warnbox', 'Önce planı düzelt.')); return; }
+    if (dataMode) { renderDataRows(s, dd); return; }
     elResults.appendChild(chipRow(LEVELS.map(function (l) { return { id: l.id, label: l.name + ' ' + C.sec[l.id].length }; }),
       function (it) { return st.level === it.id; },
       function (it) { st.level = it.id; save(); renderAll(); }));
-    elResults.appendChild(h('p', 'note', 'Ayrıntı seviyesi: parkuru kaç çıkış, iniş ve düz sektöre böleyim. Noktalara dokunup sektörleri aç.'));
-    if (!r.valid) { elResults.appendChild(h('p', 'warnbox', 'Önce planı düzelt.')); return; }
     segsByCp().forEach(function (grp) {
       var ci = grp.ci, cp = r.cp[ci], sx = status(cp.buf);
       var d = h('details', 'cpsec');
@@ -361,14 +395,34 @@
           '<td class="r"><b>' + ms(pace) + '</b> <span class="sub2">/km</span><div class="sub2">düz-eş. ' + ms(ep) + ' /km</div></td></tr>';
       });
       d.appendChild(h('div', 'tablewrap', '<table class="plantable sectable"><thead><tr><th>Sektör</th><th class="r">Süre</th><th class="r">Tempo</th></tr></thead><tbody>' + rowsHtml + '</tbody></table>'));
-      if (ci < NSTOP && cp.stop) d.appendChild(h('p', 'note', esc(cps[ci].name) + ' noktasında ' + cp.stop + ' dk durma planlı.'));
+      if (ci < NSTOP && cp.stop) d.appendChild(h('p', 'sub2', esc(cps[ci].name) + ' noktasında ' + cp.stop + ' dk durma planlı.'));
       elResults.appendChild(d);
     });
     var worst = 0;
     r.cp.forEach(function (x, i) { if (x.buf < r.cp[worst].buf) worst = i; });
-    var w = r.cp[worst], sw = status(w.buf);
-    elResults.appendChild(h('p', 'note', 'En dar nokta: ' + esc(cps[worst].name) + ', kesim payı ' + f(w.buf, 0) + ' dk (' + sw.text.toLowerCase() + '). Kesim payı: noktaya varış saatinin kesim saatinden ne kadar önce olduğu. Eşikler: 60 dk ve üstü güvende, 20-59 dk dikkat, 20 dk altı tehlike.'));
-    elResults.appendChild(h('p', 'note', 'Sektör süreleri ve tempoları tahmin değil, planın dağıtımıdır. Dakika yuvarlandığı için toplamlar 1 dk oynayabilir.'));
+    var w = r.cp[worst], sw2 = status(w.buf);
+    elResults.appendChild(h('p', 'note', 'En dar nokta: ' + esc(cps[worst].name) + ', kesim payı ' + f(w.buf, 0) + ' dk (' + sw2.text.toLowerCase() + ').'));
+  }
+  // Veri görünümü: aynı nokta listesi, varışlar antrenman GPX'inden (ana tahmin, altında iyi-kötü aralığı). Sektör ayrıntısı yalnızca Plan görünümünde.
+  function renderDataRows(s, dd) {
+    var fc = dd.fc;
+    if (fc.level === 'weak') elResults.appendChild(h('p', 'warnbox', 'Koşu zayıf: ' + esc(fc.reasons.join('; ')) + '. Tahmin aralığı geniş tutuldu (en az ±%9).'));
+    if (fc.lowSlow) elResults.appendChild(h('p', 'warnbox', 'Ölçülen yavaşlama çok düşük (%' + f(fc.slow, 1) + '). Yarışta çok daha uzun süre koşacağın için daha fazla yavaşlayabilirsin; aralık geniş tutuldu (en az ±%9).'));
+    var worst = 0, risky = null;
+    dd.cp.forEach(function (c, ci) {
+      var sx = status(c.buf);
+      var d = h('div', 'cpsec cpstatic');
+      d.appendChild(h('div', 'cphead',
+        '<div class="cpl"><b>' + esc(cps[ci].name) + '</b><div class="sub2">' + f(cps[ci].km, 1) + ' km, kesim ' + hm(cps[ci].cut * 60) + '</div></div>' +
+        '<div class="cpm r"><b>' + clock(c.mid) + '</b><div class="sub2">' + clock(c.good) + ' - ' + clock(c.bad) + '</div></div>' +
+        '<div class="cpr r"><span class="pay ' + sx.cls + '">' + sx.icon + ' ' + (c.buf < 0 ? '' : f(c.buf, 0) + ' dk') + '</span><div class="sub2 ' + sx.cls + '">' + sx.text + '</div></div>'));
+      elResults.appendChild(d);
+      if (c.buf < dd.cp[worst].buf) worst = ci;
+      if (c.badBuf < 20 && (!risky || c.badBuf < risky.c.badBuf)) risky = { c: c, ci: ci };
+    });
+    elResults.appendChild(h('p', 'note', 'En dar nokta: ' + esc(cps[worst].name) + ', kesim payı ' + f(dd.cp[worst].buf, 0) + ' dk (' + status(dd.cp[worst].buf).text.toLowerCase() + ').'));
+    if (risky) elResults.appendChild(h('p', 'warnbox', 'Kötü günde ' + esc(cps[risky.ci].name) + (risky.c.badBuf < 0 ? ' noktasında kesim saati aşılabilir.' : ' noktasında kesim payı ' + Math.round(risky.c.badBuf) + ' dk\'ya düşebilir.')));
+    elResults.appendChild(h('p', 'note', 'Durmalar ' + st.sel + ' planından (' + dd.stopTot + ' dk). Rakım (parkur 1026-1471 m), hava ve arazi tahminde yok.' + (fc.km < 40 ? ' Antrenman ' + f(fc.km, 0) + ' km: aralık geniş; 40 km üstü bir koşu daraltır.' : '')));
   }
   function segsByCp() {
     var secs = buildSectors(st.level), groups = [];
@@ -385,7 +439,8 @@
   function sv(name, attrs, parent) { var e = document.createElementNS(svgNS, name); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
   function renderCompare() {
     elCompare.textContent = '';
-    elCompare.appendChild(h('h2', '', 'A, B ve C yan yana'));
+    var cmpHead = h('h2', '', 'A, B ve C yan yana'); elCompare.appendChild(cmpHead);
+    K.infoBtn(cmpHead, 'Saatler varış saati, altında kesim payı. Grafikte yatay eksen km, dikey eksen yarışın kaçıncı saati; bir çizgi kırmızı çizginin altında kaldığı sürece kesim içindesin.');
     var res = { A: compute(st.sc.A), B: compute(st.sc.B), C: compute(st.sc.C) };
     var anyInvalid = ['A', 'B', 'C'].some(function (k) { return !res[k].valid; });
     if (anyInvalid) { elCompare.appendChild(h('p', 'warnbox', 'Bir senaryoda durma süreleri hedef süreden uzun. Önce onu düzelt.')); return; }
@@ -399,7 +454,6 @@
       rows += '</tr>';
     });
     elCompare.appendChild(h('div', 'tablewrap', '<table class="plantable"><thead><tr><th>Nokta</th><th class="r">A</th><th class="r">B</th><th class="r">C</th></tr></thead><tbody>' + rows + '</tbody></table>'));
-    elCompare.appendChild(h('p', 'note', 'Saatler varış saati, altında kesim payı.'));
 
     var box = h('div', 'chart tchart'); elCompare.appendChild(box);
     var W = Math.max(280, Math.round(box.clientWidth || 340)), H = 240, pl = 40, pr = 16, pt = 16, pb = 26;
@@ -430,15 +484,13 @@
       var lab = sv('text', { x: X(last.sec.kmTo) + 4, y: Y(last.arr) + 4, class: 't-lab t-l' + k }, svg); lab.textContent = k;
     });
     elCompare.appendChild(h('div', 'legend', '<span><i class="sw sA"></i>A</span><span><i class="sw sB"></i>B</span><span><i class="sw sC"></i>C</span><span><i class="sw sCut"></i>Kesim</span>'));
-    elCompare.appendChild(h('p', 'note', 'Yatay eksen km, dikey eksen yarışın kaçıncı saati. Bir çizgi kırmızı çizginin altında kaldığı sürece kesim içindesin.'));
   }
 
   /* ----- what-if ----- */
   function renderWhat() {
     elWhat.textContent = '';
-    elWhat.appendChild(h('h2', '', 'Ya şöyle olursa?'));
+    elWhat.appendChild(h('h2', '', 'Ya şöyle olursa? (' + st.sel + ' planı)'));
     var s = st.sc[st.sel], r = compute(s);
-    elWhat.appendChild(h('p', 'note', st.sel + ' planına göre hesaplanır.'));
     elWhat.appendChild(chipRow(cps.slice(0, NSTOP).map(function (c, i) { return { id: i, label: c.name }; }),
       function (it) { return st.whatCp === it.id; }, function (it) { st.whatCp = it.id; save(); renderWhat(); }));
     var out = h('p', 'whatout');
@@ -461,25 +513,11 @@
     calc();
   }
 
-  /* ----- aid cards ----- */
-  function renderAid() {
-    elAid.textContent = '';
-    elAid.appendChild(h('h2', '', 'Noktalarda ne var?'));
-    AID.forEach(function (a, i) {
-      var g = cps[i];
-      var d = h('details', 'aid');
-      d.innerHTML = '<summary><b>' + esc(g.name) + '</b> <span class="sub2">' + f(g.km, 1) + ' km, kesim ' + hm(g.cut * 60) + '</span></summary>' +
-        '<dl><dt>Yiyecek</dt><dd>' + esc(a.food) + '</dd><dt>İçecek</dt><dd>' + esc(a.drink) + '</dd><dt>Sıcak</dt><dd>' + esc(a.hot) + '</dd><dt>Diğer</dt><dd>' + esc(a.extra) + '</dd></dl>' +
-        '<p class="aidtip">' + esc(a.tip) + '</p>';
-      elAid.appendChild(d);
-    });
-    elAid.appendChild(h('p', 'note', 'Kaynak: resmi 2026 kurallar sayfası. Ürünler değişebilir; yarış kitindeki son bilgiye bak. Destekçiler yalnızca kontrol noktalarında belirlenen alanlarda destek verebilir.'));
-  }
-
   /* ----- garmin pacepro helper ----- */
   function renderGarmin() {
     elGarmin.textContent = '';
-    elGarmin.appendChild(h('h2', '', 'Garmin saat için'));
+    var gHead = h('h2', '', 'Garmin saat için'); elGarmin.appendChild(gHead);
+    K.infoBtn(gHead, 'PacePro planına hareket süresini gir (bitiş süresinden durma süreleri çıkarılmış hâli); noktalardaki duraklamaları PacePro bilmez. Kurs dosyası ve saat kurulum adımları Garmin rehberinde.');
     var rows = '';
     ['A', 'B', 'C'].forEach(function (k) {
       var r = compute(st.sc[k]);
@@ -487,31 +525,28 @@
         '<td class="r">' + (r.valid ? hm(r.finish) : '--') + '</td><td class="r"><b>' + (r.valid ? hm(r.M) : '--') + '</b></td></tr>';
     });
     elGarmin.appendChild(h('div', 'tablewrap', '<table class="plantable"><thead><tr><th>Plan</th><th class="r">Bitiş</th><th class="r">PacePro süresi</th></tr></thead><tbody>' + rows + '</tbody></table>'));
-    elGarmin.appendChild(h('p', 'note', 'PacePro planına hareket süresini gir (bitiş süresinden durma sürelerini çıkarılmış hâli); noktalardaki duraklamaları PacePro bilmez. Kurs dosyası ve saat kurulum adımları Garmin rehberinde.'));
   }
 
   /* ----- advanced ----- */
   function stepFmt(d) { return (d > 0 ? '+' : '−') + f(Math.abs(d), 2); }
   function renderAdv() {
     elAdv.textContent = '';
-    elAdv.appendChild(h('h2', '', 'Gelişmiş'));
+    var advHead = h('h2', '', 'Gelişmiş'); elAdv.appendChild(advHead);
+    K.infoBtn(advHead, 'Hedef süre modunda bu ayarlar bitiş saatini değiştirmez, süreyi sektörlere dağıtımını değiştirir. Düz tempo modunda ise bitiş saatini de değiştirir.');
     var total = compute(st.sc[st.sel]).E;
-    elAdv.appendChild(stepper('Tırmanış: 100 m kaç km düz sayılsın', '',
+    elAdv.appendChild(stepper('Tırmanış: 100 m kaç km düz sayılsın', 'Varsayılan 1,00: ITRA tarzı km-efor kuralı (100 m tırmanış = 1 km). Eğim yüzdesi g ise yavaşlama çarpanı yaklaşık 1 + 10 x g (%10 eğimde 2 kat, %20 eğimde 3 kat).',
       function () { return f(st.wUp, 2) + ' km'; },
       function (d) { st.wUp = clamp(Math.round((st.wUp + d) * 100) / 100, 0.25, 2.5); save(); renderDerived(); renderAdvInfo(); }, [-0.25, 0.25], stepFmt));
     elAdv.appendChild(chipRow([0.5, 0.75, 0.88, 1, 1.5].map(function (v) { return { v: v, label: f(v, 2) }; }),
       function (it) { return Math.abs(st.wUp - it.v) < 0.001; },
       function (it) { st.wUp = it.v; save(); renderDerived(); renderAdv(); }));
-    elAdv.appendChild(h('p', 'note', 'Varsayılan 1,00: ITRA tarzı km-efor kuralı (100 m tırmanış = 1 km). Eğim yüzdesi g ise yavaşlama çarpanı yaklaşık 1 + 10 x g (%10 eğimde 2 kat, %20 eğimde 3 kat).'));
-    elAdv.appendChild(stepper('İniş: 100 m kaç km düz sayılsın', '',
+    elAdv.appendChild(stepper('İniş: 100 m kaç km düz sayılsın', 'Kapalı: ITRA formülü gibi inişi saymaz. 0,25 (400 m iniş = 1 km) ve 0,50 (200 m iniş = 1 km) bazı kaynaklarda kullanılan varyantlar. Negatif değer inişi düzden hızlı sayar: 4 Ekim koşusundan kalibre edilen −0,24, 100 m inişin 0,24 km kazandırdığı anlamına gelir (en az −0,50).',
       function () { return f(st.wDn, 2) + ' km'; },
       function (d) { st.wDn = clamp(Math.round((st.wDn + d) * 100) / 100, -0.5, 1); save(); renderDerived(); renderAdvInfo(); }, [-0.05, 0.05], stepFmt));
     elAdv.appendChild(chipRow([{ v: -0.24, label: '−0,24 (kalibre)' }, { v: 0, label: 'Kapalı' }, { v: 0.25, label: '0,25' }, { v: 0.5, label: '0,50' }],
       function (it) { return Math.abs(st.wDn - it.v) < 0.001; },
       function (it) { st.wDn = it.v; save(); renderDerived(); renderAdv(); }));
-    elAdv.appendChild(h('p', 'note', 'Kapalı: ITRA formülü gibi inişi saymaz. 0,25 (400 m iniş = 1 km) ve 0,50 (200 m iniş = 1 km) bazı kaynaklarda kullanılan varyantlar. Negatif değer inişi düzden hızlı sayar: 4 Ekim koşusundan kalibre edilen −0,24, 100 m inişin 0,24 km kazandırdığı anlamına gelir (en az −0,50).'));
     var info = h('p', 'advinfo'); info.id = 'advInfo'; elAdv.appendChild(info);
-    elAdv.appendChild(h('p', 'note', 'Hedef süre modunda bu ayarlar bitiş saatini değiştirmez, süreyi sektörlere dağıtımını değiştirir. Düz tempo modunda ise bitiş saatini de değiştirir.'));
     var b = h('button', 'btn wide', 'Varsayılan değerlere dön'); b.type = 'button';
     b.addEventListener('click', function () {
       if (!b.getAttribute('data-ask')) { b.setAttribute('data-ask', '1'); b.textContent = 'Emin misin? Tekrar dokun'; setTimeout(function () { b.removeAttribute('data-ask'); b.textContent = 'Varsayılan değerlere dön'; }, 4000); return; }
@@ -523,23 +558,27 @@
   function renderAdvInfo() {
     var e = $('advInfo'); if (!e) return;
     var E = compute(st.sc[st.sel]).E;
-    e.textContent = 'Parkurun toplam eforu: ' + f(E, 1) + ' km-efor (' + f(K.TOTAL / 1000, 1) + ' km mesafe, 2030 m tırmanış).';
+    e.textContent = 'Parkurun toplam eforu: ' + f(E, 1) + ' km-efor (' + f(K.TOTAL / 1000, 1) + ' km mesafe, 2030 m tırmanış). ' + descentEffect();
+  }
+  // İniş ağırlığının canlı etkisi: şimdiki değerle, "öteki" değerle (şimdi kapalıysa -0,24, değilse kapalı) seçili planın bitişi / noktaları
+  function descentEffect() {
+    var s = st.sc[st.sel], other = Math.abs(st.wDn) < 1e-9 ? -0.24 : 0;
+    var a = compute(s), b = compute(s, { level: st.level, wUp: st.wUp, wDn: other });
+    if (!a.valid || !b.valid) return '';
+    var shift = 0; a.cp.forEach(function (c, i) { shift = Math.max(shift, Math.abs(c.arr - b.cp[i].arr)); });
+    if (s.mode === 'pace') return st.sel + ' planı, düz tempo: iniş ' + f(st.wDn, 2) + ' ile bitiş ' + clock(a.finish) + '; iniş ' + f(other, 2) + ' olsa ' + clock(b.finish) + '.';
+    return st.sel + ' planı, hedef süre: bitiş sabit ' + clock(a.finish) + '; iniş ' + f(other, 2) + ' olsa noktaların varışı en çok ' + Math.round(shift) + ' dk kayar.';
   }
 
   function renderDerived() { renderSeg(); renderSummary(); renderResults(); renderCompare(); renderWhat(); renderGarmin(); paintSettings(); if (K.calib && K.calib.refresh) K.calib.refresh(); }
-  function renderAll() { renderSeg(); renderEditor(); renderSummary(); renderResults(); renderCompare(); renderWhat(); renderAid(); renderGarmin(); renderAdv(); paintSettings(); if (K.calib && K.calib.refresh) K.calib.refresh(); }
+  function renderAll() { renderSeg(); renderEditor(); renderSummary(); renderResults(); renderCompare(); renderWhat(); renderGarmin(); renderAdv(); paintSettings(); if (K.calib && K.calib.refresh) K.calib.refresh(); }
 
   var rt = null;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { if (!$('tab-plan').hidden) renderCompare(); }, 150); });
 
   window.K63.showTab = showTab;
-  // Kalibrasyon: bir senaryoyu düz tempo moduna alıp başlangıç temposunu ayarlar
-  function applyPace(key, p0) {
-    var s = st.sc[key]; if (!s) return;
-    s.mode = 'pace'; s.p0 = clamp(Math.round(p0), 180, 720); save(); renderAll();
-  }
   window.K63.plan = { compute: compute, buildSectors: buildSectors, state: function () { return st; }, steep: steep, cps: cps, defaults: clone(DEF), settingsInfo: settingsInfo,
-    applyPace: applyPace, calibEl: function () { return elCalib; } };
+    rerender: function () { renderDerived(); }, dataFor: dataFor, dataLabel: dataLabel, calibEl: function () { return elCalib; } };
   var last = K.store('k63tab');
   showTab(tabs.indexOf(last) >= 0 ? last : 'profile');
 })();

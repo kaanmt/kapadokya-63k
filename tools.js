@@ -15,12 +15,12 @@
     { name: 'B, kalibre ağırlıklar (tırmanış 0,88, iniş -0,24)', s: { mode: 'target', target: 660, fat: 50, stops: [3, 6, 5, 6, 3] }, o: { level: 'orta', wUp: 0.88, wDn: -0.24 }, arr: [98.95, 255.76, 359.05, 451.05, 539.42, 660] }
   ];
   var NUT_VECTORS = [
-    { name: '85 kg, çok terleme, ter tuzluluğu bilmiyorum (825), 15 °C, kafein az, hareket 585 dk', p: { kg: 85, sweat: 'high', salty: 'unknown', temp: 15, caf: 'low', health: false, M: 585 }, exp: [700, 580, 65, 128] },
-    { name: 'Aynı kişi, az tuzlu ter (600 mg/L)', p: { kg: 85, sweat: 'high', salty: 'low', temp: 15, caf: 'low', health: false, M: 585 }, exp: [700, 420, 65, 128] },
-    { name: 'Aynı kişi, çok tuzlu ter (1100 mg/L)', p: { kg: 85, sweat: 'high', salty: 'high', temp: 15, caf: 'low', health: false, M: 585 }, exp: [700, 770, 65, 128] },
-    { name: '75 kg, normal terleme, az tuzlu ter, 15 °C, kafein az, hareket 637 dk', p: { kg: 75, sweat: 'normal', salty: 'low', temp: 15, caf: 'low', health: false, M: 637 }, exp: [500, 300, 60, 113] },
-    { name: '55 kg, az terleme, çok tuzlu ter, 30 °C, kafein normal, hareket 700 dk', p: { kg: 55, sweat: 'low', salty: 'high', temp: 30, caf: 'normal', health: false, M: 700 }, exp: [490, 540, 55, 165] },
-    { name: '100 kg, çok, bilmiyorum, 25 °C, kafeinsiz, hareket 525 dk (üst sınır)', p: { kg: 100, sweat: 'high', salty: 'unknown', temp: 25, caf: 'none', health: false, M: 525 }, exp: [750, 620, 65, 0] }
+    { name: '85 kg, çok terleme, ter tuzluluğu bilmiyorum (825), 15 °C, hareket 585 dk', p: { kg: 85, sweat: 'high', salty: 'unknown', temp: 15, health: false, M: 585 }, exp: [700, 580, 65] },
+    { name: 'Aynı kişi, az tuzlu ter (600 mg/L)', p: { kg: 85, sweat: 'high', salty: 'low', temp: 15, health: false, M: 585 }, exp: [700, 420, 65] },
+    { name: 'Aynı kişi, çok tuzlu ter (1100 mg/L)', p: { kg: 85, sweat: 'high', salty: 'high', temp: 15, health: false, M: 585 }, exp: [700, 770, 65] },
+    { name: '75 kg, normal terleme, az tuzlu ter, 15 °C, hareket 637 dk', p: { kg: 75, sweat: 'normal', salty: 'low', temp: 15, health: false, M: 637 }, exp: [500, 300, 60] },
+    { name: '55 kg, az terleme, çok tuzlu ter, 30 °C, hareket 700 dk', p: { kg: 55, sweat: 'low', salty: 'high', temp: 30, health: false, M: 700 }, exp: [490, 540, 55] },
+    { name: '100 kg, çok, bilmiyorum, 25 °C, hareket 525 dk (üst sınır)', p: { kg: 100, sweat: 'high', salty: 'unknown', temp: 25, health: false, M: 525 }, exp: [750, 620, 65] }
   ];
   function near(a, b, tol) { return Math.abs(a - b) <= tol; }
   function f2(x) { return (Math.round(x * 1000) / 1000).toString(); }
@@ -40,11 +40,19 @@
         });
         var bad = K.plan.compute({ mode: 'pace', target: 600, p0: 0, fat: 40, stops: [2, 4, 3, 4, 2] }, PLAN_DEFAULTS);
         check('Düz tempo 0 iken plan geçersiz', !bad.valid, String(bad.valid));
+        var dlb = K.plan.dataLabel, mvx = { good: 600, mid: 630, bad: 680 };
+        check('Veriye göre etiketi: iddialı / iyimser / gerçekçi / çok temkinli sınırları', !!dlb && dlb(599, mvx).name === 'iddialı' && dlb(600, mvx).name === 'iyimser' && dlb(630, mvx).name === 'gerçekçi' && dlb(680, mvx).name === 'gerçekçi' && dlb(681, mvx).name === 'çok temkinli',
+          [599, 600, 630, 680, 681].map(function (m) { return dlb ? dlb(m, mvx).name : '-'; }).join(', '));
+        var holder = document.createElement('div'), hd0 = document.createElement('h2'); hd0.textContent = 'Deneme'; holder.appendChild(hd0);
+        var ib = K.infoBtn(hd0, 'açıklama'), op1 = false, op2 = false;
+        ib.click(); op1 = !!holder.querySelector('.tipbody') && ib.getAttribute('aria-expanded') === 'true';
+        ib.click(); op2 = !holder.querySelector('.tipbody') && ib.getAttribute('aria-expanded') === 'false';
+        check('ⓘ düğmesi: dokununca açıklama açılır, tekrar dokununca kapanır', op1 && op2, op1 + ' / ' + op2);
       } else check('Plan modülü yüklü', false);
       if (K.nutrition) {
         check('Sabit parkur eforu 83,26 km-efor', near(K.nutrition.E_STD, 83.265, 0.02), K.nutrition.E_STD.toFixed(3));
         NUT_VECTORS.forEach(function (v) {
-          var t = K.nutrition.targetsFrom(v.p), got = [t.fluid, t.na, t.carb, t.cafCap];
+          var t = K.nutrition.targetsFrom(v.p), got = [t.fluid, t.na, t.carb];
           check('Beslenme hedefi: ' + v.name, got.join('/') === v.exp.join('/'), 'beklenen ' + v.exp.join(' / ') + ', çıkan ' + got.join(' / '));
         });
         check('Tuz 0,9 g = sodyum 360 mg', K.nutrition.saltToNa(0.9) === 360, String(K.nutrition.saltToNa(0.9)));
@@ -77,7 +85,7 @@
         zz += '</trkseg></trk></gpx>';
         var zr = K.calib.analyze(K.calib.parseGpx(zz), { wUp: 1, wDn: 0 }, { smoothSec: 0 }), zs = K.calib.analyze(K.calib.parseGpx(zz), { wUp: 1, wDn: 0 });
         check('Konum yumuşatma 9 sn: titreşimli kayıtta mesafe gerçeğe yaklaşır', zr.km > 3.6 && near(zs.km, 1.8, 0.09), 'ham ' + f2(zr.km) + ' km, yumuşatılmış ' + f2(zs.km) + ' km (gerçek 1,8)');
-        // Tahmin: kısa koşuda tahmin yok; uzun, tırmanışlı ve ikinci yarısı %10 yavaş koşuda yavaşlama ölçülür, alt < orta < üst
+        // Tahmin: kısa koşuda tahmin yok; uzun, tırmanışlı ve ikinci yarısı %10 yavaş koşuda yavaşlama ölçülür, iyi < ana < kötü
         check('Tahmin kapısı: kısa koşu (2,2 km) yetersiz sayılır, tahmin üretilmez', a.fc && a.fc.ok === false && a.fc.level === 'bad', a.fc ? a.fc.level + ', ' + a.fc.reasons.length + ' neden' : 'yok');
         // 24 km: ilk 12 km 2,5 m/sn, ikinci 12 km 2,5/1,10 m/sn; her km'de 40 m'lik tırmanış ve iniş (iki yarıda aynı), 5 sn aralıklı kayıt
         var lg = '<?xml version="1.0"?><gpx xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg>', tL = t0, posM = 0;
@@ -88,9 +96,9 @@
         }
         lg += '</trkseg></trk></gpx>';
         var lr = K.calib.analyze(K.calib.parseGpx(lg), { wUp: 1, wDn: 0 }), lf = lr.fc, last = lf && lf.ok ? K.cps.length - 1 : -1;
-        check('Tahmin: uzun koşuda yavaşlama ölçülür (kurgu %10), alt < orta < üst, varışlar artar',
-          !!lf && lf.ok && lf.measured && near(lf.slow, 10, 1.5) && lf.lo[last] < lf.mid[last] && lf.mid[last] < lf.hi[last] && lf.mid.every(function (v, i) { return i === 0 || v > lf.mid[i - 1]; }),
-          lf ? (lf.ok ? 'yavaşlama %' + f2(lf.slow) + ', bitiş hareket ' + Math.round(lf.lo[last]) + ' / ' + Math.round(lf.mid[last]) + ' / ' + Math.round(lf.hi[last]) + ' dk, düzey ' + lf.level : 'tahmin yok: ' + lf.reasons.join('; ')) : 'yok');
+        check('Tahmin: uzun koşuda yavaşlama ölçülür (kurgu %10), iyi < ana < kötü gün, varışlar artar',
+          !!lf && lf.ok && lf.measured && near(lf.slow, 10, 1.5) && lf.good[last] < lf.mid[last] && lf.mid[last] < lf.bad[last] && lf.mid.every(function (v, i) { return i === 0 || v > lf.mid[i - 1]; }),
+          lf ? (lf.ok ? 'yavaşlama %' + f2(lf.slow) + ', bitiş hareket ' + Math.round(lf.good[last]) + ' / ' + Math.round(lf.mid[last]) + ' / ' + Math.round(lf.bad[last]) + ' dk, düzey ' + lf.level : 'tahmin yok: ' + lf.reasons.join('; ')) : 'yok');
       }
       // %90 / %125 eşikleri (tam sınırlar)
       if (K.nutrition && K.nutrition.grade) {
@@ -100,12 +108,16 @@
         if (ap) {
           var evp = K.nutrition.evaluate(ap.g ? ap.g.id : '', ap.t ? ap.t.id : '', ap.s ? ap.s.id : ''), tgp = K.nutrition.targets();
           var rp = K.nutrition.ratios(evp, tgp), okp = K.nutrition.pct(rp.carb) >= 90 && (rp.na == null || K.nutrition.pct(rp.na) >= 90);
+          check('Karmayı öner kafein içeren veya kafeini bilinmeyen ürün seçmez',
+            [ap.g, ap.t, ap.s].every(function (p) { return !p || (!p.cafUnknown && !(p.caf > 0)); }), [ap.g, ap.t, ap.s].filter(Boolean).map(function (p) { return p.id; }).join(', '));
           check('Karmayı öner: %90 sağlanıyorsa gerçekten sağlar, sağlanamıyorsa neden yazar', ap.ok === okp && (ap.ok || ap.reasons.length > 0), 'karbonhidrat %' + K.nutrition.pct(rp.carb) + ', sodyum ' + (rp.na == null ? '-' : '%' + K.nutrition.pct(rp.na)) + (ap.ok ? '' : ', ' + ap.reasons.length + ' neden'));
         }
       }
-      // Kafeinli jel ve Sodium Plus diğer ürünler gibi hesaplanır (günlük sınır yok): hedefi tutacak sayıda kullanılır
-      var ev1 = K.nutrition.evaluate('onthego-progel-mocha-150', '', '');
-      if (ev1.valid) check('Kafeinli jel sınırlanmaz (diğer jeller gibi hesaplanır)', ev1.tot.gels > 2, ev1.tot.gels + ' adet, her ' + ev1.sched.gelMin + ' dk');
+      // Kafein uygulama tarafından kontrol edilmez: hedefte ve değerlendirmede kafein alanı yok; kafeinli jel diğer jeller gibi hesaplanır
+      var tcf = K.nutrition.targetsFrom({ kg: 85, sweat: 'high', salty: 'unknown', temp: 15, health: false, M: 585 }), ev1 = K.nutrition.evaluate('onthego-progel-mocha-150', '', '');
+      check('Kafein kontrolü yok (hedefte kafein sınırı ve değerlendirmede kafein toplamı yok; kafeinli jel sınırlanmaz)',
+        tcf.cafCap === undefined && (!ev1.valid || (ev1.cafOver === undefined && ev1.cafTotal === undefined && ev1.tot.gels > 2)), ev1.valid ? ev1.tot.gels + ' adet jel' : 'plan geçersiz');
+      // Sodium Plus diğer ürünler gibi hesaplanır (günlük sınır yok): hedefi tutacak sayıda kullanılır
       var ev2 = K.nutrition.evaluate('', '', 'bigjoy-sodium-plus');
       if (ev2.valid) check('Sodium Plus sınırlanmaz (diğer ürünler gibi hesaplanır)', ev2.tot.salts > 1, ev2.tot.salts + ' adet, her ' + ev2.sched.saltMin + ' dk');
       var ev3 = K.nutrition.evaluate('wup-neo3-elma', 'onthego-elektrolit-limon', 'wup-salt-tablet');

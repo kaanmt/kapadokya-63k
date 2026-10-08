@@ -232,12 +232,6 @@ tr:last-child td { border-bottom: 0; }
 .sw.sA { background: var(--sA); } .sw.sB { background: var(--sB); } .sw.sC { background: var(--sC); }
 .sw.sCut { background: var(--bad); }
 
-details.aid { border-top: 1px solid var(--line); padding: 6px 0; }
-details.aid summary { min-height: 48px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 18px; }
-details.aid dl { margin: 6px 0; display: grid; grid-template-columns: 82px 1fr; gap: 4px 10px; font-size: 16px; }
-details.aid dt { color: var(--muted); }
-details.aid dd { margin: 0; }
-.aidtip { margin: 6px 0 4px; font-size: 16px; font-weight: 600; }
 
 /* sectors */
 details.cpsec { border-top: 1px solid var(--line); padding: 4px 0; }
@@ -330,13 +324,21 @@ details.manual summary { min-height: 48px; display: flex; align-items: center; c
 .ckrow.on .ckbox { background: var(--ok); border-color: var(--ok); color: var(--surface); }
 .ckrow.on span:last-child { color: var(--muted); }
 
-.search { width: 100%; min-height: 52px; padding: 0 12px; font: inherit; font-size: 17px; background: var(--surface); color: var(--ink); border: 2px solid var(--line); border-radius: 12px; }
-.catlist { margin: 8px 0; max-height: 360px; overflow-y: auto; border: 2px solid var(--line); border-radius: 12px; padding: 0 10px; }
-.catrow { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
-.catrow .fl { flex: 1; min-width: 0; }
 
 .envbanner { position: sticky; top: 0; z-index: 30; padding: calc(8px + env(safe-area-inset-top, 0px)) 16px 8px; background: #B8620A; color: #fff; font-weight: 800; font-size: 15px; text-align: center; }
 .envbanner[hidden] { display: none; }
 
 .note.bad { color: var(--bad); font-weight: 700; }
 .note.ok { color: var(--ok); font-weight: 600; }
+
+/* ⓘ açıklama düğmesi ve açılan not */
+.tipbtn { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; min-height: 40px; margin: -8px 0 -8px 2px; padding: 0 8px; font: inherit; font-size: 17px; font-weight: 400; color: var(--accent); background: transparent; border: 0; border-radius: 20px; vertical-align: middle; cursor: pointer; }
+.tipbtn[aria-expanded="true"] { background: var(--accent); color: var(--accent-ink); }
+.tipbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.tipbody { margin: 4px 0 8px; padding: 6px 10px; border-left: 3px solid var(--accent); }
+.aidnote { margin: 4px 0 6px; }
+div.cpstatic { border-top: 1px solid var(--line); padding: 4px 0; }
+div.cpstatic:first-of-type { border-top: 0; }
+div.cpstatic .cphead { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: start; min-height: 56px; padding: 8px 0; }
+div.cpstatic .cpl b { font-size: 18px; }
+.databox { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); }

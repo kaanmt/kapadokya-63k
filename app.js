@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  var BUILD = '0.16-test-1';
+  var BUILD = '0.16-test-2';
   var C = window.COURSE;
   var N = C.n, STEP = C.step, TOTAL = C.total, K = C.k;
   var ele = C.ele;
@@ -44,6 +44,22 @@
     return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
   }
   function $(id) { return document.getElementById(id); }
+  // ⓘ düğmesi: dokununca başlığın hemen altında açıklama notu açılır / kapanır (basılı tutma yerine; her yerde aynı yardımcı).
+  // head: başlık elementi (h2 veya .stp-head); html: açıklama metni (güvenilir, kod içi metin)
+  function infoBtn(head, html) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'tipbtn'; b.textContent = 'ⓘ';
+    b.setAttribute('aria-label', 'Açıklama'); b.setAttribute('aria-expanded', 'false');
+    b.addEventListener('click', function () {
+      var nx = head.nextElementSibling;
+      if (nx && nx.classList.contains('tipbody') && nx.getAttribute('data-for') === b.id) { nx.remove(); b.setAttribute('aria-expanded', 'false'); return; }
+      var p = document.createElement('p'); p.className = 'note tipbody'; p.innerHTML = html; p.setAttribute('data-for', b.id);
+      head.parentNode.insertBefore(p, head.nextSibling); b.setAttribute('aria-expanded', 'true');
+    });
+    b.id = 'tip' + (infoBtn.n = (infoBtn.n || 0) + 1);
+    (head.querySelector('b') || head).appendChild(b);
+    return b;
+  }
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 
   /* ---------- theme ---------- */
@@ -440,8 +456,8 @@
       }
       if (K && K.nutrition) {
         var b = K.nutrition.breakdown(), ns = K.nutrition.state();
-        lines.push('Beslenme girdileri: ' + ns.kg + ' kg, terleme ' + ns.sweat + ', ter tuzluluğu ' + ns.salty + ', ' + ns.temp + ' °C, suluk ' + ns.flaskN + 'x' + ns.flaskMl + ', en fazla jel ' + ns.maxGels + ', kafein ' + ns.caf + ', sağlık işareti ' + ns.health + ', plan ' + b.key);
-        lines.push('Beslenme hesabı: bitiş ' + Math.round(b.finish) + ' dk, hareket ' + Math.round(b.M) + ' dk, hız ' + b.speed.toFixed(3) + ', tempo ç. ' + b.intF.toFixed(3) + ', terleme ç. ' + b.sweatF + ', sıcaklık ç. ' + b.tempF + ', beden ç. ' + b.kgF.toFixed(3) + ', ham sıvı ' + b.raw.toFixed(1) + ' => sıvı ' + b.fluid + ', ter tuzluluğu ' + b.conc + ' mg/L => sodyum ' + b.na + ', karbonhidrat ' + b.carb + ', kafein sınırı ' + b.cafCap);
+        lines.push('Beslenme girdileri: ' + ns.kg + ' kg, terleme ' + ns.sweat + ', ter tuzluluğu ' + ns.salty + ', ' + ns.temp + ' °C, suluk ' + ns.flaskN + 'x' + ns.flaskMl + ', en fazla jel ' + ns.maxGels + ', sağlık işareti ' + ns.health + ', plan ' + b.key);
+        lines.push('Beslenme hesabı: bitiş ' + Math.round(b.finish) + ' dk, hareket ' + Math.round(b.M) + ' dk, hız ' + b.speed.toFixed(3) + ', tempo ç. ' + b.intF.toFixed(3) + ', terleme ç. ' + b.sweatF + ', sıcaklık ç. ' + b.tempF + ', beden ç. ' + b.kgF.toFixed(3) + ', ham sıvı ' + b.raw.toFixed(1) + ' => sıvı ' + b.fluid + ', ter tuzluluğu ' + b.conc + ' mg/L => sodyum ' + b.na + ', karbonhidrat ' + b.carb);
       }
     } catch (e) { lines.push('Plan/beslenme verisi alınamadı: ' + e.message); }
     if (window.K63 && window.K63.lastSelfTest) { var ls = window.K63.lastSelfTest; lines.push('Kendini sına: ' + ls.passed + ' / ' + ls.items.length + ' geçti' + (ls.cacheOk === null ? '' : ', önbellek ' + (ls.cacheOk ? 'tamam' : 'SORUNLU')) + (ls.passed < ls.items.length ? ' | kalanlar: ' + ls.items.filter(function (r) { return !r.ok; }).map(function (r) { return r.name; }).join('; ') : '')); }
@@ -458,5 +474,5 @@
   window.addEventListener('resize', function () { clearTimeout(resizeT); resizeT = setTimeout(drawChart, 120); });
   drawChart();
   update();
-  window.K63 = { ENV: ENV, BUILD: BUILD, EXPECTED: EXPECTED, ele: ele, grade: grade, C: C, N: N, STEP: STEP, TOTAL: TOTAL, dist: dist, gain: gain, loss: loss, cps: cps, f: f, hhmm: hhmm, $: $, store: store, drawChart: drawChart, update: update };
+  window.K63 = { ENV: ENV, BUILD: BUILD, EXPECTED: EXPECTED, ele: ele, grade: grade, C: C, N: N, STEP: STEP, TOTAL: TOTAL, dist: dist, gain: gain, loss: loss, cps: cps, f: f, hhmm: hhmm, $: $, infoBtn: infoBtn, store: store, drawChart: drawChart, update: update };
 })();

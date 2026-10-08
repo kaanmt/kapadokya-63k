@@ -3,7 +3,7 @@
   var K = window.K63;
   if (!K || !K.plan) return;
   var P = K.plan, $ = K.$, f = K.f, START_H = K.C.startHour;
-  var KEY = 'k63calib-v2';
+  var KEY = 'k63calib-v3'; // v3: senaryolar değişti (iyi/ana/kötü); eski kayıt (v2) kullanılmaz, GPX'i yeniden yükle
 
   /* ---------- GPX okuma ve hesap (saf fonksiyonlar; kendini sınama da kullanır) ---------- */
   function hav(a, b) {
@@ -36,7 +36,7 @@
   var SMOOTH_SEC = 9;      // konum yumuşatma penceresi (saniye, zaman bazlı)
   var DEFAULT_SLOW = 1.12; // 20 km'den kısa koşuda ölçülemeyen yavaşlama için varsayım: 30 km'lik bir koşunun ikinci yarısı %12 yavaş
   var REF_KM = 30;         // varsayılan yavaşlamanın tanımlı olduğu referans koşu uzunluğu
-  var SHAPES = [0.5, 1, 2]; // yorulma şekli: alt (içbükey), orta (doğrusal), üst (dışbükey)
+  var SHAPES = [1, 1.5, 2]; // yorulma şekli üsleri: iyi gün (doğrusal), ana tahmin (dışbükey, hızlanan), kötü gün (daha dışbükey)
   // Konumları zaman penceresinde ortalar (GPS titreşimi mesafeyi şişirir). sec <= 0: yumuşatma yok.
   function smoothPts(pts, sec) {
     if (!(sec > 0)) return pts;
@@ -90,7 +90,7 @@
   /* ---------- Veriden tahmin: tek bir antrenman GPX'inden Kapadokya'da nerede ne zaman ---------- */
   // sm: 25 m'de yeniden örneklenmiş, yumuşatılmış rakım; tm: aynı noktalarda birikimli hareket saniyesi.
   // Model: efor (sabit 0,88 / -0,24 ağırlık) başına hareket temposu x yorulma çarpanı. Yorulma ikinci/ilk yarı tempo oranından ölçülür
-  // ve üç şekille (alt x^0,5, orta doğrusal, üst x^2) mutlak mesafeyle yarışa uzatılır.
+  // ve üç şekille (iyi gün doğrusal x, ana tahmin x^1,5, kötü gün x^2) mutlak mesafeyle yarışa uzatılır.
   function bandFor(km) { return km >= 25 ? 0.02 : km >= 20 ? 0.04 : km >= 15 ? 0.06 : km >= 10 ? 0.09 : 0.14; }
   function gate(km, movH, climb, steepKm) {
     var lv = function (v, a, b) { return v >= a ? 2 : v >= b ? 1 : 0; };
@@ -126,7 +126,7 @@
     out.measured = measured; out.slow = (r - 1) * 100; out.band = band;
     // Yorulma mutlak mesafeye bağlı. Ölçülen: koşunun kendi uzunluğu referans; ölçülemeyen: 30 km'lik referans koşu
     var runKm = measured ? n * 0.025 : REF_KM, x = new Array(n); for (k = 0; k < n; k++) x[k] = (k + 1) * 0.025 / runKm;
-    var shapes = {}, names = ['lo', 'mid', 'hi'];
+    var shapes = {}, names = ['good', 'mid', 'bad'];
     var tot = 0; for (k = 0; k < n; k++) tot += dt[k];
     SHAPES.forEach(function (pw, si) {
       // k katsayısı: 1 + kk x^pw çarpanıyla yarı tempo oranı r'yi verecek şekilde (ikili arama)
@@ -153,7 +153,7 @@
       }
       shapes[names[si]] = cumv; if (si === 1) out.basePace = base;
     });
-    out.lo = shapes.lo; out.mid = shapes.mid; out.hi = shapes.hi;
+    out.good = shapes.good; out.mid = shapes.mid; out.bad = shapes.bad;
     return out;
   }
 
@@ -161,20 +161,26 @@
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function ms(sec) { var t = Math.round(sec), m = Math.floor(t / 60), s = t % 60; return m + ':' + (s < 10 ? '0' : '') + s; }
   function hms(sec) { var t = Math.round(sec), hh = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), s = t % 60; return hh + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
-  function hm(min) { var t = Math.round(min), hh = Math.floor(t / 60), m = t % 60; return hh + ':' + (m < 10 ? '0' : '') + m; }
   function load() { try { var r = K.store(KEY); return r ? JSON.parse(r) : null; } catch (e) { return null; } }
   function save(r) { K.store(KEY, JSON.stringify(r)); }
+  // Plan sekmesindeki "Veri" görünümü için: kayıtlı koşunun tahmini (yeterliyse), yoksa null
+  // 'none': kayıtlı koşu yok; 'bad': koşu tahmin için yetersiz; 'ok': tahmin hazır
+  function status() { var r = load(); return !r || !r.fc ? 'none' : r.fc.ok ? 'ok' : 'bad'; }
+  function current() { var r = load(); return r && r.fc && r.fc.ok ? { r: r, fc: r.fc } : null; }
 
   function render() {
     var el = P.calibEl(); if (!el) return;
     el.textContent = '';
     var det = document.createElement('details'); det.className = 'manual';
     var last = load();
-    det.innerHTML = '<summary><b>Antrenmandan tahmin ve kalibrasyon (GPX)</b>' + (last ? ' <span class="sub2">son: ' + f(last.km, 1) + ' km, düz-eş. ' + ms(last.pace) + ' /km</span>' : '') + '</summary>';
+    det.innerHTML = '<summary><b>Antrenmandan tahmin (GPX)</b>' + (last ? ' <span class="sub2">son: ' + f(last.km, 1) + ' km, düz-eş. ' + ms(last.pace) + ' /km</span>' : '') + '</summary>';
     var body = document.createElement('div');
-    body.innerHTML = '<p class="note">Bir antrenman koşusunun GPX kaydını yükle (Garmin Connect web sitesinde aktiviteyi aç, sağ üstteki dişli > "GPX\'e aktar"; Strava\'da "Orijinali dışa aktar"). Uygulama koşunun temposunu ve yavaşlamasını ölçer, Kapadokya parkurunda her noktaya ne zaman varabileceğini bir aralık olarak tahmin eder. En iyisi en az 20 km, 2 saat ve tırmanışlı bir koşu. İstersen A/B/C\'ye başlangıç temposu olarak da uygularsın.</p>' +
-      '<label class="filelabel">GPX dosyası seç<input type="file" id="calFile" accept=".gpx,application/gpx+xml,application/xml,text/xml"></label>' +
-      '<p class="note" id="calMsg"></p><div id="calOut"></div>';
+    var hd = document.createElement('div'); hd.className = 'stp-head'; hd.innerHTML = '<b>GPX yükle</b>';
+    body.appendChild(hd);
+    K.infoBtn(hd, 'Bir antrenman koşusunun GPX kaydını yükle (Garmin Connect web sitesinde aktiviteyi aç, sağ üstteki dişli > "GPX\'e aktar"; Strava\'da "Orijinali dışa aktar"). Uygulama koşunun temposunu ve yavaşlamasını ölçer, Kapadokya parkurunda her noktaya ne zaman varabileceğini üç senaryoyla (iyi gün, ana tahmin, kötü gün) hesaplar. En iyisi en az 20 km, 2 saat ve tırmanışlı, mümkünse 40 km üstü bir koşu.');
+    var lab = document.createElement('label'); lab.className = 'filelabel'; lab.innerHTML = 'GPX dosyası seç<input type="file" id="calFile" accept=".gpx,application/gpx+xml,application/xml,text/xml">';
+    body.appendChild(lab);
+    body.insertAdjacentHTML('beforeend', '<p class="note" id="calMsg"></p><div id="calOut"></div>');
     det.appendChild(body); el.appendChild(det);
     if (last) { det.open = false; paintResult(last); }
     $('calFile').addEventListener('change', function () {
@@ -186,46 +192,26 @@
           var st = P.state(), r = analyze(parseGpx(String(rd.result || '')), { wUp: st.wUp, wDn: st.wDn });
           r.file = file.name; r.at = new Date().toISOString(); save(r);
           msg.textContent = 'Okundu: ' + file.name; msg.className = 'note ok'; paintResult(r); det.open = true;
+          if (P.rerender) P.rerender();
         } catch (e) { msg.textContent = 'Okunamadı: ' + e.message; msg.className = 'note bad'; }
       };
       rd.onerror = function () { msg.textContent = 'Dosya okunamadı'; msg.className = 'note bad'; };
       rd.readAsText(file);
     });
   }
-  var CUT_OK = 60, CUT_WARN = 20; // kesim payı (dk): 60+ güvende, 20-59 dikkat, 20 altı tehlike (Plan sekmesiyle aynı)
-  function clock(min) { var t = Math.round(min), hh = Math.floor(t / 60) % 24, m = ((t % 60) + 60) % 60; return (hh < 10 ? '0' : '') + hh + ':' + (m < 10 ? '0' : '') + m; }
-  function forecastHtml(r) {
-    var fc = r.fc, st = P.state(), sc = st.sc[st.sel], html = '<div class="stp-head"><b>Kapadokya\'da tahmin</b></div>';
-    if (!fc) return html + '<p class="note bad">Bu kayıtta tahmin yok; GPX\'i yeniden yükle.</p>';
-    if (!fc.ok) {
-      return html + '<p class="note bad">Bu koşu tahmin için yetersiz: ' + esc(fc.reasons.join('; ')) + '. Daha uzun (en az 10 km, 1 saat) ve tırmanışlı bir koşu yükle.</p>';
-    }
-    if (fc.level === 'weak') html += '<p class="warnbox">Koşu zayıf: ' + esc(fc.reasons.join('; ')) + '. Tahmin aralığı geniş tutuldu (en az ±%9).</p>';
-    if (fc.lowSlow) html += '<p class="warnbox">Ölçülen yavaşlama çok düşük (%' + f(fc.slow, 1) + '). Yarışta çok daha uzun süre koşacağın için daha fazla yavaşlayabilirsin; aralık geniş tutuldu (en az ±%9).</p>';
-    var stops = sc.stops, startMin = START_H * 60, rows = '', n = K.cps.length;
-    var movLo = fc.lo[n - 1] * (1 - fc.band), movMid = fc.mid[n - 1], movHi = fc.hi[n - 1] * (1 + fc.band);
-    var stopTot = stops.reduce(function (a, b) { return a + b; }, 0);
-    html += '<p class="rline"><b>Hareket süresi:</b> ' + hm(movLo) + ' - ' + hm(movHi) + ' <span class="sub2">(orta ' + hm(movMid) + ')</span></p>';
-    html += '<p class="rline"><b>Bitiş saati:</b> ' + clock(startMin + movLo + stopTot) + ' - ' + clock(startMin + movHi + stopTot) + ' <span class="sub2">(orta ' + clock(startMin + movMid + stopTot) + '; durmalar ' + st.sel + ' planı, ' + stopTot + ' dk)</span></p>';
-    for (var ci = 0; ci < n; ci++) {
-      var sb = 0; for (var q = 0; q < ci && q < stops.length; q++) sb += stops[q];
-      var lo = fc.lo[ci] * (1 - fc.band) + sb, mid = fc.mid[ci] + sb, hi = fc.hi[ci] * (1 + fc.band) + sb;
-      var pay = K.cps[ci].cut * 60 - hi, cls = pay >= CUT_OK ? 'ok' : pay >= CUT_WARN ? 'warn' : 'bad';
-      rows += '<tr><td><b>' + esc(K.cps[ci].name) + '</b><div class="sub2">km ' + f(K.cps[ci].km, 1) + ', kesim ' + clock(startMin + K.cps[ci].cut * 60) + '</div></td>' +
-        '<td class="r"><b>' + clock(startMin + mid) + '</b><div class="sub2">' + clock(startMin + lo) + ' - ' + clock(startMin + hi) + '</div></td>' +
-        '<td class="r"><b class="pay ' + cls + '">' + Math.round(pay) + ' dk</b></td></tr>';
-    }
-    html += '<div class="tablewrap"><table class="plantable"><thead><tr><th>Nokta</th><th class="r">Varış (orta, aralık)</th><th class="r">Kesim payı (en kötü uç)</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
-    html += '<p class="note">Saatler start ' + clock(startMin) + ' için. Orta tahmin doğrusal yorulma, aralığın ucu alt ve üst yorulma şekli ile tempo belirsizliği (±%' + f(fc.band * 100, 0) + '). Kesim payı en kötü uca göre hesaplanır.</p>';
-    html += '<p class="note">' + (fc.measured
-      ? 'Yorulma ölçüldü: ikinci yarı ilk yarıdan efor başına %' + f(fc.slow, 1) + ' yavaş.'
-      : '<span class="flag">Varsayım:</span> koşu 20 km\'den kısa, yavaşlama ölçülemedi; %' + f(fc.slow, 0) + ' varsayıldı.') +
-      ' Taban tempo ' + f(fc.basePace, 0) + ' sn/km-efor (tırmanış ' + f(FC_WUP, 2) + ', iniş ' + f(FC_WDN, 2) + '). Rakım (parkur 1026-1471 m), hava ve arazi tahminde yok.</p>';
-    return html;
-  }
   function refresh() { var last = load(); if (last && $('calOut')) paintResult(last); }
   function paintResult(r) {
     var out = $('calOut'); if (!out) return;
+    var fc = r.fc, html = '';
+    if (!fc) html += '<p class="note bad">Bu kayıtta tahmin yok; GPX\'i yeniden yükle.</p>';
+    else if (!fc.ok) html += '<p class="note bad">Bu koşu tahmin için yetersiz: ' + esc(fc.reasons.join('; ')) + '. Daha uzun (en az 10 km, 1 saat) ve tırmanışlı bir koşu yükle.</p>';
+    else {
+      html += '<p class="note ok">Tahmin hazır. Plan tablosunda "Veri" düğmesine dokun.</p>';
+      html += '<p class="note">' + (fc.measured
+        ? 'Yorulma ölçüldü: ikinci yarı ilk yarıdan efor başına %' + f(fc.slow, 1) + ' yavaş.'
+        : '<span class="flag">Varsayım:</span> koşu 20 km\'den kısa, yavaşlama ölçülemedi; %' + f(fc.slow, 0) + ' varsayıldı.') +
+        ' Rakım (parkur 1026-1471 m), hava ve arazi tahminde yok.</p>';
+    }
     var rows = [
       ['Dosya', r.file || '-'],
       ['Mesafe (konum yumuşatma ' + (r.smoothSec || 0) + ' sn)', f(r.km, 2) + ' km'],
@@ -238,26 +224,12 @@
       ['Koşu içindeki yavaşlama (plan ağırlıklarıyla)', (r.slow >= 0 ? '+' : '−') + f(Math.abs(r.slow), 0) + ' %']
     ];
     var tr = rows.map(function (x) { return '<tr><td>' + esc(x[0]) + '</td><td class="r"><b>' + esc(x[1]) + '</b></td></tr>'; }).join('');
-    var html = forecastHtml(r) + '<details class="manual"><summary><b>Koşunun ölçümleri</b></summary><div class="tablewrap"><table class="plantable"><tbody>' + tr + '</tbody></table></div></details>';
-    html += '<p class="note">Durma: hız saniyede ' + f(STOP_SPEED, 1) + ' metrenin altındaki anlar hareket süresine katılmaz. Yavaşlama yalnızca bu koşuya ait; yarıştaki "Yavaşlama" ayarı yarış uzunluğu için ayrıca düşünülmeli.</p>';
-    html += '<div class="stp-head"><b>Başlangıç temposu olarak uygula</b><span class="note">Önerilen değer: ilk yarının düz-eşdeğer temposu ' + ms(r.pace1) + ' /km (yarışın başı taze). İstersen tüm koşunun değeri: ' + ms(r.pace) + ' /km</span></div>';
-    var st = P.state();
-    ['A', 'B', 'C'].forEach(function (k) {
-      var s = st.sc[k];
-      var trial = { mode: 'pace', target: s.target, p0: Math.round(r.pace1), fat: s.fat, stops: s.stops };
-      var res = P.compute(trial);
-      html += '<div class="catrow"><div class="fl"><b>' + k + '</b><div class="sub2">yavaşlama %' + s.fat + ' ile bitiş ' + (res.valid ? hm(res.finish) : '--') + ' (şu an ' + (P.compute(s).valid ? hm(P.compute(s).finish) : '--') + ')</div></div><button type="button" class="btn small" data-k="' + k + '">' + k + '\'ya uygula</button></div>';
-    });
+    html += '<details class="manual"><summary><b>Koşunun ölçümleri</b></summary><div class="tablewrap"><table class="plantable"><tbody>' + tr + '</tbody></table></div>' +
+      '<p class="note">Durma: hız saniyede ' + f(STOP_SPEED, 1) + ' metrenin altındaki anlar hareket süresine katılmaz.</p></details>';
     out.innerHTML = html;
-    Array.prototype.forEach.call(out.querySelectorAll('button[data-k]'), function (b) {
-      b.addEventListener('click', function () {
-        if (!b.getAttribute('data-ask')) { b.setAttribute('data-ask', '1'); b.textContent = 'Emin misin? Tekrar dokun'; setTimeout(function () { if (b.isConnected) { b.removeAttribute('data-ask'); b.textContent = b.getAttribute('data-k') + '\'ya uygula'; } }, 4000); return; }
-        P.applyPace(b.getAttribute('data-k'), r.pace1); render();
-        var m = $('calMsg'); if (m) { m.textContent = b.getAttribute('data-k') + ' planı düz tempo moduna alındı, başlangıç temposu ' + ms(r.pace1) + ' /km. Plan sekmesinde istediğin gibi değiştirebilirsin.'; m.className = 'note ok'; }
-      });
-    });
   }
 
-  K.calib = { parseGpx: parseGpx, analyze: analyze, smoothPts: smoothPts, forecast: forecast, render: render, refresh: refresh, FC: { wUp: FC_WUP, wDn: FC_WDN, smoothSec: SMOOTH_SEC } };
+  K.calib = { parseGpx: parseGpx, analyze: analyze, smoothPts: smoothPts, forecast: forecast, render: render, refresh: refresh, current: current, status: status, FC: { wUp: FC_WUP, wDn: FC_WDN, smoothSec: SMOOTH_SEC } };
   render();
+  if (P.rerender && load()) P.rerender();   // plan.js bu dosyadan önce yüklenir; kayıtlı veri varsa Plan görünümünü yenile
 })();

@@ -26,7 +26,7 @@ window.PRODUCTS = [
     src: [{ vendor: 'bigjoy.com.tr (satış sayfası; tuz değeri hatalı)', url: 'https://www.bigjoy.com.tr/onthego-progel-24x60', values: false }, ev('https://enduranlar.com/en/products/onthego-progel-orange-box-24-pieces'), ev('https://www.decathlon.com.tr/p/on-the-go-progel-enerji-jeli-elma/_/R-p-X8762613', D)], checked: '2026-10-02', conf: 'Ambalaj etiketiyle doğrulandı (kullanıcı); BigJoy sayfasındaki 0,03 g hatalı' },
   { id: 'onthego-progel-mocha-150', brand: 'On The Go', name: 'Kafeinli Progel, Caffe Mocha', type: 'gel', unit: 'saşe', size: '60 mL',
     kcal: 96, carb: 24, na: 24, k: null, mg: null, caf: 150, vol: null, naNote: 'Etikette TUZ 0,06 g; sodyum = 0,06 g / 2,5 = 24 mg (hesaplandı). Progel jellerindeki ondalık hatası görüldüğü için bu değerin ambalajdan kontrol edilmesi iyi olur (henüz doğrulanmadı)',
-    note: 'Kafein 150 mg. Üretici günde en fazla 2 jel öneriyor (bilgi; planda sınırlanmaz, kafein toplamı kullanıcı sınırına göre kontrol edilir).', src: [ev('https://enduranlar.com/products/onthego-kafeinli-progel-caffe-mocha-aromali'), ev('https://www.decathlon.com.tr/p/on-the-go-progel-coffee-mocha/_/R-p-X8762614', D)], checked: '2026-10-02', conf: 'İki satıcı sayfası aynı (tuzdan hesaplandı)' },
+    note: 'Kafein 150 mg. Üretici günde en fazla 2 jel öneriyor (bilgi; planda sınırlanmaz).', src: [ev('https://enduranlar.com/products/onthego-kafeinli-progel-caffe-mocha-aromali'), ev('https://www.decathlon.com.tr/p/on-the-go-progel-coffee-mocha/_/R-p-X8762614', D)], checked: '2026-10-02', conf: 'İki satıcı sayfası aynı (tuzdan hesaplandı)' },
   { id: 'sis-go-energy-caf-150', brand: 'SiS', name: 'GO Energy + Kafein Jeli, Espresso', type: 'gel', unit: 'saşe', size: '60 mL',
     kcal: 87, carb: 22, na: 16, k: null, mg: null, caf: 150, vol: null, naNote: 'Etikette TUZ 0,04 g; sodyum = 0,04 g / 2,5 = 16 mg (hesaplandı)',
     note: 'Kafein 150 mg; B6, folik asit, B12 içerir.', src: [ev('https://enduranlar.com/en/products/sis-go-energy-caffeine-energy-gel-espresso-flavored')], checked: '2026-10-01', conf: 'Satıcı sayfası (tuzdan hesaplandı)' },
@@ -55,7 +55,7 @@ window.PRODUCTS = [
     note: 'İzotonik, su gerektirmez; iki tip karbonhidrat. Kafein belirtilmemiş (0 sayıldı).', src: [ev('https://enduranlar.com/en/blogs/blog/wup-energy-guide')], checked: '2026-10-02', conf: 'Satıcının ürün rehberi (enerji değeri yok)' },
   { id: 'onthego-energy-chews', brand: 'On The Go (BigJoy)', name: 'Energy Chews (6 parça, 30 g)', type: 'gel', unit: 'paket', size: '30 g',
     kcal: 104, carb: 25, na: 177, k: null, mg: null, caf: 0, cafUnknown: true, vol: null, naNote: 'Etikette sodyum 177 mg; aynı tabloda tuz 0,59 g (= 236 mg) yazıyor, tutarsız; sodyum değeri alındı',
-    note: 'GUARANA (kafein kaynağı) içerir, kafein miktarı yazmıyor: kafein toplamına katılamaz, otomatik öneriye girmez. Kalsiyum 65,6 mg.', src: [{ vendor: 'bigjoy.com.tr (üretici)', url: 'https://www.bigjoy.com.tr/onthego-energy-chews', values: true }], checked: '2026-10-02', conf: 'Üretici sayfası; kafein bilinmiyor' },
+    note: 'GUARANA (kafein kaynağı) içerir, kafein miktarı yazmıyor. Kalsiyum 65,6 mg.', src: [{ vendor: 'bigjoy.com.tr (üretici)', url: 'https://www.bigjoy.com.tr/onthego-energy-chews', values: true }], checked: '2026-10-02', conf: 'Üretici sayfası; kafein bilinmiyor' },
 
   /* ---------- Efervesan tabletler ve tozlar ---------- */
   { id: 'wup-hydractive-limon', brand: 'WUP', name: 'Hydractive Elektrolit ve Kafeinli Efervesan Tablet, Limon', type: 'tablet', unit: 'tablet', size: '1 tablet',
@@ -130,6 +130,14 @@ window.FOODS = [
     ver: 'Karbonhidrat ve kafein: Coca-Cola Türkiye (100 mL\'de 10,6 g, litrede 98 mg kafein). Noktadaki kola markası farklı olabilir; enerji yaklaşık.', src: [{ label: 'coca-cola.com/tr', url: 'https://www.coca-cola.com/tr/tr/brands/coca-cola' }] }
 ];
 // Her kontrol noktasında bulunanlar (sırayla: İbrahimpaşa, Uçhisar, Göreme, Çavuşin, Akdağ)
+// Noktalarda ayrıca bulunanlar (resmî 2026 kurallar sayfası; yukarıdaki yiyecek menüsünde olmayanlar) ve konum notu
+window.AID_INFO = [
+  { more: 'Su. Sağlık ekibi, tuvalet.', tip: 'Sonraki nokta 16 km uzakta ve burada ikmal sade. Suyu ve yiyeceği tam doldurup çıkmak gerekir.' },
+  { more: 'Su, maden suyu, çay, kahve, limon, züber. Sağlık ekibi.', tip: 'Çorba olan iki noktadan biri.' },
+  { more: 'Su, maden suyu, çay, kahve, limon, züber. Sağlık ekibi, tuvalet.', tip: 'Çorba yok; patates ve ekmek var.' },
+  { more: 'Su, maden suyu, çay, kahve, limon. Sağlık ekibi, tuvalet.', tip: 'Çorba olan son nokta. Hemen sonrasında, yaklaşık km 47-48 arasında çok dik bir tırmanış var.' },
+  { more: 'Su, züber. Sağlık ekibi.', tip: 'En sade nokta. Finişe kadar gereken beslenmeyi bir önceki noktada tamamlamak mantıklı olabilir.' }
+];
 window.AID_MENU = [
   ['muz', 'portakal', 'kek', 'kraker', 'tuz', 'kola'],
   ['muz', 'portakal', 'elma', 'kek', 'kraker', 'ekmek', 'peynir', 'helva', 'tuz', 'corba', 'kola'],
