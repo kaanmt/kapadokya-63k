@@ -48,6 +48,13 @@
         ib.click(); op1 = !!holder.querySelector('.tipbody') && ib.getAttribute('aria-expanded') === 'true';
         ib.click(); op2 = !holder.querySelector('.tipbody') && ib.getAttribute('aria-expanded') === 'false';
         check('ⓘ düğmesi: dokununca açıklama açılır, tekrar dokununca kapanır', op1 && op2, op1 + ' / ' + op2);
+        // Tek seçim: Beslenme Plan sekmesindeki seçimi kullanır (A / B / C ve Plan | Veri)
+        if (K.plan.selected && K.nutrition) {
+          var sl = K.plan.selected(), bk = K.nutrition.breakdown();
+          check('Tek seçim: Beslenme Plan sekmesindeki seçimi kullanır', bk.label === sl.label && near(bk.M, sl.r.M, 1e-9), bk.label + ' / ' + sl.label);
+        }
+        var leftTips = document.querySelectorAll('p.note[data-tip]').length, testHd = document.querySelector('#selftest h2 .tipbtn');
+        check('ⓘ tüm sekmelerde: sayfadaki açıklama notları başlıklara taşındı', leftTips === 0 && !!testHd, leftTips + ' not kaldı');
       } else check('Plan modülü yüklü', false);
       if (K.nutrition) {
         check('Sabit parkur eforu 83,26 km-efor', near(K.nutrition.E_STD, 83.265, 0.02), K.nutrition.E_STD.toFixed(3));
@@ -99,6 +106,29 @@
         check('Tahmin: uzun koşuda yavaşlama ölçülür (kurgu %10), iyi < ana < kötü gün, varışlar artar',
           !!lf && lf.ok && lf.measured && near(lf.slow, 10, 1.5) && lf.good[last] < lf.mid[last] && lf.mid[last] < lf.bad[last] && lf.mid.every(function (v, i) { return i === 0 || v > lf.mid[i - 1]; }),
           lf ? (lf.ok ? 'yavaşlama %' + f2(lf.slow) + ', bitiş hareket ' + Math.round(lf.good[last]) + ' / ' + Math.round(lf.mid[last]) + ' / ' + Math.round(lf.bad[last]) + ' dk, düzey ' + lf.level : 'tahmin yok: ' + lf.reasons.join('; ')) : 'yok');
+        if (lf && lf.ok && K.calib.cum && K.plan && K.plan.dataResult) {
+          // Parkur boyu tahmin (sektörler, yarış) noktalardaki tahminle birebir aynı
+          // Bağımsız döngü (v0.16'daki gibi, adım adım) ile karşılaştır
+          var cmid = K.calib.cum(lf, 'mid'), sp = lf.shp.mid, wu = K.calib.FC.wUp, wd = K.calib.FC.wDn, c2 = 0, ci2 = 0, mx = 0;
+          for (var i2 = 1; i2 < K.N && ci2 < K.cps.length; i2++) {
+            var e2 = Math.max(0.002, (K.dist[i2] - K.dist[i2 - 1]) / 1000 + (K.gain[i2] - K.gain[i2 - 1]) * wu / 100 + (K.loss[i2] - K.loss[i2 - 1]) * wd / 100);
+            c2 += sp.base * e2 * (1 + sp.kk * Math.pow(K.dist[i2] / 1000 / lf.runKm, sp.pw)) / 60;
+            if (K.cps[ci2].idx === i2) { mx = Math.max(mx, Math.abs(c2 - lf.mid[ci2]), Math.abs(cmid[i2] - c2)); ci2++; }
+          }
+          if (ci2 < K.cps.length) mx = Infinity;
+          check('Veri: parkur boyu tahmin noktalardaki tahminle aynı', mx < 1e-9, 'en büyük fark ' + mx.toExponential(1) + ' dk');
+          // Veri sonucu Plan biçiminde: sektörlerin toplamı hareket süresi, varış = tahmin + önceki durmalar, iyi < ana < kötü
+          var bS = { mode: 'target', target: 660, fat: 50, stops: [3, 6, 5, 6, 3] }, dr = K.plan.dataResult(bS, 'orta', lf), sumT = 0, okA = true, sb = 0;
+          dr.rows.forEach(function (x) { sumT += x.t; });
+          dr.cp.forEach(function (c, i) { okA = okA && near(c.arr, lf.mid[i] + sb, 1e-6) && c.good < c.arr && c.arr < c.bad; sb += c.stop; });
+          check('Veri sonucu Plan biçiminde (sektör toplamı = hareket süresi, varış = tahmin + durmalar, iyi < ana < kötü)', near(sumT, dr.M, 1e-6) && okA && near(dr.finish, lf.mid[last] + 23, 1e-6),
+            'sektör toplamı ' + f2(sumT) + ', hareket ' + f2(dr.M) + ' dk, bitiş ' + f2(dr.finish) + ' dk');
+          // Beslenme Veri sonucuyla çalışır: hareket süresi ve bölümler tahminden
+          var evd = K.nutrition && K.nutrition.evaluate('wup-neo3-elma', '', '', dr), secH = 0;
+          if (evd && evd.valid) evd.rows.forEach(function (x) { secH += x.hours; });
+          check('Beslenme Veri\'de: hareket süresi ve bölüm süreleri tahminden', !!evd && evd.valid && near(evd.movH * 60, dr.M, 1e-6) && near(secH * 60, dr.M, 1e-6) && evd.rows.length === K.cps.length,
+            evd && evd.valid ? 'hareket ' + f2(evd.movH * 60) + ' dk, bölümler ' + f2(secH * 60) + ' dk' : 'değerlendirilemedi');
+        }
       }
       // %90 / %125 eşikleri (tam sınırlar)
       if (K.nutrition && K.nutrition.grade) {

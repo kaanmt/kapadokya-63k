@@ -33,7 +33,8 @@
   function num(v, d) { return f(v, d === undefined ? 0 : d); }
   function stepper(label, hint, getText, onStep, steps) {
     var wrap = h('div', 'stp');
-    wrap.appendChild(h('div', 'stp-head', '<b>' + esc(label) + '</b>' + (hint ? '<span class="note">' + esc(hint) + '</span>' : '')));
+    var head = h('div', 'stp-head', '<b>' + esc(label) + '</b>'); wrap.appendChild(head);
+    if (hint) K.infoBtn(head, esc(hint));
     var row = h('div', 'stp-row'), val = h('span', 'stp-val', esc(getText()));
     function mk(d) { var b = h('button', 'btn step', (d > 0 ? '+' : '−') + Math.abs(d)); b.type = 'button'; b.setAttribute('aria-label', label + (d > 0 ? ' artır' : ' azalt')); b.addEventListener('click', function () { onStep(d); val.textContent = getText(); update(); }); return b; }
     steps.filter(function (d) { return d < 0; }).forEach(function (d) { row.appendChild(mk(d)); });
@@ -65,8 +66,14 @@
   function saltToNa(g) { return Math.round(g * 1000 / 2.5); }
 
   /* ---------- engine ---------- */
-  function scKey() { return st.sc || P.state().sel; }
-  function planResult(key) { return P.compute(P.state().sc[key || scKey()]); }
+  // Süre ve bölümler Plan sekmesindeki seçimden (A / B / C ve Plan | Veri). key verilirse o planın kendisi (kendini sınama).
+  function sel() {
+    if (P.selected) return P.selected();
+    var k = P.state().sel; return { kind: 'plan', key: k, label: 'Plan ' + k, short: k, r: P.compute(P.state().sc[k]) };
+  }
+  function scKey() { return P.state().sel; }
+  // key: yoksa uygulama seçimi; 'A' / 'B' / 'C' o planın kendisi; nesne ise hazır sonuç (kendini sınama, Veri)
+  function planResult(key) { return key && typeof key === 'object' ? key : key ? P.compute(P.state().sc[key]) : sel().r; }
   // Saf hesap: yalnızca verilen girdilere bağlı (kendini sınama da bunu kullanır).
   // p = { kg, sweat, salty, temp, health, M (hareket süresi, dk; yoksa referans hız) }
   // Terleme miktarı (Az/Normal/Çok) yalnızca sıvıyı belirler; terin tuzluluğu (salty) sodyum konsantrasyonunu belirler.
@@ -163,10 +170,10 @@
 
   // Hesabın tüm girdilerini ve ara değerlerini döker; sonuçları elle doğrulamak için.
   function breakdown() {
-    var key = scKey(), sc = P.state().sc[key], r = planResult(), tg = targets();
+    var s0 = sel(), key = s0.key, sc = P.state().sc[key], r = s0.r, tg = targets();
     var stops = sc.stops.reduce(function (a, b) { return a + b; }, 0);
     var raw = 500 * tg.sweatF * tg.tempF * tg.kgF * tg.intF;
-    return { key: key, mode: sc.mode, valid: r.valid, finish: r.finish, stops: stops, M: r.M, E: E_STD, speed: tg.speed, intF: tg.intF, sweatF: tg.sweatF, tempF: tg.tempF, kgF: tg.kgF,
+    return { key: key, label: s0.label, kind: s0.kind, mode: sc.mode, valid: r.valid, finish: r.finish, stops: stops, M: r.M, E: E_STD, speed: tg.speed, intF: tg.intF, sweatF: tg.sweatF, tempF: tg.tempF, kgF: tg.kgF,
       raw: raw, fluid: tg.fluid, cap: tg.cap, capped: Math.round(raw / 10) * 10 > tg.cap, conc: tg.conc, salty: tg.salty, na: tg.na, carb: tg.carb, kg: st.kg, sweat: st.sweat, temp: st.temp };
   }
   /* ---------- yeterlilik: plan / hedef oranı ---------- */
@@ -184,7 +191,7 @@
   // Sodyumu bilinmeyen ürünler (0 sayılması öneriyi yanıltır) ile kafeinli / kafeini bilinmeyen ürünler otomatik öneriye girmez; elle seçilebilir.
   // Uygulama kafeini saymaz, sınırlamaz ve uyarmaz; yalnızca öneri kafein içeren ürün seçmez.
   function candidates() {
-    var ck = JSON.stringify([st.kg, st.sweat, st.salty, st.temp, st.health, st.maxGels, st.flaskN, st.flaskMl, st.meal, st.custom, st.sc || P.state().sel, P.state()]);
+    var ck = JSON.stringify([st.kg, st.sweat, st.salty, st.temp, st.health, st.maxGels, st.flaskN, st.flaskMl, st.meal, st.custom, selSig(), P.state()]);
     if (candCache.key === ck && candCache.list) return candCache.list;
     function known(p) { return notRecommended(p) === false; }
     var gels = ofType(['gel']).filter(known), tabs = ofType(['tablet', 'powder']).filter(known), salts = ofType(['salt']).filter(known), tg = targets(), out = [];
@@ -204,6 +211,7 @@
     candCache = { key: ck, list: out };
     return out;
   }
+  function selSig() { var s0 = sel(); return [s0.label, s0.r.valid, Math.round((s0.r.finish || 0) * 100), Math.round((s0.r.M || 0) * 100)].join('|'); }
   function notRecommended(p) { return !!(p.naUnknown || p.cafUnknown || (p.caf || 0) > 0); }
   function excludedCount() { return allProducts().filter(notRecommended).length; }
   // Hiçbir karma %90'a ulaşamıyorsa nedenleri
@@ -251,15 +259,20 @@
   var elForms = null, elRes = null;
   function render() {
     root.textContent = '';
-    root.appendChild(h('h2', 'tabtitle', 'Beslenme'));
-    root.appendChild(h('p', 'note', 'Cevapladığın bilgilere göre saatlik sıvı, sodyum ve karbonhidrat planı çıkarır, her değişiklikte kendini günceller. Genel bilgidir, tıbbi tavsiye değildir; yarış günü yeni bir şey deneme, antrenmanda test et.'));
+    var tt = h('h2', 'tabtitle', 'Beslenme'); root.appendChild(tt);
+    K.infoBtn(tt, 'Cevapladığın bilgilere göre saatlik sıvı, sodyum ve karbonhidrat planı çıkarır, her değişiklikte kendini günceller. Yarış günü yeni bir şey deneme, antrenmanda test et.');
+    root.appendChild(h('p', 'note', 'Genel bilgidir, tıbbi tavsiye değildir.'));
     elForms = h('div'); root.appendChild(elForms);
     elRes = h('div'); root.appendChild(elRes);
     formProfile(); formProducts(); formCarry(); formFoods();
     update();
   }
   function update() { if (!elRes) return; elRes.textContent = ''; resultCards(); }
-  function card(parent, title) { var c = h('section', 'card'); if (title) c.appendChild(h('h2', '', esc(title))); parent.appendChild(c); return c; }
+  function card(parent, title, tip) {
+    var c = h('section', 'card');
+    if (title) { var hd = h('h2', '', esc(title)); c.appendChild(hd); if (tip) K.infoBtn(hd, esc(tip)); }
+    parent.appendChild(c); return c;
+  }
 
   /* ---------- hava tahmini (Open-Meteo, internet gerekir) ---------- */
   var RACE_DATE = '2026-10-17';
@@ -296,23 +309,20 @@
   }
 
   function formProfile() {
-    var c = card(elForms, 'Sen ve yarış');
-    c.appendChild(chips(['A', 'B', 'C'].map(function (k) { var r = P.compute(P.state().sc[k]); return { id: k, label: k + '  ' + (r.valid ? hm(r.finish) : '--') }; }),
-      function (it) { return scKey() === it.id; }, function (it) { st.sc = it.id; save(); render(); }));
-    c.appendChild(h('p', 'note', 'Süre ve bölümler Plan sekmesindeki senaryodan gelir; orada değiştirdiğinde buraya dönünce hedefler güncellenir.'));
-    // Sonucu etkileyen plan ayarları her zaman görünür
-    var pr = planResult(), si = P.settingsInfo ? P.settingsInfo(scKey()) : null;
+    var c = card(elForms, 'Sen ve yarış', 'Süre ve bölümler Plan sekmesindeki seçimden gelir (A / B / C ve Plan | Veri); değiştirmek için Plan sekmesine git. Veri seçiliyse antrenman GPX\'inden ana tahmin kullanılır, durmalar seçili plandan.');
+    // Sonucu etkileyen seçim ve plan ayarları her zaman görünür
+    var s0 = sel(), pr = s0.r, si = P.settingsInfo ? P.settingsInfo(scKey()) : null;
     if (pr.valid && si) {
-      c.appendChild(h('p', 'settingsline', 'Plan ' + scKey() + ': bitiş <b>' + hm(pr.finish) + '</b>, durma toplamı <b>' + si.stops + ' dk</b>' +
+      c.appendChild(h('p', 'settingsline', '<b>' + esc(s0.label) + '</b>: bitiş <b>' + hm(pr.finish) + '</b>, durma toplamı <b>' + si.stops + ' dk</b>' +
         (si.stopsChanged ? ' <span class="flag">varsayılandan farklı (' + si.defStops + ' dk)</span>' : ' (varsayılan)') + ', hareket <b>' + hm(pr.M) + '</b>' +
-        (si.adv.length ? '<br>Plan sekmesindeki <span class="flag">' + esc(si.adv.join(', ')) + '</span>; bunlar beslenme hedeflerini etkilemez' : '')));
-    }
+        (s0.kind === 'plan' && si.adv.length ? '<br>Plan sekmesindeki <span class="flag">' + esc(si.adv.join(', ')) + '</span>; bunlar beslenme hedeflerini etkilemez' : '')));
+    } else if (!pr.valid) c.appendChild(h('p', 'settingsline', '<b>' + esc(s0.label) + '</b>: durma süreleri hedef süreden uzun.'));
     c.appendChild(stepper('Vücut ağırlığı', '', function () { return st.kg + ' kg'; }, function (d) { st.kg = clamp(st.kg + d, 35, 160); save(); }, [-5, -1, 1, 5]));
-    c.appendChild(h('div', 'stp-head', '<b>Ne kadar terliyorsun?</b><span class="note">Sıvı hedefini belirler</span>'));
+    var swh = h('div', 'stp-head', '<b>Ne kadar terliyorsun?</b>'); c.appendChild(swh); K.infoBtn(swh, 'Sıvı hedefini belirler.');
     c.appendChild(chips([{ id: 'low', label: 'Az' }, { id: 'normal', label: 'Normal' }, { id: 'high', label: 'Çok' }], function (it) { return st.sweat === it.id; }, function (it) { st.sweat = it.id; save(); render(); }));
-    c.appendChild(h('div', 'stp-head', '<b>Terin ne kadar tuzlu?</b><span class="note">Sodyum hedefini belirler</span>'));
+    var slh = h('div', 'stp-head', '<b>Terin ne kadar tuzlu?</b>'); c.appendChild(slh);
+    K.infoBtn(slh, 'Sodyum hedefini belirler. Bilmiyorsan "Bilmiyorum" bırak: ortalama sporcunun ter sodyumu yaklaşık 825 mg/L, kişiden kişiye 420-1630 arası değişir (Baker ve ark., 506 sporcu). Az ve çok seçenekleri bu aralığın alt ve üst kısmını temsil eder.');
     c.appendChild(chips(['low', 'unknown', 'high'].map(function (k) { return { id: k, label: SALTY_LABEL[k] + ' (' + SALTY[k] + ' mg/L)' }; }), function (it) { return st.salty === it.id; }, function (it) { st.salty = it.id; save(); render(); }));
-    c.appendChild(h('p', 'note', 'Bilmiyorsan "Bilmiyorum" bırak: ortalama sporcunun ter sodyumu yaklaşık 825 mg/L, kişiden kişiye 420-1630 arası değişir (Baker ve ark., 506 sporcu). Az ve çok seçenekleri bu aralığın alt ve üst kısmını temsil eder.'));
     c.appendChild(stepper('Yarış günü ortalama sıcaklık', 'Göreme\'de Ekim ayı yaklaşık 3-20 °C', function () { return st.temp + ' °C'; }, function (d) { st.temp = clamp(st.temp + d, -5, 45); st.tempSrc = null; save(); }, [-5, -1, 1, 5]));
     var wmsg = h('p', 'note', '');
     if (st.tempSrc) {
@@ -329,8 +339,7 @@
   }
 
   function formProducts() {
-    var c = card(elForms, 'Ürünler');
-    c.appendChild(h('p', 'note', 'Değerler satıcı ve üretici sayfalarından; her ürünün kaynağı ve kontrol tarihi var. Kendi ürünün yoksa aşağıdan ekle.'));
+    var c = card(elForms, 'Ürünler', 'Değerler satıcı ve üretici sayfalarından; her ürünün kaynağı ve kontrol tarihi var. Kendi ürünün yoksa aşağıdan ekle. "Karmayı öner", karbonhidrat ve sodyumu hedefin en az %' + LOW_PCT + '\'ına çıkaran karmayı arar; sodyumu bilinmeyen ve kafein içeren ürünleri seçmez (elle seçebilirsin); ulaşılamıyorsa nedenini yazar.');
     var area = h('div'); c.appendChild(area);
 
     function selectFor(label, types, key) {
@@ -368,7 +377,6 @@
       if (pm.ok) c.appendChild(h('p', 'note ok', 'Öneri uygulandı: ' + txt + '.'));
       else c.appendChild(h('p', 'note bad', 'Hedefin %' + LOW_PCT + '\'ına ulaşan karma bulunamadı; en iyisi seçildi (' + txt + '). ' + pm.reasons.join(' ')));
     }
-    c.appendChild(h('p', 'note', 'Öneri, karbonhidrat ve sodyumu hedefin en az %' + LOW_PCT + '\'ına çıkaran karmayı arar. Sodyumu bilinmeyen ve kafein içeren ürünleri seçmez (elle seçebilirsin). Ulaşılamıyorsa nedenini yazar.'));
     customForm(c);
   }
 
@@ -437,8 +445,7 @@
   }
 
   function formFoods() {
-    var c = card(elForms, 'Noktalarda ne yiyeceksin?');
-    c.appendChild(h('p', 'note', 'Her noktada bulunanlardan yiyeceğin porsiyonları seç. Plan buna göre jel ve tableti otomatik ayarlar. Değerlerin kaynağı her satırda yazar; bir kısmı TürKomp ve üretici verisiyle doğrulandı, kalanlar tahmindir. Noktalardaki ürünler resmî 2026 kurallar sayfasındandır, değişebilir; yarış kitindeki son bilgiye bak.'));
+    var c = card(elForms, 'Noktalarda ne yiyeceksin?', 'Her noktada bulunanlardan yiyeceğin porsiyonları seç. Plan buna göre jel ve tableti otomatik ayarlar. Değerlerin kaynağı her satırda yazar; bir kısmı TürKomp ve üretici verisiyle doğrulandı, kalanlar tahmindir. Noktalardaki ürünler resmî 2026 kurallar sayfasındandır, değişebilir; yarış kitindeki son bilgiye bak.');
     window.AID_MENU.forEach(function (ids, ci) {
       var det = h('details', 'cpsec');
       var sumEl = h('div', 'sub2');
@@ -477,8 +484,8 @@
     if (!b.valid) { det.appendChild(h('p', 'warnbox', 'Seçili planda durma süreleri hedef süreden uzun.')); return det; }
     var swLabel = { low: 'Az', normal: 'Normal', high: 'Çok' }[b.sweat];
     var rows = [
-      ['Seçili plan', b.key + (b.mode === 'pace' ? ' (düz tempo modu)' : ' (hedef süre modu)')],
-      ['Plan bitiş süresi', hm(b.finish) + ' (' + num(b.finish) + ' dk)'],
+      ['Seçim (Plan sekmesi)', b.label + (b.kind === 'data' ? ' (ana tahmin)' : b.mode === 'pace' ? ' (düz tempo modu)' : ' (hedef süre modu)')],
+      ['Bitiş süresi', hm(b.finish) + ' (' + num(b.finish) + ' dk)'],
       ['Durma süreleri toplamı', num(b.stops) + ' dk'],
       ['Hareket süresi', hm(b.M) + ' (' + num(b.M) + ' dk)'],
       ['Parkurun eforu (mesafe + tırmanış/100, sabit)', num(b.E, 2) + ' km-efor'],
@@ -501,7 +508,7 @@
 
   function resultCards() {
     var e = evaluate(st.gelId, st.drinkId, st.saltId), tg = targets();
-    var c = card(elRes, 'Saatlik hedefler');
+    var c = card(elRes, 'Saatlik hedefler', 'Sıvı = 500 mL x terleme ' + num(tg.sweatF, 2) + ' x sıcaklık ' + num(tg.tempF, 2) + ' x beden ' + num(tg.kgF, 2) + ' x tempo ' + num(tg.intF, 2) + ' (hızı ' + num(tg.speed, 1) + ' km-efor/saat), en çok ' + tg.cap + ' mL. Sodyum = sıvı x ' + tg.conc + ' mg/L (' + SALTY_LABEL[tg.salty].toLowerCase() + ' ter). Karbonhidrat = 60 g x tempo. Susadıkça iç, kilo alacak kadar içme.');
     var dl = h('dl', 'sumlist');
     function row(a, b) { dl.appendChild(h('dt', '', esc(a))); dl.appendChild(h('dd', '', esc(b))); }
     row('Sıvı', tg.fluid + ' mL/saat (her ' + st.flaskMl + ' mL flask yaklaşık ' + round5(st.flaskMl / tg.fluid * 60) + ' dk)');
@@ -509,13 +516,13 @@
     row('Karbonhidrat', tg.carb + ' g/saat');
     c.appendChild(dl);
     c.appendChild(breakdownEl());
-    c.appendChild(h('p', 'note', 'Sıvı = 500 mL x terleme ' + num(tg.sweatF, 2) + ' x sıcaklık ' + num(tg.tempF, 2) + ' x beden ' + num(tg.kgF, 2) + ' x tempo ' + num(tg.intF, 2) + ' (planın hızı ' + num(tg.speed, 1) + ' km-efor/saat), en çok ' + tg.cap + ' mL. Sodyum = sıvı x ' + tg.conc + ' mg/L (' + SALTY_LABEL[tg.salty].toLowerCase() + ' ter). Karbonhidrat = 60 g x tempo. Susadıkça iç, kilo alacak kadar içme.'));
 
     if (!e.valid) { var w = card(elRes, ''); w.appendChild(h('p', 'warnbox', 'Seçili planda durma süreleri hedef süreden uzun. Plan sekmesinde düzelt.')); return; }
     if (!e.gel && !e.tab && !e.salt) { var n = card(elRes, ''); n.appendChild(h('p', 'note', 'Plan için bir jel veya tablet seç ya da "karmayı öner"e dokun.')); }
 
-    var pc = card(elRes, 'Uygulama planı (' + scKey() + ', ' + hm(e.finish) + ')');
-    var sd = e.sched, items = '';
+    var s0 = sel(), sd = e.sched, items = '';
+    var pc = card(elRes, 'Uygulama planı (' + s0.short + ', ' + hm(e.finish) + ')',
+      'Süreler yarışın hareket süresine göre (' + hm(e.movH * 60) + '; noktalardaki duraklamalar hariç). Seçtiğin her ürün planda kullanılır; miktarlar hedefe en yakın uygulanabilir takvime göre seçilir. Saatin tekrarlayan zaman uyarısını jel aralığına kur' + (sd.saltMin && sd.gelMin && sd.saltMin !== sd.gelMin ? '; tuz tableti için ikinci bir uyarı kullan' : '') + '. Hedefin %' + LOW_PCT + '\'ından azı yetersiz sayılır (kırmızı); %' + HIGH_PCT + '\'in üstü fazla (sarı, yalnızca bilgi).');
     function dk(m) { return m >= 60 && m % 60 === 0 ? (m / 60) + ' saatte' : m + ' dakikada'; }
     function nm(p) { return esc((p.brand ? p.brand + ' ' : '') + p.name); }
     var bothMin = sd.flaskMin * st.flaskN;
@@ -524,7 +531,6 @@
     if (e.gel) items += '<div class="rline"><b>Jel:</b> ' + (sd.gelMin ? '<b>her ' + dk(sd.gelMin) + ' 1</b>' : 'yok') + ' (' + nm(e.gel) + ')</div>';
     if (e.salt) items += '<div class="rline"><b>Tuz tableti:</b> <b>her ' + dk(sd.saltMin) + ' 1</b> (' + nm(e.salt) + ')</div>';
     pc.appendChild(h('div', '', items));
-    pc.appendChild(h('p', 'note', 'Süreler yarışın hareket süresine göre (' + hm(e.movH * 60) + '; noktalardaki duraklamalar hariç). Seçtiğin her ürün planda kullanılır; miktarlar hedefe en yakın uygulanabilir takvime göre seçilir. Saatin tekrarlayan zaman uyarısını jel aralığına kur' + (sd.saltMin && sd.gelMin && sd.saltMin !== sd.gelMin ? '; tuz tableti için ikinci bir uyarı kullan' : '') + '.'));
     var dl2 = h('dl', 'sumlist');
     function row2(a, b, cls) { dl2.appendChild(h('dt', '', esc(a))); dl2.appendChild(h('dd', cls || '', esc(b))); }
     var rt = ratios(e, tg), cp = pct(rt.carb), np = rt.na == null ? null : pct(rt.na);
@@ -532,7 +538,6 @@
     if (tg.na != null) row2('Bu takvimle sodyum', num(e.naH) + ' mg/saat, hedefin %' + np + ' (hedef ' + tg.na + ')', grade(np));
     row2('Bu takvimle sıvı', Math.round(sd.fluidEff) + ' mL/saat, hedefin %' + pct(sd.fluidEff / tg.fluid) + ' (hedef ' + tg.fluid + ')', 'ok');
     pc.appendChild(dl2);
-    pc.appendChild(h('p', 'note', 'Hedefin %' + LOW_PCT + '\'ından azı yetersiz sayılır (kırmızı); %' + HIGH_PCT + '\'in üstü fazla (sarı, yalnızca bilgi).'));
     if (cp < LOW_PCT) pc.appendChild(h('p', 'note bad', 'Karbonhidrat yetersiz: hedefin %' + cp + '\'i, saatte ' + num(tg.carb - e.carbH) + ' g eksik.'));
     if (np != null && np < LOW_PCT) pc.appendChild(h('p', 'note bad', 'Sodyum yetersiz: hedefin %' + np + '\'i, saatte ' + num(tg.na - e.naH) + ' mg eksik.'));
     if (cp > HIGH_PCT) pc.appendChild(h('p', 'note flag', 'Karbonhidrat hedefin %' + cp + '\'i (fazla). Bilgi: mide toleransına dikkat et.'));
@@ -551,7 +556,7 @@
       }
     }
 
-    var sc = card(elRes, 'Bölüm bölüm taşı');
+    var sc = card(elRes, 'Bölüm bölüm taşı', 'Jel ve tablet sayıları, önceki noktada yediklerin düşülerek hesaplanır.');
     var rows = '';
     e.rows.forEach(function (r) {
       var ex = r.extraMl > 0;
@@ -561,14 +566,12 @@
     var short = e.rows.filter(function (r) { return r.extraMl > 0; });
     if (short.length) sc.appendChild(h('p', 'warnbox', 'Taşıma kapasiten (' + num(e.capL, 2) + ' L) bu bölümlerde yetmiyor: ' + short.map(function (r) { return r.name + ' (+' + r.extraMl + ' mL)'; }).join(', ') + '. Ek suluk taşıyabilir, o bölümde susadıkça içip miktarı kısabilir ya da ikmali buna göre planlayabilirsin.'));
     else sc.appendChild(h('p', 'note', 'Taşıma kapasiten tüm bölümler için yeterli.'));
-    sc.appendChild(h('p', 'note', 'Jel ve tablet sayıları, önceki noktada yediklerin düşülerek hesaplanır.'));
 
     var t = e.tot;
-    var tc = card(elRes, 'Yarış boyunca toplam');
+    var tc = card(elRes, 'Yarış boyunca toplam', 'Potasyum ve magnezyum için hedef koymuyorum; burada sadece alınan miktar görünür. Yiyecek değerleri yaklaşıktır, jel ve tablet değerleri etiketlerden.');
     function trow(label, p, fd, d) { return '<tr><td>' + label + '</td><td class="r">' + num(p, d) + '</td><td class="r">' + num(fd, d) + '</td><td class="r"><b>' + num(p + fd, d) + '</b></td></tr>'; }
     var trs = trow('Karbonhidrat (g)', t.pCarb, t.fCarb) + (tg.na != null ? trow('Sodyum (mg)', t.pNa, t.fNa) : '') + trow('Potasyum (mg)', t.pK, t.fK) + trow('Magnezyum (mg)', t.pMg, t.fMg) + trow('Enerji (kcal)', t.pKcal, t.fKcal);
     tc.appendChild(h('div', 'tablewrap', '<table class="plantable"><thead><tr><th></th><th class="r">Jel ve tablet</th><th class="r">Yiyecek</th><th class="r">Toplam</th></tr></thead><tbody>' + trs + '</tbody></table>'));
-    tc.appendChild(h('p', 'note', 'Potasyum ve magnezyum için hedef koymuyorum; burada sadece alınan miktar görünür. Yiyecek değerleri yaklaşıktır, jel ve tablet değerleri etiketlerden.'));
   }
 
   function onTab(name) { if (name === 'nutrition') render(); }

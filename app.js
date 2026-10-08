@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  var BUILD = '0.16-test-2';
+  var BUILD = '0.17';
   var C = window.COURSE;
   var N = C.n, STEP = C.step, TOTAL = C.total, K = C.k;
   var ele = C.ele;
@@ -60,6 +60,11 @@
     (head.querySelector('b') || head).appendChild(b);
     return b;
   }
+  // index.html'deki açıklama notları (data-tip) bölüm başlığındaki ⓘ'ye taşınır
+  Array.prototype.forEach.call(document.querySelectorAll('p.note[data-tip]'), function (p) {
+    var sec = p.closest('section'), hd = sec && sec.querySelector('h2');
+    if (!hd) return; infoBtn(hd, p.innerHTML); p.remove();
+  });
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 
   /* ---------- theme ---------- */
@@ -452,11 +457,12 @@
           var sc = ps.sc[k], r = K.plan.compute(sc);
           lines.push('Plan ' + k + ': mod ' + sc.mode + ', hedef ' + sc.target + ' dk, yavaşlama %' + sc.fat + ', durmalar ' + sc.stops.join('+') + ' dk, bitiş ' + (r.valid ? Math.round(r.finish) + ' dk' : 'geçersiz') + ', hareket ' + (r.valid ? Math.round(r.M) + ' dk' : '-') + ', efor ' + (r.valid ? r.E.toFixed(2) : '-'));
         });
+        if (K.plan.selected) lines.push('Uygulama seçimi: ' + K.plan.selected().label);
         lines.push('Plan ayarları: seçili ' + ps.sel + ', tırmanış ağırlığı ' + ps.wUp + ', iniş ağırlığı ' + ps.wDn + ', ayrıntı ' + ps.level);
       }
       if (K && K.nutrition) {
         var b = K.nutrition.breakdown(), ns = K.nutrition.state();
-        lines.push('Beslenme girdileri: ' + ns.kg + ' kg, terleme ' + ns.sweat + ', ter tuzluluğu ' + ns.salty + ', ' + ns.temp + ' °C, suluk ' + ns.flaskN + 'x' + ns.flaskMl + ', en fazla jel ' + ns.maxGels + ', sağlık işareti ' + ns.health + ', plan ' + b.key);
+        lines.push('Beslenme girdileri: ' + ns.kg + ' kg, terleme ' + ns.sweat + ', ter tuzluluğu ' + ns.salty + ', ' + ns.temp + ' °C, suluk ' + ns.flaskN + 'x' + ns.flaskMl + ', en fazla jel ' + ns.maxGels + ', sağlık işareti ' + ns.health + ', seçim ' + b.label);
         lines.push('Beslenme hesabı: bitiş ' + Math.round(b.finish) + ' dk, hareket ' + Math.round(b.M) + ' dk, hız ' + b.speed.toFixed(3) + ', tempo ç. ' + b.intF.toFixed(3) + ', terleme ç. ' + b.sweatF + ', sıcaklık ç. ' + b.tempF + ', beden ç. ' + b.kgF.toFixed(3) + ', ham sıvı ' + b.raw.toFixed(1) + ' => sıvı ' + b.fluid + ', ter tuzluluğu ' + b.conc + ' mg/L => sodyum ' + b.na + ', karbonhidrat ' + b.carb);
       }
     } catch (e) { lines.push('Plan/beslenme verisi alınamadı: ' + e.message); }

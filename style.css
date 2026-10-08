@@ -337,8 +337,15 @@ details.manual summary { min-height: 48px; display: flex; align-items: center; c
 .tipbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .tipbody { margin: 4px 0 8px; padding: 6px 10px; border-left: 3px solid var(--accent); }
 .aidnote { margin: 4px 0 6px; }
-div.cpstatic { border-top: 1px solid var(--line); padding: 4px 0; }
-div.cpstatic:first-of-type { border-top: 0; }
-div.cpstatic .cphead { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: start; min-height: 56px; padding: 8px 0; }
-div.cpstatic .cpl b { font-size: 18px; }
-.databox { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); }
+/* Plan | Veri: uygulama genelinde seçim (A / B / C'nin altında) */
+.viewsw .chips { margin-top: 0; margin-bottom: 12px; }
+.viewsw .chip { flex: 1 1 0; }
+.datalabel { margin-top: 10px; }
+/* Veri: kesikli çizgi ve iyi-kötü gün bandı */
+.t-V { stroke: var(--ink); stroke-width: 2.5; stroke-dasharray: 6 4; }
+.t-band { fill: var(--ink); opacity: .12; stroke: none; }
+.sw.sV { background: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 9px); }
+.plantable.cmp4 th, .plantable.cmp4 td { padding-left: 3px; padding-right: 3px; }
+.plantable.cmp4 td:first-child, .plantable.cmp4 th:first-child { padding-left: 0; }
+.plantable.cmp4 td b { font-size: 15px; }
+.plantable.cmp4 .sub2 { font-size: 12px; white-space: nowrap; }
