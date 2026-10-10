@@ -69,11 +69,8 @@
 - **Yapılan:** 12 sayfanın ve konuşmacı notlarının tamamı okundu. Dört dil bilgisi düzeltmesi pptx'e işlendi: s3 "⋮ menüsüne dokun"; s4 "parmağını grafikte gezdir: her noktanın km'sini, rakımını ve eğimini gör ... saatleri var"; s8 "Üç senaryo: yorulmanın artış hızına göre ayrılır"; s10 "kaydedilir". Yerleşim Keynote çıktısıyla denetlendi. Özgün dosya: `...-v0.17-orijinal.pptx`. PDF henüz eski
 - **Öneri (uygulanmadı, üslup):** S1 "okut ya da aç" → "okut ya da adresi aç" (s1, s3); S2 s2 "farkı" → "plana göre farkı"; S3 s6 "parkuru kaç sektöre böleceğin" → "parkurun kaç sektöre bölüneceği"; S4 s7 başlık "Antrenmanın tahmin etsin" → "Antrenmanından tahmin"; S5 s8 "Yorulmanı uzatır" → "Yorulmayı hesaba katar"; S6 s8 "20 km üstü" → "20 km'den uzun"; S7 s11 "Android'de Chrome, iPhone'da Safari" + "kullan"; S8 s11 "Saatin ana araç" → "Ana aracın saatin"; S9 notlar (s8 "yarış boyuna uzatır" → "yarışın tamamına yayar"; s10 "Start'ta Yarışı başlat" → tırnaklı; s12 "rapor ... içerir")
 
-### 11 Ekim (devam): v0.20 yazıldı (test dalında); sunum geldi
-- **Karar (kullanıcı):** İ1-İ9 önerilerinin hepsi kabul, dikey kilit denensin, "koda uygula". Sunum `docs/tanıtım-sunumu/` içinde; önce Türkçe (dil bilgisi ve akıcılık) denetimi, sonra 3B eklemesi
-- **Yapılan:** İ1 ⓘ cümlesi; İ2 yarış ekranı açıkken `screen.orientation.lock('portrait')` denenir, sekmeden çıkınca bırakılır; İ3 tam ekran sorgusuna `pointer: coarse`; İ4 yatayda yükleme / hata mesajı görünür, "Geçmek için telefonu dik çevir", yüklenirken ok gizli; İ5 `.m3-ov` dört kenar; İ6 boyut değişince `clampCam`, boyut aynıysa tuvale dokunulmaz; İ7 çift dokunuş 30 px içinde; İ8 grafiğe `ResizeObserver`
-- **Doğrulama:** 44/44, akış, harita, tahmin; Chrome'da 9 yeni denetim (dokunmatik olmayan pencere, yatayda yükleme ve hata, kamera payı, çift dokunuş, kilit çağrısı sahte nesneyle) + v0.19'un 26 denetimi
-- **Denenmeyen:** kilidin gerçek cihazda çalışması, iPhone. İ9 cihaz denemesini bekliyor. Sunum klasörü şimdilik git dışı (`docs/.gitignore`)
+### 11 Ekim: v0.20 yazıldı, test dalında (ayrıntı arşivde)
+- İ1-İ8 uygulandı (yarış ekranında dikey kilit denemesi, tam ekran yalnızca dokunmatikte, yatayda mesajlar, kamera sınırı, çift dokunuş, grafik boyut izleyici); 44/44 + Chrome'da 35 denetim. Denenmeyen: kilidin gerçek cihazda çalışması, iPhone; İ9 cihaz denemesini bekliyor
 
 ### 11 Ekim: v0.19 dört ajanlı inceleme (ayrıntı arşivde)
 - Alt ajanların idaresi Claude'da (en çok 4; 2 Opus + 2 Sonnet). Yüksek önemde hata yok; düzeltme önerileri İ1-İ9, İ1-İ8 v0.20'de uygulandı
