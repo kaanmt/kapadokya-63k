@@ -30,7 +30,7 @@
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
 
 ### Tamamlananlar
-- [x] Kararlar (11 Ekim): sunum akıcılık önerileri S1-S9 kabul; sunum depoya girmez; sunumda sürüm 0.20; v1.0 kullanıcı söyleyene kadar önerilmez; Claude orkestra şefi gibi çalışır (işleri alt ajanlara dağıtır)
+- [x] Kararlar (11 Ekim): sunum akıcılık önerileri S1-S9 kabul; sunum depoya girmez; sunumda sürüm 0.20; v1.0 kullanıcı söyleyene kadar önerilmez; Claude orkestra şefi gibi çalışır (kendin yapmak yerine delege et); push / deploy yalnızca sürüm numarası artınca
 - [x] **v0.20 yazıldı, doğrulandı, test dalında** (11 Ekim): inceleme düzeltmeleri İ1-İ8
 - [x] v0.19 ayrı ajan incelemesi (11 Ekim): 4 ajan (2 Opus, 2 Sonnet), salt okunur; yüksek önemde hata yok
 - [x] **v0.19 denendi, test listesinin tamamı tamam** (11 Ekim)
@@ -64,7 +64,7 @@
 ## Günlük (en yeni en üstte) {#gunluk}
 
 ### 11 Ekim (devam): sunum kararları ve iki genel kural
-- **Karar (kullanıcı):** S1-S9 hepsi; sunum depoya girmesin; 3B sayfası eklensin; sürüm yazısı 0.20. Kurallar: v1.0 kullanıcı söyleyene kadar yok ve önerilmez; Claude işleri alt ajanlara dağıtan şef gibi çalışır (CLAUDE.md kural 10-11). Mesajın sonu yarım geldi ("kend")
+- **Karar (kullanıcı):** S1-S9 hepsi; sunum depoya girmesin; 3B sayfası eklensin; sürüm yazısı 0.20. Kurallar: v1.0 kullanıcı söyleyene kadar yok ve önerilmez; Claude işleri alt ajanlara dağıtan şef gibi çalışır (CLAUDE.md kural 10-11). Devamı: kendin yapmak yerine delege et; push yalnızca yazılım sürümü artınca, belge değişiklikleri o push'la birlikte (CLAUDE.md kural 12)
 - **Sürüyor:** iki ajan paralel (ekran görüntüleri; metin ve sürüm yazıları), ardından sayfa yapımı ve son okuma
 
 ### 11 Ekim: sunum Türkçe denetimi (ayrıntı arşivde)

@@ -11,18 +11,19 @@ Bu depo, Salomon Cappadocia Ultra-Trail 63K (17 Ekim 2026, 07:00, Ürgüp) için
 3. **Tasarım ilkesi:** başka bir yerin kopyası gibi duran şey eklenmez, gereksiz kalabalık yapılmaz. Seçim tek yerde (Plan sekmesindeki A/B/C + Plan | Veri), diğer sekmeler onu izler. Açıklayıcı küçük notlar ⓘ arkasında (`K.infoBtn`).
 4. **Zaman kaygısıyla kapsam daraltma önerme.** Kendi görüşünü çekinmeden söyle; geri bildirimde fikir üret.
 5. **Uygulama girdileriyle ilgili sorular uygulamada sorulur**, sohbette değil.
-6. **Plan belgesi `docs/PLAN.md`:** her kullanıcı mesajından sonra önce oku, sonra güncelle, test dalına commit et. Onay isteme; yanıtında ne değiştiğini tek cümleyle söyle. Biçim korunur: en üstte checkbox'lı Sende / Karar bekleyen / Bende / Tamamlananlar / Takvim; Günlük en yeni üstte, her giriş 2-4 kısa madde; belge ~20 KB'ı geçerse eski girişler özetlenip `docs/arsiv/` altına taşınır.
+6. **Plan belgesi `docs/PLAN.md`:** her kullanıcı mesajından sonra önce oku, sonra güncelle (yerelde; push için kural 12). Onay isteme; yanıtında ne değiştiğini tek cümleyle söyle. Biçim korunur: en üstte checkbox'lı Sende / Karar bekleyen / Bende / Tamamlananlar / Takvim; Günlük en yeni üstte, her giriş 2-4 kısa madde; belge ~20 KB'ı geçerse eski girişler özetlenip `docs/arsiv/` altına taşınır.
 7. **Sürüm numarası** her yeni sürümde bir artar (şu an 0.20 → sıradaki 0.21), sonek yok. Değişecek yerler: `app.js` içindeki `BUILD`, `sw.js` içindeki `VERSION` (`k63-0.21`). Yeni dosya eklenirse `sw.js` `ASSETS` listesine ve `app.js` içindeki `EXPECTED` sayısına da eklenir.
 8. **Her sürüme ayrı test listesi:** `docs/test-listeleri/vX.md`, madde madde, kullanıcının o sürümde neyi denemesi gerektiği. Kullanıcı sonuçlarını aynı dosyaya işlenir (test günlüğü). Örnek: `docs/test-listeleri/v0.17.md`.
 9. Hız birimi yok, yalnızca tempo (dk/km).
 10. **v1.0 (M3) kullanıcı söyleyene kadar yok ve önerilmez** (11 Ekim). Sürümler 0.21, 0.22 diye sürer.
-11. **Orkestra şefi gibi çalış** (11 Ekim): istenen işi parçalara böl, uygun parçaları alt ajanlara dağıt (en çok 4; 2 Opus 5.5 + 2 Sonnet 5.5), sonuçları doğrulayıp birleştir. Dağıtım için onay sorma.
+11. **Orkestra şefi gibi çalış** (11 Ekim): istenen işi parçalara böl, uygun parçaları alt ajanlara dağıt (en çok 4; 2 Opus 5.5 + 2 Sonnet 5.5), sonuçları doğrulayıp birleştir. Dağıtım için onay sorma. Kendin yapmak yerine delege etme eğiliminde ol.
+12. **Push = deploy, yalnızca yazılım sürüm numarası artınca** (11 Ekim). Belge, plan, test listesi değişti diye GitHub deposu güncellenmez; biriken tüm değişiklikler sürüm artışının push'uyla bir defada gider.
 
 ## Yayın akışı (Netlify, kredi sınırlı)
 
 - **Tüm ara sürümler ve deneme yayınları `test` dalına** gider. Netlify dal yayını ücretsiz; adres `test--<site>.netlify.app`. Uygulama adreste `--` görünce turuncu "TEST ORTAMI" şeridi gösterir (`app.js`, `ENV`).
 - **`main` dalına asla doğrudan push etme, birleştirme yapma.** Her `main` yayını 15 kredi (ücretsiz plan 300 kredi). Kilometre taşı (M1 = v0.12.1, M2 = v0.17, M3 = ?) yalnızca kullanıcı isteyince, `test` → `main` pull request'iyle olur; başlık "vX (Mn)", ör. "v0.17 (M2)". Ana adres: https://candid-zabaione-2be2ed.netlify.app/
-- Değişiklikleri doğrudan `test` dalına gönder. Gereksiz yayın yaratmamak için `test`'e ayrı PR açma; doğrudan push mümkün değilse kullanıcıya söyle.
+- Değişiklikleri (yalnızca sürüm artışında, kural 12) doğrudan `test` dalına gönder. Gereksiz yayın yaratmamak için `test`'e ayrı PR açma; doğrudan push mümkün değilse kullanıcıya söyle.
 - **Geliştirme dosyaları sitede yayınlanmaz:** Netlify depo kökünü yayınlıyor (`publish = "."`); `netlify.toml` içindeki 404 kuralları `/docs/*`, `/tools/*`, `/CLAUDE.md`, `/.claude/*` yollarını kapatır (`404.html`). Kökte yeni bir geliştirme dosyası ya da klasörü açarsan kurala ekle. `tools/veri/` kişisel koşu GPX'leri içerir; uygulamaya ya da yayına koyma.
 
 ## Doğrulama (her push'tan önce)
