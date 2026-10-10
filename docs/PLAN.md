@@ -22,11 +22,12 @@
 - [ ] (Düşük öncelik) Dışarıda "Konumumu göster" ve rota dışı uyarısı; Az/Çok ayrıntı seviyeleri
 
 ### Karar bekleyen
+- [ ] **Sunum:** akıcılık önerileri (günlükte S1-S9) uygulansın mı; sunum klasörü depoya girsin mi (şimdilik git dışı)
 - [ ] **M3 = v1.0:** v0.19 denendi; sürüm adı 1.0 yapılıp ("koda uygula") `test` → `main` pull request'i (15 kredi); dondurma 12-13 Ekim
 
 ### Bende (Claude)
 - [ ] İ9 (iPhone'da bağlam geri gelmezse takılma): cihaz denemesinin sonucuna göre
-- [ ] Sunum: Türkçe denetimi (sürüyor), sonra 2B / 3B sayfası
+- [ ] Sunum: onaylanan akıcılık önerileri, v0.20 ekranları ve sürüm yazıları, 2B / 3B sayfası, PDF'in yeniden üretimi
 - [ ] İstenince: sürüm 1.0, test listesi, `test` → `main` pull request'i "v1.0 (M3)"
 - [ ] Yarıştan sonra: Garmin GPX'iyle plan karşılaştırması ve 17 Ekim GPX'iyle yorulma şekli (1,5 / 2 üsleri varsayım)
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
@@ -64,17 +65,18 @@
 
 ## Günlük (en yeni en üstte) {#gunluk}
 
+### 11 Ekim (devam): sunum Türkçe denetimi
+- **Yapılan:** 12 sayfanın ve konuşmacı notlarının tamamı okundu. Dört dil bilgisi düzeltmesi pptx'e işlendi: s3 "⋮ menüsüne dokun"; s4 "parmağını grafikte gezdir: her noktanın km'sini, rakımını ve eğimini gör ... saatleri var"; s8 "Üç senaryo: yorulmanın artış hızına göre ayrılır"; s10 "kaydedilir". Yerleşim Keynote çıktısıyla denetlendi. Özgün dosya: `...-v0.17-orijinal.pptx`. PDF henüz eski
+- **Öneri (uygulanmadı, üslup):** S1 "okut ya da aç" → "okut ya da adresi aç" (s1, s3); S2 s2 "farkı" → "plana göre farkı"; S3 s6 "parkuru kaç sektöre böleceğin" → "parkurun kaç sektöre bölüneceği"; S4 s7 başlık "Antrenmanın tahmin etsin" → "Antrenmanından tahmin"; S5 s8 "Yorulmanı uzatır" → "Yorulmayı hesaba katar"; S6 s8 "20 km üstü" → "20 km'den uzun"; S7 s11 "Android'de Chrome, iPhone'da Safari" + "kullan"; S8 s11 "Saatin ana araç" → "Ana aracın saatin"; S9 notlar (s8 "yarış boyuna uzatır" → "yarışın tamamına yayar"; s10 "Start'ta Yarışı başlat" → tırnaklı; s12 "rapor ... içerir")
+
 ### 11 Ekim (devam): v0.20 yazıldı (test dalında); sunum geldi
 - **Karar (kullanıcı):** İ1-İ9 önerilerinin hepsi kabul, dikey kilit denensin, "koda uygula". Sunum `docs/tanıtım-sunumu/` içinde; önce Türkçe (dil bilgisi ve akıcılık) denetimi, sonra 3B eklemesi
 - **Yapılan:** İ1 ⓘ cümlesi; İ2 yarış ekranı açıkken `screen.orientation.lock('portrait')` denenir, sekmeden çıkınca bırakılır; İ3 tam ekran sorgusuna `pointer: coarse`; İ4 yatayda yükleme / hata mesajı görünür, "Geçmek için telefonu dik çevir", yüklenirken ok gizli; İ5 `.m3-ov` dört kenar; İ6 boyut değişince `clampCam`, boyut aynıysa tuvale dokunulmaz; İ7 çift dokunuş 30 px içinde; İ8 grafiğe `ResizeObserver`
 - **Doğrulama:** 44/44, akış, harita, tahmin; Chrome'da 9 yeni denetim (dokunmatik olmayan pencere, yatayda yükleme ve hata, kamera payı, çift dokunuş, kilit çağrısı sahte nesneyle) + v0.19'un 26 denetimi
 - **Denenmeyen:** kilidin gerçek cihazda çalışması, iPhone. İ9 cihaz denemesini bekliyor. Sunum klasörü şimdilik git dışı (`docs/.gitignore`)
 
-### 11 Ekim (devam): v0.19 dört ajanlı inceleme
-- **Karar (kullanıcı):** alt ajanların idaresi Claude'da (en çok 4; 2 Opus + 2 Sonnet), gerektikçe
-- **Sonuç:** yüksek önemde hata yok; pusula yönü, grafik geometrisi, sekme geçişleri, sürüm ve dosya sayıları, lisans metinleri temiz
-- **Düzeltme önerileri (kod yok):** İ1 ⓘ cümlesi ("oka dokununca ya da haritaya çift dokununca"); İ2 dönme kilidi kalkınca Yarış sekmesi de yataya dönüyor: yarış etkinken dikey kilit denenir (çalıştığı doğrulanmadı); İ3 tam ekran yalnızca dokunmatik cihazda (`pointer: coarse`); İ4 yatayda "yükleniyor" / hata mesajı görünür, mesaja "telefonu dik çevir", yüklemede ok gizli; İ5 `.m3-ov` `inset` yerine dört kenar (eski tarayıcı); İ6 boyut değişince `clampCam`, boyut aynıysa tuvale dokunma; İ7 çift dokunuşa uzaklık koşulu; İ8 grafiğe `ResizeObserver`; İ9 iPhone'da bağlam geri gelmezse takılma (hipotez): önce cihazda denensin
-- **Belge düzeltmeleri (yapıldı):** `README.md` için 404 kuralı, test listesindeki ok cümlesi, CLAUDE.md tarih başlığı
+### 11 Ekim: v0.19 dört ajanlı inceleme (ayrıntı arşivde)
+- Alt ajanların idaresi Claude'da (en çok 4; 2 Opus + 2 Sonnet). Yüksek önemde hata yok; düzeltme önerileri İ1-İ9, İ1-İ8 v0.20'de uygulandı
 
 ### 11 Ekim: v0.19 yazıldı ve denendi; sunum isteği (ayrıntı arşivde)
 - v0.19: silik yollar + koyu parkur kenarı, kuzey oku, yatay tutuşta 2B / 3B tam ekran, dönme kilidi kalktı; 44/44; kullanıcı test listesinin tamamını denedi, tamam (iPhone belirsiz)
