@@ -9,7 +9,7 @@
 ## Yapılacaklar {#yapilacaklar}
 
 ### Sende
-- [ ] **v0.19 için "koda uygula"** (ya da aşağıdaki açık noktalara yanıt)
+- [ ] **v0.19 için "koda uygula"** (kararlar tamam, kapsam günlükte)
 - [ ] iPhone'u olan bir arkadaş 3B'yi denesin (iPhone / Safari hiç denenmedi)
 - [ ] Ana adreste başlık "sürüm 0.17" mi bak; verileri taşımak için test dalında Test > "Yedeği dosya olarak indir", ana adreste geri yükle
 - [ ] **Garmin FIT kursunu Fenix 8'de dene**, yarıştan önceki en önemli açık; sorun çıkarsa v1.0'da düzeltilir ([rehber](https://claude.ai/artifact/T56PuY5jpTP6tJb7btnXad), Yol A)
@@ -20,15 +20,15 @@
 - [ ] (Düşük öncelik) Dışarıda "Konumumu göster" ve rota dışı uyarısı; Az/Çok ayrıntı seviyeleri
 
 ### Karar bekleyen
-- [ ] **v0.19 açık noktaları** (önerilerim günlükte): tam ekran yalnızca 3B mi; yüklü uygulamada dönme için `manifest` "portrait" kilidi kalksın mı; "x1.5" mi "×1,5" mi
 - [ ] **M3 = v1.0:** v0.19 denenince `test` → `main` pull request'i (15 kredi); dondurma 12-13 Ekim
 
 ### Bende (Claude)
-- [ ] v0.19 ("koda uygula" gelince): yollar daha silik, yatay tutuşta 3B tam ekran, ⓘ metni; test listesi; sonra v1.0 (M3)
+- [ ] v0.19 ("koda uygula" gelince): yollar daha silik + parkura koyu kenar; yatay tutuşta 2B ve 3B tam ekran, köşede km / rakım / eğim; `manifest` dönme kilidi kalkar; ⓘ metni ("Yükseklik x1,5"); kuzey oku; test listesi; sonra v1.0 (M3)
 - [ ] Yarıştan sonra: Garmin GPX'iyle plan karşılaştırması ve 17 Ekim GPX'iyle yorulma şekli (1,5 / 2 üsleri varsayım)
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
 
 ### Tamamlananlar
+- [x] Kararlar (11 Ekim): v0.19 kapsamı, 018fb1-3 önerilerimin tümü + yatay tam ekran 2B'de de, dönme kilidi kalkar, "x1,5", kuzey oku
 - [x] **v0.18 Android'de denendi, her şey tamam** (11 Ekim); iPhone yok, denenmedi
 - [x] **v0.18 yazıldı, doğrulandı, test dalında** (10 Ekim): 3B arazi görünümü; kararlar H1-H4 önerildiği gibi (kendi 3B görünümümüz, veri gömülü; GLO-30 + Sentinel-2 + OSM; "2B | 3B" anahtarı; v0.18 test dalında), araç yolları soluk çizgi
 - [x] Devir paketi test dalında; Claude Code yerelde bağlı; 404 kuralları test adresinde denendi (10 Ekim)
@@ -55,6 +55,10 @@
 - **17 Ekim:** yarış, start 07:00 (start alanı en geç 06:30)
 
 ## Günlük (en yeni en üstte) {#gunluk}
+
+### 11 Ekim (devam): v0.19 kararları
+- **Karar (kullanıcı):** önerilerimin hepsi kabul. Yatay tam ekran 2B grafikte de; `manifest` "portrait" kilidi kalkar; yazım "x1,5"; kuzey oku olur (dokununca görünüm başa döner)
+- **Durum:** "koda uygula" denmedi, kod yazılmadı
 
 ### 11 Ekim: v0.18 test sonucu ve geri bildirim (018fb1-3)
 - **Test (kullanıcı, Android):** her şey tamam. iPhone yok, denenmedi
