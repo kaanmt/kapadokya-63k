@@ -64,7 +64,7 @@
 - Depo taraması (43 dosya, desen aramasıyla): şifre, telefon, ev konumu yok; arşivlerde kilo, boy, nabız ve bir antrenman yerinin adı var
 - **Karar (kullanıcı):** `docs/arsiv/` depodan çıkar. `docs/.gitignore`'a `arsiv/` eklendi; bugünkü iki commit tek commit olarak yeniden yazıldı, `test` dalına zorla gönderildi
 - **Sonucu:** arşivler yalnızca bu bilgisayarda (`docs/arsiv/`), yedeği kullanıcıda; "ayrıntı arşivde" notları yerel dosyayı gösterir
-- **Karar (kullanıcı):** sonraki commit'lerde yazar adı `kaanocb` (bu depoya özel git ayarı; e-posta bilgisayarın yerel adresi olarak kaldı)
+- **Karar (kullanıcı):** sonraki commit'lerde yazar adı `kaanocb` (bu depoya özel git ayarı); e-posta GitHub'ın gizli noreply adresi. Kullanıcı GitHub'da "Keep my email addresses private" ve "Block command line pushes that expose my email" ayarlarını açtı
 
 ### 10 Ekim (akşam): depo Claude Code'da klonlandı; koşu GPX'leri depo dışı (uygulama kodu değişmedi)
 - Devir paketi `test` dalına gönderildi; push öncesi kendini sına 40/40, akış hepsi OK, tahmin farkı < 1e-7
