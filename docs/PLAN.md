@@ -11,7 +11,6 @@
 ### Sende
 - [ ] **v0.20'yi dene** (`docs/test-listeleri/v0.20.md`); en önemlisi yüklü uygulamada yarış ekranı yan çevrilince dikeyde kalıyor mu
 - [ ] iPhone'u olan bir arkadaş test listesindeki iPhone bölümünü denesin
-- [ ] M3 = v1.0 için karar ver (aşağıda)
 - [ ] iPhone'u olan bir arkadaş 3B'yi denesin (iPhone / Safari hiç denenmedi)
 - [ ] Ana adreste başlık "sürüm 0.17" mi bak; verileri taşımak için test dalında Test > "Yedeği dosya olarak indir", ana adreste geri yükle
 - [ ] **Garmin FIT kursunu Fenix 8'de dene**, yarıştan önceki en önemli açık; sorun çıkarsa v1.0'da düzeltilir ([rehber](https://claude.ai/artifact/T56PuY5jpTP6tJb7btnXad), Yol A)
@@ -22,17 +21,16 @@
 - [ ] (Düşük öncelik) Dışarıda "Konumumu göster" ve rota dışı uyarısı; Az/Çok ayrıntı seviyeleri
 
 ### Karar bekleyen
-- [ ] **Sunum:** akıcılık önerileri (günlükte S1-S9) uygulansın mı; sunum klasörü depoya girsin mi (şimdilik git dışı)
-- [ ] **M3 = v1.0:** v0.19 denendi; sürüm adı 1.0 yapılıp ("koda uygula") `test` → `main` pull request'i (15 kredi); dondurma 12-13 Ekim
+- [ ] M3 = v1.0: kullanıcı söyleyene kadar yok, önerilmez (11 Ekim kuralı)
 
 ### Bende (Claude)
 - [ ] İ9 (iPhone'da bağlam geri gelmezse takılma): cihaz denemesinin sonucuna göre
-- [ ] Sunum: onaylanan akıcılık önerileri, v0.20 ekranları ve sürüm yazıları, 2B / 3B sayfası, PDF'in yeniden üretimi
-- [ ] İstenince: sürüm 1.0, test listesi, `test` → `main` pull request'i "v1.0 (M3)"
+- [ ] Sunum (sürüyor, alt ajanlarla): S1-S9, sürüm yazıları 0.20, Profil ekranı, 2B / 3B sayfası, PDF
 - [ ] Yarıştan sonra: Garmin GPX'iyle plan karşılaştırması ve 17 Ekim GPX'iyle yorulma şekli (1,5 / 2 üsleri varsayım)
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
 
 ### Tamamlananlar
+- [x] Kararlar (11 Ekim): sunum akıcılık önerileri S1-S9 kabul; sunum depoya girmez; sunumda sürüm 0.20; v1.0 kullanıcı söyleyene kadar önerilmez; Claude orkestra şefi gibi çalışır (işleri alt ajanlara dağıtır)
 - [x] **v0.20 yazıldı, doğrulandı, test dalında** (11 Ekim): inceleme düzeltmeleri İ1-İ8
 - [x] v0.19 ayrı ajan incelemesi (11 Ekim): 4 ajan (2 Opus, 2 Sonnet), salt okunur; yüksek önemde hata yok
 - [x] **v0.19 denendi, test listesinin tamamı tamam** (11 Ekim)
@@ -65,9 +63,12 @@
 
 ## Günlük (en yeni en üstte) {#gunluk}
 
-### 11 Ekim (devam): sunum Türkçe denetimi
-- **Yapılan:** 12 sayfanın ve konuşmacı notlarının tamamı okundu. Dört dil bilgisi düzeltmesi pptx'e işlendi: s3 "⋮ menüsüne dokun"; s4 "parmağını grafikte gezdir: her noktanın km'sini, rakımını ve eğimini gör ... saatleri var"; s8 "Üç senaryo: yorulmanın artış hızına göre ayrılır"; s10 "kaydedilir". Yerleşim Keynote çıktısıyla denetlendi. Özgün dosya: `...-v0.17-orijinal.pptx`. PDF henüz eski
-- **Öneri (uygulanmadı, üslup):** S1 "okut ya da aç" → "okut ya da adresi aç" (s1, s3); S2 s2 "farkı" → "plana göre farkı"; S3 s6 "parkuru kaç sektöre böleceğin" → "parkurun kaç sektöre bölüneceği"; S4 s7 başlık "Antrenmanın tahmin etsin" → "Antrenmanından tahmin"; S5 s8 "Yorulmanı uzatır" → "Yorulmayı hesaba katar"; S6 s8 "20 km üstü" → "20 km'den uzun"; S7 s11 "Android'de Chrome, iPhone'da Safari" + "kullan"; S8 s11 "Saatin ana araç" → "Ana aracın saatin"; S9 notlar (s8 "yarış boyuna uzatır" → "yarışın tamamına yayar"; s10 "Start'ta Yarışı başlat" → tırnaklı; s12 "rapor ... içerir")
+### 11 Ekim (devam): sunum kararları ve iki genel kural
+- **Karar (kullanıcı):** S1-S9 hepsi; sunum depoya girmesin; 3B sayfası eklensin; sürüm yazısı 0.20. Kurallar: v1.0 kullanıcı söyleyene kadar yok ve önerilmez; Claude işleri alt ajanlara dağıtan şef gibi çalışır (CLAUDE.md kural 10-11). Mesajın sonu yarım geldi ("kend")
+- **Sürüyor:** iki ajan paralel (ekran görüntüleri; metin ve sürüm yazıları), ardından sayfa yapımı ve son okuma
+
+### 11 Ekim: sunum Türkçe denetimi (ayrıntı arşivde)
+- 12 sayfa ve notlar okundu; dört dil bilgisi düzeltmesi işlendi (s3, s4, s8, s10); akıcılık önerileri S1-S9 sonradan onaylandı. Özgün dosya `...-v0.17-orijinal.pptx`
 
 ### 11 Ekim: v0.20 yazıldı, test dalında (ayrıntı arşivde)
 - İ1-İ8 uygulandı (yarış ekranında dikey kilit denemesi, tam ekran yalnızca dokunmatikte, yatayda mesajlar, kamera sınırı, çift dokunuş, grafik boyut izleyici); 44/44 + Chrome'da 35 denetim. Denenmeyen: kilidin gerçek cihazda çalışması, iPhone; İ9 cihaz denemesini bekliyor

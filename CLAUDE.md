@@ -12,9 +12,11 @@ Bu depo, Salomon Cappadocia Ultra-Trail 63K (17 Ekim 2026, 07:00, Ürgüp) için
 4. **Zaman kaygısıyla kapsam daraltma önerme.** Kendi görüşünü çekinmeden söyle; geri bildirimde fikir üret.
 5. **Uygulama girdileriyle ilgili sorular uygulamada sorulur**, sohbette değil.
 6. **Plan belgesi `docs/PLAN.md`:** her kullanıcı mesajından sonra önce oku, sonra güncelle, test dalına commit et. Onay isteme; yanıtında ne değiştiğini tek cümleyle söyle. Biçim korunur: en üstte checkbox'lı Sende / Karar bekleyen / Bende / Tamamlananlar / Takvim; Günlük en yeni üstte, her giriş 2-4 kısa madde; belge ~20 KB'ı geçerse eski girişler özetlenip `docs/arsiv/` altına taşınır.
-7. **Sürüm numarası** her yeni sürümde bir artar (şu an 0.20 → sıradaki 0.21; M3 çıkışında 1.0), sonek yok. Değişecek yerler: `app.js` içindeki `BUILD`, `sw.js` içindeki `VERSION` (`k63-0.21`). Yeni dosya eklenirse `sw.js` `ASSETS` listesine ve `app.js` içindeki `EXPECTED` sayısına da eklenir.
+7. **Sürüm numarası** her yeni sürümde bir artar (şu an 0.20 → sıradaki 0.21), sonek yok. Değişecek yerler: `app.js` içindeki `BUILD`, `sw.js` içindeki `VERSION` (`k63-0.21`). Yeni dosya eklenirse `sw.js` `ASSETS` listesine ve `app.js` içindeki `EXPECTED` sayısına da eklenir.
 8. **Her sürüme ayrı test listesi:** `docs/test-listeleri/vX.md`, madde madde, kullanıcının o sürümde neyi denemesi gerektiği. Kullanıcı sonuçlarını aynı dosyaya işlenir (test günlüğü). Örnek: `docs/test-listeleri/v0.17.md`.
 9. Hız birimi yok, yalnızca tempo (dk/km).
+10. **v1.0 (M3) kullanıcı söyleyene kadar yok ve önerilmez** (11 Ekim). Sürümler 0.21, 0.22 diye sürer.
+11. **Orkestra şefi gibi çalış** (11 Ekim): istenen işi parçalara böl, uygun parçaları alt ajanlara dağıt (en çok 4; 2 Opus 5.5 + 2 Sonnet 5.5), sonuçları doğrulayıp birleştir. Dağıtım için onay sorma.
 
 ## Yayın akışı (Netlify, kredi sınırlı)
 
@@ -51,7 +53,7 @@ npm run tahmin                 # veriden tahmin: JS sonuçları = bağımsız Py
 ## Güncel durum (11 Ekim 2026)
 
 - Ana adreste **v0.17 (M2)**. Test dalında **v0.20** (11 Ekim; v0.19 + dört ajanlı incelemenin düzeltmeleri İ1-İ8, yarış ekranında dikey kilit denemesi `race.js` `orient`; kullanıcı denemesi bekleniyor: `docs/test-listeleri/v0.20.md`). v0.19: v0.18'in 3B görünümü (Android'de denendi, tamam) + geri bildirim: yollar daha silik, parkura koyu kenar, kuzey oku, telefon yatayken Profil'de 2B grafik ya da 3B harita tam ekran (`app.js` `FULLQ` ve `style.css` ortam sorgusu aynı kalmalı), `manifest` dönme kilidi kalktı. Kullanıcı denedi, test listesi tamam (`docs/test-listeleri/v0.19.md`); iPhone'da denenip denenmediği doğrulanmadı.
-- Sıradaki: M3 = v1.0 (`test` → `main` pull request'i, yalnızca kullanıcı isteyince).
+- Sıradaki: v0.20 geri bildirimi; tanıtım sunumunun v0.20'ye güncellenmesi (2B / 3B sayfası). v1.0 için kural 10'a bak.
 - Takvim: 12-13 Ekim dondurma (sonrası yalnızca hata düzeltme), 17 Ekim yarış.
 - Yarıştan sonra: yarış GPX'iyle plan karşılaştırması ve yorulma şeklinin doğrulanması.
 
