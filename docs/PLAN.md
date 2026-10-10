@@ -75,15 +75,8 @@
 - **Doğrulama:** kendini sına 44/44 (yeni: kuzey oku yönü), arayüz akışı, harita, tahmin. Chrome'da 360 x 780 ve 780 x 360, açık ve koyu: tam ekrana giriş ve çıkış, yatay grafikte nokta seçimi, tuvalin yeniden boyutlanması, okun dönmesi ve sıfırlaması, yatayda başka sekmede tam ekran olmaması
 - **Denenmeyen:** gerçek telefon (çentik payları, yüklü uygulamanın dönmesi), iPhone. Ayrı ajan incelemesi yapılmadı (değişiklik küçük); kendi gözden geçirmem
 
-### 11 Ekim (devam): v0.19 kararları
-- **Karar (kullanıcı):** önerilerimin hepsi kabul. Yatay tam ekran 2B grafikte de; `manifest` "portrait" kilidi kalkar; yazım "x1,5"; kuzey oku olur (dokununca görünüm başa döner)
-- **Durum:** "koda uygula" denmedi, kod yazılmadı
-
-### 11 Ekim: v0.18 test sonucu ve geri bildirim (018fb1-3)
-- **Test (kullanıcı, Android):** her şey tamam. iPhone yok, denenmedi
-- **Geri bildirim:** fb1 beyaz yollar fazla göz alıcı, daha silik olsun; fb2 telefon yan yatırılınca harita tam ekran; fb3 ⓘ metni: "İki parmakla yakınlaştır, iki parmağını sürükleyerek kaydır", "Yükseklik x1.5"
-- **Önerilerim (kod yok, "koda uygula" bekliyor):** fb1 patika 0,42-0,85 → 0,22-0,60, yol 0,22-0,55 → 0,10-0,32, parkurun beyaz kenarı koyu; fb2 tarayıcı tam ekran API'si yerine CSS ile ekranı kaplama (iPhone'da da çalışır), köşede km / rakım / eğim satırı, yalnızca 3B. **Bulgu:** `manifest.webmanifest` "orientation: portrait" diyor; ana ekrana yüklü Android uygulaması dönmez, kilit kalkmalı (yüklü uygulamaya geç yansır); fb3 uygulamadaki virgüllü yazımla "×1,5"
-- **Oturum notu:** Claude Code varsayılan izin modu otomatik yapıldı (`~/.claude/settings.json`); depoda değişiklik yok
+### 11 Ekim: v0.18 Android'de tamam; geri bildirim 018fb1-3 ve v0.19 kararları (ayrıntı arşivde)
+- Yollar daha silik, yatay tutuşta tam ekran (2B ve 3B), ⓘ metni "x1,5", kuzey oku, `manifest` dönme kilidi kalkar; hepsi v0.19'da uygulandı
 
 ### 10 Ekim (gece): v0.18 yazıldı, 3B arazi görünümü (ayrıntı arşivde)
 - Kararlar H1-H4 önerildiği gibi; Profil'de "2B | 3B" anahtarı, `map3d.js` el yazımı WebGL 1, veri gömülü (GLO-30 + Sentinel-2 + OSM, 797 KB), üretim `tools/3b/uret.py`
