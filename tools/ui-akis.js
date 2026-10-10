@@ -5,7 +5,7 @@ const GPX=path.join(__dirname,'veri','kosu-27eylul.gpx');
   const T=(id)=>doc.getElementById(id).textContent.replace(/\s+/g,' ');
   let nf=0;const ok=(n,c,d)=>{if(!c)nf++;console.log((c?'OK   ':'FAIL ')+n+(d!==undefined?'  ['+d+']':''))};
   const hs=()=>Array.from(doc.querySelectorAll('#tab-plan h2')).map(h=>h.textContent);
-  ok('Başlık: sürüm 0.18, "test sürümü" yok',/sürüm 0\.18/.test(doc.querySelector('header').textContent)&&!/test sürümü/.test(doc.body.textContent.replace(/TEST ORTAMI[^.]*\./,'')),doc.querySelector('header .sub').textContent);
+  ok('Başlık: sürüm 0.19, "test sürümü" yok',/sürüm 0\.19/.test(doc.querySelector('header').textContent)&&!/test sürümü/.test(doc.body.textContent.replace(/TEST ORTAMI[^.]*\./,'')),doc.querySelector('header .sub').textContent);
   // Profil ⓘ
   ok('Profil: "Start 07:00" notu ⓘ arkasında',!/Start 07:00\. Kesim saati/.test(T('tab-profile'))&&!!doc.querySelector('#tab-profile h2 .tipbtn'));
   // 2B | 3B anahtarı (jsdom'da WebGL ve fetch yok: 3B açıklayıcı mesaj gösterir, 2B çalışır)
@@ -13,6 +13,7 @@ const GPX=path.join(__dirname,'veri','kosu-27eylul.gpx');
   ok('3B: anahtar "2B | 3B", açılışta 2B',pv().map(c=>c.textContent+':'+c.getAttribute('aria-pressed')).join(' ')==='2B:true 3B:false'&&vis('chart')&&!vis('map3d'));
   pv()[1].click();
   ok('3B seçilince grafik gizlenir, harita kutusu ve kendi açıklaması gelir',!vis('chart')&&vis('map3d')&&!vis('legend2')&&vis('legend3')&&pv()[1].getAttribute('aria-pressed')==='true'&&w.localStorage.getItem('k63profview')==='3');
+  ok('3B: kuzey oku düğmesi ve yatay özet satırı var',!!doc.querySelector('#map3d #m3north #m3needle')&&/^0,0 km · /.test(T('profHud'))&&K.profFull()===false,T('profHud'));
   ok('3B açılamazsa mesaj: 2B çalışmaya devam eder',/2B görünüm çalışmaya devam eder/.test(T('m3msg')),T('m3msg'));
   ok('3B: atıf görünür, lisans metinleri ⓘ\'de',/OpenStreetMap contributors/.test(doc.querySelector('.m3-attr').textContent)&&!/WorldDEM-30/.test(T('tab-profile'))&&!!doc.querySelector('#legend3 .tipbtn'));
   doc.querySelector('#legend3 .tipbtn').click();

@@ -10,6 +10,7 @@
   var FOVY = 32 * Math.PI / 180;
   var TILT0 = 55 * Math.PI / 180, TILT_MIN = 12 * Math.PI / 180, TILT_MAX = 88 * Math.PI / 180;
   var COURSE_RGB = [0.14, 0.29, 0.91];   // #2449E8; görüntü temayla değişmediği için sabit
+  var EDGE_RGBA = [0.05, 0.07, 0.15, 0.9];
 
   /* ---------- veri çözme (WebGL gerektirmez; kendini sına bunları dener) ---------- */
   // terrain.bin: int32 x 8 (sihir 'K63T', sürüm, w, h, taban dm, ...), float64 x 4 (lat0, lat1, lon0, lon1), uint16 x w*h (kuzeyden güneye)
@@ -79,8 +80,11 @@
     return { x: (cx / cw * 0.5 + 0.5) * W, y: (0.5 - cy / cw * 0.5) * H, w: cw };
   }
 
+  // kuzey okunun dönüşü, derece (0 yukarı, saat yönünde artar): pusula gibi kameranın baktığı yöne göre, eğimden bağımsız
+  function northDeg(c) { var d = c.az * 180 / Math.PI % 360; return d > 180 ? d - 360 : d <= -180 ? d + 360 : d; }
+
   /* ---------- durum ---------- */
-  var box = $('map3d'), canvas = $('m3c'), ov = $('m3ov'), msg = $('m3msg');
+  var box = $('map3d'), canvas = $('m3c'), ov = $('m3ov'), msg = $('m3msg'), needle = $('m3needle');
   var view = K.store('k63profview') === '3' ? '3' : '2';
   var T = null, trails = null, img = null;           // çözülmüş veri
   var gl = null, G = null;                             // WebGL bağlamı ve kaynakları
@@ -305,9 +309,9 @@
     gl.enableVertexAttribArray(p.a.p); gl.enableVertexAttribArray(p.a.a); gl.enableVertexAttribArray(p.a.b); gl.enableVertexAttribArray(p.a.d);
     gl.depthMask(false); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     var near = Math.max(0, Math.min(1, (fit / cam.dist - 1) / 3));   // 0 genel bakış, 1 yakın: uzaktan yollar soluk ve ince, parkur öne çıksın
-    drawLines(G.roads, 1.0 + 1.4 * near, [1, 0.95, 0.8, 0.22 + 0.33 * near], 8);
-    drawLines(G.paths, 1.0 + 1.2 * near, [1, 1, 1, 0.42 + 0.43 * near], 9);
-    drawLines(G.course, 6.5, [1, 1, 1, 0.95], 12);
+    drawLines(G.roads, 1.0 + 1.4 * near, [1, 0.95, 0.8, 0.10 + 0.22 * near], 8);
+    drawLines(G.paths, 1.0 + 1.2 * near, [1, 1, 1, 0.22 + 0.38 * near], 9);
+    drawLines(G.course, 6.5, EDGE_RGBA, 12);   // koyu kenar: beyaz patikalarla karışmasın
     drawLines(G.course, 3.6, COURSE_RGB.concat(1), 12);
     gl.disableVertexAttribArray(p.a.a); gl.disableVertexAttribArray(p.a.b); gl.disableVertexAttribArray(p.a.d);
     overlay();
@@ -342,6 +346,7 @@
     }
     labels.forEach(function (l) { place(l.el, l.idx); });
     place(curEl, K.cur());
+    needle.setAttribute('transform', 'rotate(' + northDeg(cam).toFixed(1) + ' 22 22)');
   }
 
   /* ---------- etkileşim: tek parmak döndür, iki parmak yakınlaştır ve kaydır, dokun = nokta seç ---------- */
@@ -400,6 +405,7 @@
     if (!M) return; ev.preventDefault();
     cam.dist *= Math.exp(ev.deltaY * 0.0015); clampCam(); redraw();
   }, { passive: false });
+  $('m3north').addEventListener('click', function () { if (!M) return; resetView(); redraw(); });
   // bağlam kaybı (ör. uygulama arka plandan dönerken): geri gelene kadar beklenir, hata sayılmaz
   var lost = false;
   canvas.addEventListener('webglcontextlost', function (ev) { ev.preventDefault(); lost = true; gl = null; G = null; M = null; ov.hidden = true; say('3B görünüm yeniden hazırlanıyor'); });
@@ -439,8 +445,9 @@
     if (T) start(); else load();
   }
   K.infoBtn($('legend3'),
-    'Tek parmakla döndür, iki parmakla yakınlaştır ve kaydır. Parkura dokununca o nokta seçilir; çift dokunuş görünümü başa alır. ' +
-    'Yükseklik 1,5 kat abartılıdır. Arazi 30 m, görüntü 10 m ayrıntıdadır: dar vadi tabanları yuvarlanır, peribacaları görünmez. Sayılar (km, rakım, eğim) resmî GPX\'ten gelir. ' +
+    'Tek parmakla döndür. İki parmakla yakınlaştır, iki parmağını sürükleyerek kaydır. Parkura dokununca o nokta seçilir. ' +
+    'Sağ üstteki ok kuzeyi gösterir; oka ya da haritaya çift dokununca görünüm başa döner. Telefonu yan çevirince harita ekranı kaplar. ' +
+    'Yükseklik x1,5. Arazi 30 m, görüntü 10 m ayrıntıdadır: dar vadi tabanları yuvarlanır, peribacaları görünmez. Sayılar (km, rakım, eğim) resmî GPX\'ten gelir. ' +
     'Yollar OpenStreetMap\'ten; parkurun bir kısmı orada çizili değil, mavi parkur çizgisi ise eksiksizdir.<br>' +
     'Arazi: produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. ' +
     'The organisations in charge of the Copernicus programme by law or by delegation do not incur any liability for any use of the Copernicus WorldDEM-30.<br>' +
@@ -455,7 +462,7 @@
 
   K.map3d = {
     setView: setView, view: function () { return view; }, onCursor: onCursor,
-    parseTerrain: parseTerrain, heightAt: heightAt, decodeTrails: decodeTrails,
+    parseTerrain: parseTerrain, heightAt: heightAt, decodeTrails: decodeTrails, northDeg: northDeg,
     perspective: perspective, lookAt: lookAt, mul: mul, viewProj: viewProj, project: project,
     state: function () { return { view: view, loaded: !!T, gl: !!gl, failed: failed, cam: cam, fit: fit, terrain: T, pointers: nPts }; }
   };

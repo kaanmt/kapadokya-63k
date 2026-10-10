@@ -1,6 +1,6 @@
 # Kapadokya Trail Uygulaması
 
-*11 Ekim 2026. Ana adres: **v0.17 (M2)**. Test dalı: **v0.18** (Profil sekmesinde 3B arazi görünümü; Android'de denendi, tamam), [test listesi](test-listeleri/v0.18.md). Sırada v0.19 (3B geri bildirimi), "koda uygula" bekliyor. Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
+*11 Ekim 2026. Ana adres: **v0.17 (M2)**. Test dalı: **v0.19** (3B geri bildirimi: silik yollar, kuzey oku, yatay tam ekran), [test listesi](test-listeleri/v0.19.md). Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
 
 *M = milestone (kilometre taşı): ana adrese (herkese açık sürüm) çıkan sürüm; M1 = v0.12.1, M2 = v0.17, M3 = v1.0 (yalnızca hata çıkarsa). Ara sürümler yalnızca test dalına gider.*
 
@@ -9,7 +9,7 @@
 ## Yapılacaklar {#yapilacaklar}
 
 ### Sende
-- [ ] **v0.19 için "koda uygula"** (kararlar tamam, kapsam günlükte)
+- [ ] **v0.19'u test adresinde dene** (`docs/test-listeleri/v0.19.md`); en önemlisi telefonu yan çevirince tam ekran (tarayıcıda ve yüklü uygulamada)
 - [ ] iPhone'u olan bir arkadaş 3B'yi denesin (iPhone / Safari hiç denenmedi)
 - [ ] Ana adreste başlık "sürüm 0.17" mi bak; verileri taşımak için test dalında Test > "Yedeği dosya olarak indir", ana adreste geri yükle
 - [ ] **Garmin FIT kursunu Fenix 8'de dene**, yarıştan önceki en önemli açık; sorun çıkarsa v1.0'da düzeltilir ([rehber](https://claude.ai/artifact/T56PuY5jpTP6tJb7btnXad), Yol A)
@@ -23,11 +23,12 @@
 - [ ] **M3 = v1.0:** v0.19 denenince `test` → `main` pull request'i (15 kredi); dondurma 12-13 Ekim
 
 ### Bende (Claude)
-- [ ] v0.19 ("koda uygula" gelince): yollar daha silik + parkura koyu kenar; yatay tutuşta 2B ve 3B tam ekran, köşede km / rakım / eğim; `manifest` dönme kilidi kalkar; ⓘ metni ("Yükseklik x1,5"); kuzey oku; test listesi; sonra v1.0 (M3)
+- [ ] v0.19 geri bildirimi gelince: düzeltme; sonra v1.0 (M3)
 - [ ] Yarıştan sonra: Garmin GPX'iyle plan karşılaştırması ve 17 Ekim GPX'iyle yorulma şekli (1,5 / 2 üsleri varsayım)
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
 
 ### Tamamlananlar
+- [x] **v0.19 yazıldı, doğrulandı, test dalında** (11 Ekim): silik yollar + koyu parkur kenarı, kuzey oku, yatay tutuşta 2B / 3B tam ekran ve özet satırı, dönme kilidi kalktı, ⓘ metni
 - [x] Kararlar (11 Ekim): v0.19 kapsamı, 018fb1-3 önerilerimin tümü + yatay tam ekran 2B'de de, dönme kilidi kalkar, "x1,5", kuzey oku
 - [x] **v0.18 Android'de denendi, her şey tamam** (11 Ekim); iPhone yok, denenmedi
 - [x] **v0.18 yazıldı, doğrulandı, test dalında** (10 Ekim): 3B arazi görünümü; kararlar H1-H4 önerildiği gibi (kendi 3B görünümümüz, veri gömülü; GLO-30 + Sentinel-2 + OSM; "2B | 3B" anahtarı; v0.18 test dalında), araç yolları soluk çizgi
@@ -56,6 +57,12 @@
 
 ## Günlük (en yeni en üstte) {#gunluk}
 
+### 11 Ekim (devam): v0.19 yazıldı (test dalında)
+- **Karar (kullanıcı):** "koda uygula"
+- **Yapılan:** patika opaklığı 0,42-0,85 → 0,22-0,60, yol 0,22-0,55 → 0,10-0,32; parkur kenarı koyu. Kuzey oku (`#m3north`): kameranın yönünü izler, dokununca görünüm başa döner. Telefon yatayken (yatay ve yükseklik < 500 px) Profil'de grafik ya da harita ekranı kaplar, sol üstte özet satırı (`#profHud`); grafik ekran yüksekliğine göre çizilir. `manifest` "orientation": "any". ⓘ metni yeni. Yeni dosya yok, önbellek 21 dosya
+- **Doğrulama:** kendini sına 44/44 (yeni: kuzey oku yönü), arayüz akışı, harita, tahmin. Chrome'da 360 x 780 ve 780 x 360, açık ve koyu: tam ekrana giriş ve çıkış, yatay grafikte nokta seçimi, tuvalin yeniden boyutlanması, okun dönmesi ve sıfırlaması, yatayda başka sekmede tam ekran olmaması
+- **Denenmeyen:** gerçek telefon (çentik payları, yüklü uygulamanın dönmesi), iPhone. Ayrı ajan incelemesi yapılmadı (değişiklik küçük); kendi gözden geçirmem
+
 ### 11 Ekim (devam): v0.19 kararları
 - **Karar (kullanıcı):** önerilerimin hepsi kabul. Yatay tam ekran 2B grafikte de; `manifest` "portrait" kilidi kalkar; yazım "x1,5"; kuzey oku olur (dokununca görünüm başa döner)
 - **Durum:** "koda uygula" denmedi, kod yazılmadı
@@ -66,11 +73,9 @@
 - **Önerilerim (kod yok, "koda uygula" bekliyor):** fb1 patika 0,42-0,85 → 0,22-0,60, yol 0,22-0,55 → 0,10-0,32, parkurun beyaz kenarı koyu; fb2 tarayıcı tam ekran API'si yerine CSS ile ekranı kaplama (iPhone'da da çalışır), köşede km / rakım / eğim satırı, yalnızca 3B. **Bulgu:** `manifest.webmanifest` "orientation: portrait" diyor; ana ekrana yüklü Android uygulaması dönmez, kilit kalkmalı (yüklü uygulamaya geç yansır); fb3 uygulamadaki virgüllü yazımla "×1,5"
 - **Oturum notu:** Claude Code varsayılan izin modu otomatik yapıldı (`~/.claude/settings.json`); depoda değişiklik yok
 
-### 10 Ekim (gece): v0.18 yazıldı, 3B arazi görünümü (test dalında)
-- **Karar (kullanıcı):** H1-H4 önerildiği gibi; yol katmanına araç yolları da girer (soluk); "koda uygula". Bu dizindeki işler için onay sorulmaz
-- **Yapılan:** Profil'de "2B | 3B" anahtarı (seçim `k63profview`). `map3d.js` el yazımı WebGL 1; veri gömülü: `terrain.bin` (GLO-30, 462 x 340 örnek), `terrain.jpg` (Sentinel-2, 2026 yazı 7 sahnenin medyanı, 1024 px), `trails.json` (OSM: 1.543 patika, 1.159 yol). Toplam 797 KB, önbellek 21 dosya. Veri yalnızca 3B ilk açıldığında okunur. Üretim: `tools/3b/uret.py`
-- **Doğrulama:** kendini sına 43/43 (3 yeni madde), arayüz akışı, `npm run harita` (parkurda arazi - GPX rakımı ortalama 1,4 m, en büyük 11 m; yön denetimi), tahmin farkı < 1e-7. Chrome'da 360 px, açık ve koyu tema: döndürme, yakınlaştırma, kaydırma, dokunarak seçim, çift dokunuş, yenilemede hatırlama, çevrimdışı açılış, WebGL'siz mesaj, bağlam kaybından dönüş. Ayrı ajan kod incelemesi: veri ve matematik uyumlu, 8 orta/düşük bulgu; hepsi düzeltildi (yükleme hatasında yeniden deneme, 2B'de açık kalan not, bağlam kaybı, çizgilerin sırt arkasından görünmesi, doku duyarlığı, yatay tutuşta tuval boyu, kameranın arazi altına girmesi, tepe arkasındaki noktanın seçilmesi)
-- **Denenmeyen:** gerçek telefon (iPhone Safari, Android); ekran görüntüleri yazılım çizicili masaüstü Chrome'dan. Test listesi: `docs/test-listeleri/v0.18.md`
+### 10 Ekim (gece): v0.18 yazıldı, 3B arazi görünümü (ayrıntı arşivde)
+- Kararlar H1-H4 önerildiği gibi; Profil'de "2B | 3B" anahtarı, `map3d.js` el yazımı WebGL 1, veri gömülü (GLO-30 + Sentinel-2 + OSM, 797 KB), üretim `tools/3b/uret.py`
+- Doğrulama: 43/43, arazi - GPX rakımı ortalama 1,4 m; ayrı ajan incelemesinin 8 bulgusu düzeltildi
 
 ### 10 Ekim: Claude Code'a geçiş (ayrıntı arşivde)
 - Devir paketi `test` dalında; depo yerelde (Mac) klonlu. Koşu GPX'leri (`tools/veri/`) ve plan arşivleri (`docs/arsiv/`) kişisel veri içerdiği için git dışı, yalnızca yerelde

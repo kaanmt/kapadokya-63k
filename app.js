@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  var BUILD = '0.18';
+  var BUILD = '0.19';
   var C = window.COURSE;
   var N = C.n, STEP = C.step, TOTAL = C.total, K = C.k;
   var ele = C.ele;
@@ -107,10 +107,15 @@
     if (g <= -4) return 'g-dn1';
     return 'g-flat';
   }
+  // telefon yatay tutulunca Profil'deki grafik ya da 3B harita ekranı kaplar (style.css'teki aynı ortam sorgusu)
+  var FULLQ = '(orientation: landscape) and (max-height: 500px)';
+  function profFull() { return !!(window.matchMedia && window.matchMedia(FULLQ).matches) && !$('tab-profile').hidden; }
   function drawChart() {
-    var W = Math.max(280, Math.round(chartEl.clientWidth || 340));
-    var H = 220;
-    var pl = 38, pr = 10, pt = 22, pb = 24;
+    var full = profFull(), cs = full ? getComputedStyle(chartEl) : null;
+    function px(v) { return parseFloat(v) || 0; }
+    var W = Math.max(280, Math.round((chartEl.clientWidth || 340) - (cs ? px(cs.paddingLeft) + px(cs.paddingRight) : 0)));
+    var H = full ? Math.max(180, Math.round(chartEl.clientHeight - px(cs.paddingBottom))) : 220;
+    var pl = 38, pr = 10, pt = full ? 62 : 22, pb = 24;   // tam ekranda üstte özet satırına yer
     var pw = W - pl - pr, ph = H - pt - pb;
     var mn = Infinity, mx = -Infinity;
     for (var i = 0; i < N; i++) { if (ele[i] < mn) mn = ele[i]; if (ele[i] > mx) mx = ele[i]; }
@@ -153,7 +158,7 @@
     cps.forEach(function (c, n) {
       var x = X(c.km * 1000);
       el('line', { x1: x, x2: x, y1: pt - 4, y2: pt + ph, class: 'g-cp' }, svg);
-      var lab = el('text', { x: x, y: 13, 'text-anchor': 'middle', class: 'g-cplabel' }, svg);
+      var lab = el('text', { x: x, y: pt - 9, 'text-anchor': 'middle', class: 'g-cplabel' }, svg);
       lab.textContent = c.id === 'FIN' ? 'F' : String(n + 1);
     });
     // cursor
@@ -175,6 +180,7 @@
     $('rEle').textContent = f(ele[cur], 0);
     $('rGrade').textContent = signed(grade[cur], 1);
     $('rGain').textContent = f(gain[cur], 0);
+    $('profHud').textContent = f(km, 1) + ' km · ' + f(ele[cur], 0) + ' m · eğim ' + signed(grade[cur], 1) + ' % · tırmanış ' + f(gain[cur], 0) + ' m';
     chartEl.setAttribute('aria-label', 'Yükseklik profili, ' + f(km, 1) + ' km, eğim yüzde ' + signed(grade[cur], 1));
     moveCursor();
     if (window.K63 && window.K63.map3d) window.K63.map3d.onCursor(cur);
@@ -205,7 +211,7 @@
 
   function onPointer(ev) {
     if (!geo) return;
-    var r = chartEl.getBoundingClientRect();
+    var r = (chartEl.firstElementChild || chartEl).getBoundingClientRect();
     var x = ev.clientX - r.left;
     var m = (x - geo.pl) / geo.pw * TOTAL;
     setIdx(Math.round(m / STEP));
@@ -479,7 +485,8 @@
   /* ---------- start ---------- */
   var resizeT = null;
   window.addEventListener('resize', function () { clearTimeout(resizeT); resizeT = setTimeout(drawChart, 120); });
+  if (window.matchMedia) { var fq = window.matchMedia(FULLQ); if (fq.addEventListener) fq.addEventListener('change', drawChart); }
   drawChart();
   update();
-  window.K63 = { ENV: ENV, BUILD: BUILD, EXPECTED: EXPECTED, ele: ele, grade: grade, C: C, N: N, STEP: STEP, TOTAL: TOTAL, dist: dist, gain: gain, loss: loss, cps: cps, f: f, hhmm: hhmm, $: $, infoBtn: infoBtn, store: store, drawChart: drawChart, update: update, setIdx: setIdx, cur: function () { return cur; } };
+  window.K63 = { ENV: ENV, BUILD: BUILD, EXPECTED: EXPECTED, ele: ele, grade: grade, C: C, N: N, STEP: STEP, TOTAL: TOTAL, dist: dist, gain: gain, loss: loss, cps: cps, f: f, hhmm: hhmm, $: $, infoBtn: infoBtn, profFull: profFull, store: store, drawChart: drawChart, update: update, setIdx: setIdx, cur: function () { return cur; } };
 })();

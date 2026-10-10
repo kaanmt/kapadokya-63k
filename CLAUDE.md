@@ -12,7 +12,7 @@ Bu depo, Salomon Cappadocia Ultra-Trail 63K (17 Ekim 2026, 07:00, Ürgüp) için
 4. **Zaman kaygısıyla kapsam daraltma önerme.** Kendi görüşünü çekinmeden söyle; geri bildirimde fikir üret.
 5. **Uygulama girdileriyle ilgili sorular uygulamada sorulur**, sohbette değil.
 6. **Plan belgesi `docs/PLAN.md`:** her kullanıcı mesajından sonra önce oku, sonra güncelle, test dalına commit et. Onay isteme; yanıtında ne değiştiğini tek cümleyle söyle. Biçim korunur: en üstte checkbox'lı Sende / Karar bekleyen / Bende / Tamamlananlar / Takvim; Günlük en yeni üstte, her giriş 2-4 kısa madde; belge ~20 KB'ı geçerse eski girişler özetlenip `docs/arsiv/` altına taşınır.
-7. **Sürüm numarası** her yeni sürümde bir artar (şu an 0.18 → sıradaki 0.19), sonek yok. Değişecek yerler: `app.js` içindeki `BUILD`, `sw.js` içindeki `VERSION` (`k63-0.19`). Yeni dosya eklenirse `sw.js` `ASSETS` listesine ve `app.js` içindeki `EXPECTED` sayısına da eklenir.
+7. **Sürüm numarası** her yeni sürümde bir artar (şu an 0.19 → sıradaki 0.20), sonek yok. Değişecek yerler: `app.js` içindeki `BUILD`, `sw.js` içindeki `VERSION` (`k63-0.20`). Yeni dosya eklenirse `sw.js` `ASSETS` listesine ve `app.js` içindeki `EXPECTED` sayısına da eklenir.
 8. **Her sürüme ayrı test listesi:** `docs/test-listeleri/vX.md`, madde madde, kullanıcının o sürümde neyi denemesi gerektiği. Kullanıcı sonuçlarını aynı dosyaya işlenir (test günlüğü). Örnek: `docs/test-listeleri/v0.17.md`.
 9. Hız birimi yok, yalnızca tempo (dk/km).
 
@@ -27,7 +27,7 @@ Bu depo, Salomon Cappadocia Ultra-Trail 63K (17 Ekim 2026, 07:00, Ürgüp) için
 
 ```
 cd tools && npm install        # ilk seferde (jsdom)
-npm run selftest               # uygulamadaki "Kendini sına": şu an 43/43
+npm run selftest               # uygulamadaki "Kendini sına": şu an 44/44
 npm run akis                   # arayüz akışı (v0.17 senaryosu + 2B | 3B anahtarı); yeni özellikte güncelle
 npm run harita                 # 3B verisi: arazi = resmî GPX rakımı, yön, yollar, önbellek listesi
 npm run tahmin                 # veriden tahmin: JS sonuçları = bağımsız Python hesabı (fark < 1e-7)
@@ -50,8 +50,8 @@ npm run tahmin                 # veriden tahmin: JS sonuçları = bağımsız Py
 
 ## Güncel durum (10 Ekim 2026)
 
-- Ana adreste **v0.17 (M2)**. Test dalında **v0.18**: Profil sekmesinde 3B arazi görünümü (2B | 3B anahtarı). Kullanıcı denemesi bekleniyor: `docs/test-listeleri/v0.18.md`. Gerçek telefonda henüz denenmedi.
-- Sıradaki: kullanıcının v0.18 geri bildirimi; tamamsa M3 = v1.0 (`test` → `main` pull request'i, yalnızca kullanıcı isteyince).
+- Ana adreste **v0.17 (M2)**. Test dalında **v0.19** (11 Ekim): v0.18'in 3B görünümü (Android'de denendi, tamam) + geri bildirim: yollar daha silik, parkura koyu kenar, kuzey oku, telefon yatayken Profil'de 2B grafik ya da 3B harita tam ekran (`app.js` `FULLQ` ve `style.css` ortam sorgusu aynı kalmalı), `manifest` dönme kilidi kalktı. Kullanıcı denemesi bekleniyor: `docs/test-listeleri/v0.19.md`. iPhone'da hiç denenmedi.
+- Sıradaki: kullanıcının v0.19 geri bildirimi; tamamsa M3 = v1.0 (`test` → `main` pull request'i, yalnızca kullanıcı isteyince).
 - Takvim: 12-13 Ekim dondurma (sonrası yalnızca hata düzeltme), 17 Ekim yarış.
 - Yarıştan sonra: yarış GPX'iyle plan karşılaştırması ve yorulma şeklinin doğrulanması.
 

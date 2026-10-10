@@ -170,6 +170,12 @@
         var tt = m3.parseTerrain(tb), h1 = m3.heightAt(tt, 38.001, 34), h2 = m3.heightAt(tt, 38.0005, 34.0005), h3 = m3.heightAt(tt, 38, 34.002);
         check('3B: arazi dosyası çözümü ve ara değer', tt.w === 3 && tt.h === 2 && near(h1, 1000, 1e-9) && near(h2, 1020, 1e-9) && near(h3, 1050, 1e-9), h1 + ', ' + h2 + ', ' + h3 + ' m');
         var tr = m3.decodeTrails({ yollar: [[0, 0, 65535, 65535, -65535], [1, 100, 200, 0, 0]] });
+        // kuzey oku: kamera güneydeyken kuzey yukarıda (0°); kamera doğudayken (batıya bakar) kuzey sağda (90°)
+        var cN = { tx: 0, ty: 0, tz: 0, az: 0, tilt: Math.PI / 4, dist: 1000 }, cE = { tx: 0, ty: 0, tz: 0, az: Math.PI / 2, tilt: Math.PI / 4, dist: 1000 };
+        // okun dönüşü, 100 m kuzeydeki noktanın ekrandaki yönüyle aynı olmalı
+        function scr(c) { var m = m3.viewProj(c, 2), a = m3.project(m, 0, 0, 0, 400, 200), b = m3.project(m, 0, 0, -100, 400, 200); return Math.atan2(b.x - a.x, a.y - b.y) * 180 / Math.PI; }
+        var n0 = m3.northDeg(cN), n1 = m3.northDeg(cE), n2 = m3.northDeg({ az: -7 * Math.PI / 2 });
+        check('3B: kuzey oku yönü', near(n0, 0, 1e-9) && near(n1, 90, 1e-9) && near(scr(cN), 0, 1e-6) && near(scr(cE), 90, 1e-6) && near(n2, 90, 1e-9), n0.toFixed(1) + '°, ' + n1.toFixed(1) + '° (ekranda ' + scr(cE).toFixed(1) + '°), ' + n2.toFixed(1) + '°');
         check('3B: yol çözümü (fark kodlaması)', tr.length === 2 && tr[0].t === 0 && tr[0].p.join(',') === '0,1,1,0' && tr[1].t === 1 && tr[1].p.length === 4, tr[0].p.join(',') + ' | ' + tr[1].p.length);
       }
     } catch (e) { check('Beklenmeyen hata', false, e.message); }

@@ -46,9 +46,13 @@
   <section class="chartwrap">
     <div class="viewsw" id="profView"><div class="chips" role="group" aria-label="Görünüm"></div></div>
     <div id="chart" class="chart" role="img" aria-label="Yükseklik profili"></div>
+    <p id="profHud" class="profhud" aria-hidden="true"></p>
     <div id="map3d" class="map3d" hidden>
       <canvas id="m3c" role="img" aria-label="3B arazi görünümü: parkur, patikalar ve kontrol noktaları"></canvas>
       <div id="m3ov" class="m3-ov" aria-hidden="true"></div>
+      <button type="button" id="m3north" class="m3-north" aria-label="Kuzey oku. Dokununca görünüm başa döner">
+        <svg viewBox="0 0 44 44" width="44" height="44" aria-hidden="true"><g id="m3needle"><text x="22" y="11" text-anchor="middle">K</text><path class="n" d="M22 13 L28 25 H16 Z"/><path class="s" d="M16 25 H28 L22 37 Z"/></g></svg>
+      </button>
       <p id="m3msg" class="m3-msg" hidden></p>
       <p class="m3-attr">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, Copernicus</p>
     </div>
