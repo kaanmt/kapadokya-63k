@@ -9,10 +9,10 @@
 ## Yapılacaklar {#yapilacaklar}
 
 ### Sende
-- [ ] **Devir paketini test dalına yükle** (`kapadokya-63k-claude-code-devir.zip`; içindekiler depo köküne; `netlify.toml` değişir; uygulama dosyalarına dokunulmadı, sürüm 0.17 kalır). Depo Private değilse `tools/veri/` klasörünü yükleme (kişisel koşu GPX'leri)
+- [x] **Devir paketi test dalında** (10 Ekim, Claude Code yerelde klonlayıp gönderdi; `tools/veri/` ve `docs/arsiv/` git dışı)
     - [ ] Test adresinde uygulama açılıyor, başlık "sürüm 0.17"
-    - [ ] Test adresinde `/docs/PLAN.md`, `/CLAUDE.md`, `/tools/package.json` "Sayfa bulunamadı" gösteriyor
-    - [ ] claude.ai/code'da GitHub bağlandı, depo seçildi; ilk mesaj: "CLAUDE.md ve docs/PLAN.md'yi oku, test dalından devam edelim"
+    - [ ] Test adresinde `/docs/PLAN.md`, `/CLAUDE.md`, `/tools/package.json` "Sayfa bulunamadı" gösteriyor (Claude denetleyemedi: test adresi Netlify girişi istiyor, 401)
+    - [x] Claude Code bağlandı (yerel, Mac; depo `test` dalında)
 - [ ] Ana adreste başlık "sürüm 0.17" mi bak; verileri taşımak için test dalında Test > "Yedeği dosya olarak indir", ana adreste geri yükle
 - [ ] **Garmin FIT kursunu Fenix 8'de dene**, yarıştan önceki en önemli açık; sorun çıkarsa v1.0'da düzeltilir ([rehber](https://claude.ai/artifact/T56PuY5jpTP6tJb7btnXad), Yol A)
     - [ ] Connect'e yüklendi
@@ -27,7 +27,8 @@
     - [ ] **H2 Görünüm (araştırmadan sonra, bedava + kaliteli):** zemin Copernicus GLO-30 (30 m'den iyisi açık değil: EEA-10 yalnızca kurumlara, ASF 12,5 m aslında yeniden örneklenmiş 30 m, HGM 5 m bireye satılmıyor, ticari 5 m ~€900 + yayın izni); üstüne Sentinel-2 10 m yaz uydu görüntüsü + gölgeleme (vadiler, bağlar, kasabalar seçilir); patikalar OpenStreetMap'ten ince çizgi, yarış parkuru kalın ayrı renk; yalnızca 6 nokta etiketi; tek parmak döndür, iki parmak yakınlaştır; yükseklik 1,5 kat abartılı. Toplam ~1 MB. Atıflar (Copernicus, Sentinel, © OpenStreetMap) köşede görünür
     - [ ] **H3 Anahtar:** profil grafiğinin üstünde "2B | 3B"; seçim hatırlanır; altındaki km / rakım / eğim satırı ikisinde de aynı (3B'de parkura dokununca)
     - [ ] **H4 Yayın:** v0.18 test dalında denenir; tamamsa M3 = v1.0 (15 kredi). Dondurma (12-13 Ekim) öncesi
-    - [ ] **Veri erişimi:** üç kaynak (Copernicus, Sentinel, OSM Overpass) claude.ai sohbet ortamından erişilemiyor. Claude Code'da bulut ortamının ağı "Custom" (bu alan adları) ya da "Full" yapılırsa ya da yerel çalışılırsa Claude kendisi indirir; Copernicus/Sentinel için ücretsiz hesabı kullanıcı açar. Ayrıntı: `docs/arastirma/3b-veri-raporu.md`
+    - [x] **Veri erişimi (10 Ekim, yerelde denendi):** üçü de hesapsız erişilebilir. GLO-30 karosu N38 E034 AWS açık veride (39 MB); Sentinel-2 L2A AWS'de, 2026 yazında parkur üstünde bulutu %2'den az 12 sahne; OSM Overpass yanıt verdi (1.407 patika/yol, 24.489 nokta, ham 1,9 MB). Kullanıcının hesap açması ya da dosya indirmesi gerekmiyor
+    - [ ] **OSM kapsamı ölçüldü:** parkurun 15 m yakınında patika (path/footway/track) olan kısmı %83,9; tüm yol türleriyle %95,0. Kalan 3,1 km OSM'de hiç yok (en uzunları km 16,1'de 650 m, km 11,5'te 550 m, km 2,7'de 425 m). Etkisi: yarış parkuru kendi GPX'imizden çizildiği için eksiksiz; eksik yerlerde yalnızca altındaki ince OSM çizgisi olmaz. Karar: patika katmanına asfalt/köy yolları da girsin mi
 - [ ] **M3 gerekli mi?** 3B girerse evet (v1.0); girmezse yalnızca hata çıkarsa
 
 ### Bende (Claude)
@@ -59,6 +60,12 @@
 - **17 Ekim:** yarış, start 07:00 (start alanı en geç 06:30)
 
 ## Günlük (en yeni en üstte) {#gunluk}
+
+### 10 Ekim (akşam): 3B için veri erişimi ve OSM kapsamı ölçüldü (kod değişmedi)
+- **Karar (kullanıcı):** commit geçmişindeki e-posta ve eski arşiv commit'leri olduğu gibi kalsın
+- Üç veri kaynağı bu bilgisayardan hesapsız erişilebilir (ayrıntı Karar bekleyen > Veri erişimi); rapordaki "kullanıcı indirir" koşulu kalktı
+- OSM kapsamı: patikalar %83,9, tüm yollar %95,0 (15 m eşik, 2.520 parkur noktası); 3,1 km OSM'de yok
+- Test adresi Netlify girişi istiyor (401); 404 kurallarını Claude denetleyemedi, kullanıcı tarayıcıda bakacak
 
 ### 10 Ekim (akşam): plan arşivleri depo dışı (uygulama kodu değişmedi)
 - Depo taraması (43 dosya, desen aramasıyla): şifre, telefon, ev konumu yok; arşivlerde kilo, boy, nabız ve bir antrenman yerinin adı var
