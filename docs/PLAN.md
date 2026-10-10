@@ -21,15 +21,18 @@
 - [ ] (Düşük öncelik) Dışarıda "Konumumu göster" ve rota dışı uyarısı; Az/Çok ayrıntı seviyeleri
 
 ### Karar bekleyen
+- [ ] **v0.20 düzeltme paketi** (inceleme bulguları, günlükte İ1-İ9): "koda uygula" ya da seçim; İ2'de yarışta dikey kilit denensin mi
 - [ ] **M3 = v1.0:** v0.19 denendi; sürüm adı 1.0 yapılıp ("koda uygula") `test` → `main` pull request'i (15 kredi); dondurma 12-13 Ekim
 
 ### Bende (Claude)
+- [ ] v0.20 ("koda uygula" gelince): inceleme düzeltmeleri, test listesi (iPhone maddeleri dahil)
 - [ ] Sunum (dosya gelince): Türkçe denetimi ve düzeltme, v0.19'a güncelleme, 2B / 3B sayfası (önerim günlükte)
 - [ ] İstenince: sürüm 1.0, test listesi, `test` → `main` pull request'i "v1.0 (M3)"
 - [ ] Yarıştan sonra: Garmin GPX'iyle plan karşılaştırması ve 17 Ekim GPX'iyle yorulma şekli (1,5 / 2 üsleri varsayım)
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
 
 ### Tamamlananlar
+- [x] v0.19 ayrı ajan incelemesi (11 Ekim): 4 ajan (2 Opus, 2 Sonnet), salt okunur; yüksek önemde hata yok
 - [x] **v0.19 denendi, test listesinin tamamı tamam** (11 Ekim)
 - [x] **v0.19 yazıldı, doğrulandı, test dalında** (11 Ekim): silik yollar + koyu parkur kenarı, kuzey oku, yatay tutuşta 2B / 3B tam ekran ve özet satırı, dönme kilidi kalktı, ⓘ metni
 - [x] Kararlar (11 Ekim): v0.19 kapsamı, 018fb1-3 önerilerimin tümü + yatay tam ekran 2B'de de, dönme kilidi kalkar, "x1,5", kuzey oku
@@ -59,6 +62,12 @@
 - **17 Ekim:** yarış, start 07:00 (start alanı en geç 06:30)
 
 ## Günlük (en yeni en üstte) {#gunluk}
+
+### 11 Ekim (devam): v0.19 dört ajanlı inceleme
+- **Karar (kullanıcı):** alt ajanların idaresi Claude'da (en çok 4; 2 Opus + 2 Sonnet), gerektikçe
+- **Sonuç:** yüksek önemde hata yok; pusula yönü, grafik geometrisi, sekme geçişleri, sürüm ve dosya sayıları, lisans metinleri temiz
+- **Düzeltme önerileri (kod yok):** İ1 ⓘ cümlesi ("oka dokununca ya da haritaya çift dokununca"); İ2 dönme kilidi kalkınca Yarış sekmesi de yataya dönüyor: yarış etkinken dikey kilit denenir (çalıştığı doğrulanmadı); İ3 tam ekran yalnızca dokunmatik cihazda (`pointer: coarse`); İ4 yatayda "yükleniyor" / hata mesajı görünür, mesaja "telefonu dik çevir", yüklemede ok gizli; İ5 `.m3-ov` `inset` yerine dört kenar (eski tarayıcı); İ6 boyut değişince `clampCam`, boyut aynıysa tuvale dokunma; İ7 çift dokunuşa uzaklık koşulu; İ8 grafiğe `ResizeObserver`; İ9 iPhone'da bağlam geri gelmezse takılma (hipotez): önce cihazda denensin
+- **Belge düzeltmeleri (yapıldı):** `README.md` için 404 kuralı, test listesindeki ok cümlesi, CLAUDE.md tarih başlığı
 
 ### 11 Ekim (devam): sunum güncelleme isteği
 - **İstek (kullanıcı):** sunum v0.19'a güncellensin, Türkçesi denetlenip düzeltilsin, 2B / 3B'yi tanıtan bir sayfa eklensin

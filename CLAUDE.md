@@ -48,7 +48,7 @@ npm run tahmin                 # veriden tahmin: JS sonuçları = bağımsız Py
 - 3B verisi uygulama dosyasıdır (kökte, yayınlanır, `sw.js` önbelleğinde): `terrain.bin` (Copernicus GLO-30), `terrain.jpg` (Sentinel-2), `trails.json` (OpenStreetMap, ODbL). Elle düzenlenmez; `tools/3b/uret.py` üretir (rasterio, numpy, pillow ister; indirilenler `tools/out/3b/`). Yalnızca 3B ilk açıldığında okunur. Atıf metinleri `map3d.js` içindeki ⓘ notunda ve haritanın köşesinde; kaldırma. jsdom'da WebGL yok: görsel değişiklikte gerçek tarayıcıda (Playwright + Chrome) ekran görüntüsüyle bak
 - Hesap modelleri, yarış verisi (kesimler, ikmal) ve Garmin iş bölümü: `docs/PLAN.md` > Başvuru.
 
-## Güncel durum (10 Ekim 2026)
+## Güncel durum (11 Ekim 2026)
 
 - Ana adreste **v0.17 (M2)**. Test dalında **v0.19** (11 Ekim): v0.18'in 3B görünümü (Android'de denendi, tamam) + geri bildirim: yollar daha silik, parkura koyu kenar, kuzey oku, telefon yatayken Profil'de 2B grafik ya da 3B harita tam ekran (`app.js` `FULLQ` ve `style.css` ortam sorgusu aynı kalmalı), `manifest` dönme kilidi kalktı. Kullanıcı denedi, test listesi tamam (`docs/test-listeleri/v0.19.md`); iPhone'da denenip denenmediği doğrulanmadı.
 - Sıradaki: M3 = v1.0 (`test` → `main` pull request'i, yalnızca kullanıcı isteyince).
