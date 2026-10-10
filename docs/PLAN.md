@@ -1,6 +1,6 @@
 # Kapadokya Trail Uygulaması
 
-*10 Ekim 2026. Ana adres: **v0.17 (M2)**. Test dalı: **v0.18** (Profil sekmesinde 3B arazi görünümü), [test listesi](test-listeleri/v0.18.md). Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
+*11 Ekim 2026. Ana adres: **v0.17 (M2)**. Test dalı: **v0.18** (Profil sekmesinde 3B arazi görünümü; Android'de denendi, tamam), [test listesi](test-listeleri/v0.18.md). Sırada v0.19 (3B geri bildirimi), "koda uygula" bekliyor. Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
 
 *M = milestone (kilometre taşı): ana adrese (herkese açık sürüm) çıkan sürüm; M1 = v0.12.1, M2 = v0.17, M3 = v1.0 (yalnızca hata çıkarsa). Ara sürümler yalnızca test dalına gider.*
 
@@ -9,7 +9,8 @@
 ## Yapılacaklar {#yapilacaklar}
 
 ### Sende
-- [ ] **v0.18'i test adresinde dene** (`docs/test-listeleri/v0.18.md`); en önemlisi kendi telefonunda 3B: açılıyor mu, akıcı mı, çevrimdışı çalışıyor mu
+- [ ] **v0.19 için "koda uygula"** (ya da aşağıdaki açık noktalara yanıt)
+- [ ] iPhone'u olan bir arkadaş 3B'yi denesin (iPhone / Safari hiç denenmedi)
 - [ ] Ana adreste başlık "sürüm 0.17" mi bak; verileri taşımak için test dalında Test > "Yedeği dosya olarak indir", ana adreste geri yükle
 - [ ] **Garmin FIT kursunu Fenix 8'de dene**, yarıştan önceki en önemli açık; sorun çıkarsa v1.0'da düzeltilir ([rehber](https://claude.ai/artifact/T56PuY5jpTP6tJb7btnXad), Yol A)
     - [ ] Connect'e yüklendi
@@ -19,14 +20,16 @@
 - [ ] (Düşük öncelik) Dışarıda "Konumumu göster" ve rota dışı uyarısı; Az/Çok ayrıntı seviyeleri
 
 ### Karar bekleyen
-- [ ] **M3 = v1.0:** v0.18 test listesi tamamlanınca `test` → `main` pull request'i (15 kredi); dondurma 12-13 Ekim
+- [ ] **v0.19 açık noktaları** (önerilerim günlükte): tam ekran yalnızca 3B mi; yüklü uygulamada dönme için `manifest` "portrait" kilidi kalksın mı; "x1.5" mi "×1,5" mi
+- [ ] **M3 = v1.0:** v0.19 denenince `test` → `main` pull request'i (15 kredi); dondurma 12-13 Ekim
 
 ### Bende (Claude)
-- [ ] v0.18 geri bildirimi gelince: düzeltme sürümü ve test listesi; sonra v1.0 (M3)
+- [ ] v0.19 ("koda uygula" gelince): yollar daha silik, yatay tutuşta 3B tam ekran, ⓘ metni; test listesi; sonra v1.0 (M3)
 - [ ] Yarıştan sonra: Garmin GPX'iyle plan karşılaştırması ve 17 Ekim GPX'iyle yorulma şekli (1,5 / 2 üsleri varsayım)
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
 
 ### Tamamlananlar
+- [x] **v0.18 Android'de denendi, her şey tamam** (11 Ekim); iPhone yok, denenmedi
 - [x] **v0.18 yazıldı, doğrulandı, test dalında** (10 Ekim): 3B arazi görünümü; kararlar H1-H4 önerildiği gibi (kendi 3B görünümümüz, veri gömülü; GLO-30 + Sentinel-2 + OSM; "2B | 3B" anahtarı; v0.18 test dalında), araç yolları soluk çizgi
 - [x] Devir paketi test dalında; Claude Code yerelde bağlı; 404 kuralları test adresinde denendi (10 Ekim)
 - [x] GitHub + Netlify kurulumu; v0.12.1 ana adreste (M1)
@@ -52,6 +55,12 @@
 - **17 Ekim:** yarış, start 07:00 (start alanı en geç 06:30)
 
 ## Günlük (en yeni en üstte) {#gunluk}
+
+### 11 Ekim: v0.18 test sonucu ve geri bildirim (018fb1-3)
+- **Test (kullanıcı, Android):** her şey tamam. iPhone yok, denenmedi
+- **Geri bildirim:** fb1 beyaz yollar fazla göz alıcı, daha silik olsun; fb2 telefon yan yatırılınca harita tam ekran; fb3 ⓘ metni: "İki parmakla yakınlaştır, iki parmağını sürükleyerek kaydır", "Yükseklik x1.5"
+- **Önerilerim (kod yok, "koda uygula" bekliyor):** fb1 patika 0,42-0,85 → 0,22-0,60, yol 0,22-0,55 → 0,10-0,32, parkurun beyaz kenarı koyu; fb2 tarayıcı tam ekran API'si yerine CSS ile ekranı kaplama (iPhone'da da çalışır), köşede km / rakım / eğim satırı, yalnızca 3B. **Bulgu:** `manifest.webmanifest` "orientation: portrait" diyor; ana ekrana yüklü Android uygulaması dönmez, kilit kalkmalı (yüklü uygulamaya geç yansır); fb3 uygulamadaki virgüllü yazımla "×1,5"
+- **Oturum notu:** Claude Code varsayılan izin modu otomatik yapıldı (`~/.claude/settings.json`); depoda değişiklik yok
 
 ### 10 Ekim (gece): v0.18 yazıldı, 3B arazi görünümü (test dalında)
 - **Karar (kullanıcı):** H1-H4 önerildiği gibi; yol katmanına araç yolları da girer (soluk); "koda uygula". Bu dizindeki işler için onay sorulmaz
