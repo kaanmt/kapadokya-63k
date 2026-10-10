@@ -9,6 +9,7 @@
 ## Yapılacaklar {#yapilacaklar}
 
 ### Sende
+- [ ] **Sunum dosyasını proje klasörüne koy** (`kapadokya-63k-planner-tanitim.pptx`; bu bilgisayarda yok, claude.ai sohbetinde üretilmişti), ör. `docs/sunum/`
 - [ ] **M3 = v1.0 için karar ver** (aşağıda); iPhone'da denendi mi, söyle
 - [ ] iPhone'u olan bir arkadaş 3B'yi denesin (iPhone / Safari hiç denenmedi)
 - [ ] Ana adreste başlık "sürüm 0.17" mi bak; verileri taşımak için test dalında Test > "Yedeği dosya olarak indir", ana adreste geri yükle
@@ -23,6 +24,7 @@
 - [ ] **M3 = v1.0:** v0.19 denendi; sürüm adı 1.0 yapılıp ("koda uygula") `test` → `main` pull request'i (15 kredi); dondurma 12-13 Ekim
 
 ### Bende (Claude)
+- [ ] Sunum (dosya gelince): Türkçe denetimi ve düzeltme, v0.19'a güncelleme, 2B / 3B sayfası (önerim günlükte)
 - [ ] İstenince: sürüm 1.0, test listesi, `test` → `main` pull request'i "v1.0 (M3)"
 - [ ] Yarıştan sonra: Garmin GPX'iyle plan karşılaştırması ve 17 Ekim GPX'iyle yorulma şekli (1,5 / 2 üsleri varsayım)
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
@@ -57,6 +59,11 @@
 - **17 Ekim:** yarış, start 07:00 (start alanı en geç 06:30)
 
 ## Günlük (en yeni en üstte) {#gunluk}
+
+### 11 Ekim (devam): sunum güncelleme isteği
+- **İstek (kullanıcı):** sunum v0.19'a güncellensin, Türkçesi denetlenip düzeltilsin, 2B / 3B'yi tanıtan bir sayfa eklensin
+- **Durum:** dosya bu bilgisayarda bulunamadı (proje klasörü, Masaüstü, İndirilenler, Belgeler, Spotlight); kullanıcıdan bekleniyor
+- **Önerim:** Profil sayfasından hemen sonra tek sayfa "Parkuru iki gözle gör: 2B | 3B"; solda dikey 2B ve 3B ekranı, sağda yatay tam ekran 3B; dört numaralı balon (anahtar, hareketler, kuzey oku, yan çevir). 13 sayfa olur
 
 ### 11 Ekim (devam): v0.19 test sonucu
 - **Test (kullanıcı):** "test listesindeki tüm adımlar denendi, ok". Yeni geri bildirim yok
