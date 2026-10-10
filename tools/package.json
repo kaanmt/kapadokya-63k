@@ -1,0 +1,11 @@
+{
+  "name": "k63-dogrulama",
+  "private": true,
+  "description": "Kapadokya 63K: uygulamayı tarayıcısız (jsdom) yükleyip kendini sınama, arayüz akışı ve tahmin karşılaştırması",
+  "scripts": {
+    "selftest": "node selftest.js",
+    "akis": "node ui-akis.js",
+    "tahmin": "node tahmin-js.js && python3 -I ref/tahmin_karsilastir.py"
+  },
+  "dependencies": { "jsdom": "^24.1.3" }
+}
