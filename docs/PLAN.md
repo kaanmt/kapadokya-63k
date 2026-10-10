@@ -1,6 +1,6 @@
 # Kapadokya Trail Uygulaması
 
-*10 Ekim 2026. Ana adres: **v0.17 (M2)**, [test listesi](https://claude.ai/artifact/R4dz2Hvz3bAHyTv2TmVgvq). Claude Code'a geçiş: devir paketi hazır (CLAUDE.md, docs/, tools/, yayın kuralı). Konuşulan: Profil sekmesine 3B harita (v0.18 adayı). Yarış: 17 Ekim, 07:00, Ürgüp.*
+*10 Ekim 2026. Ana adres: **v0.17 (M2)**. Test dalı: **v0.18** (Profil sekmesinde 3B arazi görünümü), [test listesi](test-listeleri/v0.18.md). Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
 
 *M = milestone (kilometre taşı): ana adrese (herkese açık sürüm) çıkan sürüm; M1 = v0.12.1, M2 = v0.17, M3 = v1.0 (yalnızca hata çıkarsa). Ara sürümler yalnızca test dalına gider.*
 
@@ -9,10 +9,7 @@
 ## Yapılacaklar {#yapilacaklar}
 
 ### Sende
-- [x] **Devir paketi test dalında** (10 Ekim, Claude Code yerelde klonlayıp gönderdi; `tools/veri/` ve `docs/arsiv/` git dışı)
-    - [ ] Test adresinde uygulama açılıyor, başlık "sürüm 0.17"
-    - [ ] Test adresinde `/docs/PLAN.md`, `/CLAUDE.md`, `/tools/package.json` "Sayfa bulunamadı" gösteriyor (Claude denetleyemedi: test adresi Netlify girişi istiyor, 401)
-    - [x] Claude Code bağlandı (yerel, Mac; depo `test` dalında)
+- [ ] **v0.18'i test adresinde dene** (`docs/test-listeleri/v0.18.md`); en önemlisi kendi telefonunda 3B: açılıyor mu, akıcı mı, çevrimdışı çalışıyor mu
 - [ ] Ana adreste başlık "sürüm 0.17" mi bak; verileri taşımak için test dalında Test > "Yedeği dosya olarak indir", ana adreste geri yükle
 - [ ] **Garmin FIT kursunu Fenix 8'de dene**, yarıştan önceki en önemli açık; sorun çıkarsa v1.0'da düzeltilir ([rehber](https://claude.ai/artifact/T56PuY5jpTP6tJb7btnXad), Yol A)
     - [ ] Connect'e yüklendi
@@ -22,21 +19,16 @@
 - [ ] (Düşük öncelik) Dışarıda "Konumumu göster" ve rota dışı uyarısı; Az/Çok ayrıntı seviyeleri
 
 ### Karar bekleyen
-- [ ] **3B harita, Profil sekmesi (v0.18 adayı; görüşüm: değer, kendi verimizle çevrimdışı yapılırsa)**
-    - [ ] **H1 Yol:** önerim kendi 3B görünümümüz: parkur çevresinin yükseklik verisi (yaklaşık 11 × 10 km, 30 m ızgara) uygulamaya gömülür, el yazımı WebGL ile çizilir, internet gerekmez. Alternatif: hazır harita kütüphanesi + uydu görüntüsü (internet ister, anahtar ve kullanım şartı, yarışta çalışmaz); önermiyorum
-    - [ ] **H2 Görünüm (araştırmadan sonra, bedava + kaliteli):** zemin Copernicus GLO-30 (30 m'den iyisi açık değil: EEA-10 yalnızca kurumlara, ASF 12,5 m aslında yeniden örneklenmiş 30 m, HGM 5 m bireye satılmıyor, ticari 5 m ~€900 + yayın izni); üstüne Sentinel-2 10 m yaz uydu görüntüsü + gölgeleme (vadiler, bağlar, kasabalar seçilir); patikalar OpenStreetMap'ten ince çizgi, yarış parkuru kalın ayrı renk; yalnızca 6 nokta etiketi; tek parmak döndür, iki parmak yakınlaştır; yükseklik 1,5 kat abartılı. Toplam ~1 MB. Atıflar (Copernicus, Sentinel, © OpenStreetMap) köşede görünür
-    - [ ] **H3 Anahtar:** profil grafiğinin üstünde "2B | 3B"; seçim hatırlanır; altındaki km / rakım / eğim satırı ikisinde de aynı (3B'de parkura dokununca)
-    - [ ] **H4 Yayın:** v0.18 test dalında denenir; tamamsa M3 = v1.0 (15 kredi). Dondurma (12-13 Ekim) öncesi
-    - [x] **Veri erişimi (10 Ekim, yerelde denendi):** üçü de hesapsız erişilebilir. GLO-30 karosu N38 E034 AWS açık veride (39 MB); Sentinel-2 L2A AWS'de, 2026 yazında parkur üstünde bulutu %2'den az 12 sahne; OSM Overpass yanıt verdi (1.407 patika/yol, 24.489 nokta, ham 1,9 MB). Kullanıcının hesap açması ya da dosya indirmesi gerekmiyor
-    - [ ] **OSM kapsamı ölçüldü:** parkurun 15 m yakınında patika (path/footway/track) olan kısmı %83,9; tüm yol türleriyle %95,0. Kalan 3,1 km OSM'de hiç yok (en uzunları km 16,1'de 650 m, km 11,5'te 550 m, km 2,7'de 425 m). Etkisi: yarış parkuru kendi GPX'imizden çizildiği için eksiksiz; eksik yerlerde yalnızca altındaki ince OSM çizgisi olmaz. Karar: patika katmanına asfalt/köy yolları da girsin mi
-- [ ] **M3 gerekli mi?** 3B girerse evet (v1.0); girmezse yalnızca hata çıkarsa
+- [ ] **M3 = v1.0:** v0.18 test listesi tamamlanınca `test` → `main` pull request'i (15 kredi); dondurma 12-13 Ekim
 
 ### Bende (Claude)
-- [ ] Hata gelirse: düzeltme sürümü, test listesi, gerekirse v1.0 (M3)
+- [ ] v0.18 geri bildirimi gelince: düzeltme sürümü ve test listesi; sonra v1.0 (M3)
 - [ ] Yarıştan sonra: Garmin GPX'iyle plan karşılaştırması ve 17 Ekim GPX'iyle yorulma şekli (1,5 / 2 üsleri varsayım)
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
 
 ### Tamamlananlar
+- [x] **v0.18 yazıldı, doğrulandı, test dalında** (10 Ekim): 3B arazi görünümü; kararlar H1-H4 önerildiği gibi (kendi 3B görünümümüz, veri gömülü; GLO-30 + Sentinel-2 + OSM; "2B | 3B" anahtarı; v0.18 test dalında), araç yolları soluk çizgi
+- [x] Devir paketi test dalında; Claude Code yerelde bağlı; 404 kuralları test adresinde denendi (10 Ekim)
 - [x] GitHub + Netlify kurulumu; v0.12.1 ana adreste (M1)
 - [x] **v0.17 ana dala birleştirildi = M2** (9 Ekim)
 - [x] **Claude Code devir paketi** (10 Ekim): CLAUDE.md (kurallar, yapı, yayın akışı), docs/ (plan, arşiv, test listesi, rehberler, 3B araştırması, Garmin FIT), tools/ (kendini sına, arayüz akışı, JS-Python tahmin karşılaştırması; göreli yollarla 40/40, akış HEPSİ OK, fark < 1e-7), 404 kuralı + 404.html
@@ -61,37 +53,19 @@
 
 ## Günlük (en yeni en üstte) {#gunluk}
 
-### 10 Ekim (akşam): 3B için veri erişimi ve OSM kapsamı ölçüldü (kod değişmedi)
-- **Karar (kullanıcı):** commit geçmişindeki e-posta ve eski arşiv commit'leri olduğu gibi kalsın
-- Üç veri kaynağı bu bilgisayardan hesapsız erişilebilir (ayrıntı Karar bekleyen > Veri erişimi); rapordaki "kullanıcı indirir" koşulu kalktı
-- OSM kapsamı: patikalar %83,9, tüm yollar %95,0 (15 m eşik, 2.520 parkur noktası); 3,1 km OSM'de yok
-- Test adresi Netlify girişi istiyor (401); 404 kurallarını Claude denetleyemedi, kullanıcı tarayıcıda bakacak
+### 10 Ekim (gece): v0.18 yazıldı, 3B arazi görünümü (test dalında)
+- **Karar (kullanıcı):** H1-H4 önerildiği gibi; yol katmanına araç yolları da girer (soluk); "koda uygula". Bu dizindeki işler için onay sorulmaz
+- **Yapılan:** Profil'de "2B | 3B" anahtarı (seçim `k63profview`). `map3d.js` el yazımı WebGL 1; veri gömülü: `terrain.bin` (GLO-30, 462 x 340 örnek), `terrain.jpg` (Sentinel-2, 2026 yazı 7 sahnenin medyanı, 1024 px), `trails.json` (OSM: 1.543 patika, 1.159 yol). Toplam 797 KB, önbellek 21 dosya. Veri yalnızca 3B ilk açıldığında okunur. Üretim: `tools/3b/uret.py`
+- **Doğrulama:** kendini sına 43/43 (3 yeni madde), arayüz akışı, `npm run harita` (parkurda arazi - GPX rakımı ortalama 1,4 m, en büyük 11 m; yön denetimi), tahmin farkı < 1e-7. Chrome'da 360 px, açık ve koyu tema: döndürme, yakınlaştırma, kaydırma, dokunarak seçim, çift dokunuş, yenilemede hatırlama, çevrimdışı açılış, WebGL'siz mesaj, bağlam kaybından dönüş. Ayrı ajan kod incelemesi: veri ve matematik uyumlu, 8 orta/düşük bulgu; hepsi düzeltildi (yükleme hatasında yeniden deneme, 2B'de açık kalan not, bağlam kaybı, çizgilerin sırt arkasından görünmesi, doku duyarlığı, yatay tutuşta tuval boyu, kameranın arazi altına girmesi, tepe arkasındaki noktanın seçilmesi)
+- **Denenmeyen:** gerçek telefon (iPhone Safari, Android); ekran görüntüleri yazılım çizicili masaüstü Chrome'dan. Test listesi: `docs/test-listeleri/v0.18.md`
 
-### 10 Ekim (akşam): plan arşivleri depo dışı (uygulama kodu değişmedi)
-- Depo taraması (43 dosya, desen aramasıyla): şifre, telefon, ev konumu yok; arşivlerde kilo, boy, nabız ve bir antrenman yerinin adı var
-- **Karar (kullanıcı):** `docs/arsiv/` depodan çıkar. `docs/.gitignore`'a `arsiv/` eklendi; bugünkü iki commit tek commit olarak yeniden yazıldı, `test` dalına zorla gönderildi
-- **Sonucu:** arşivler yalnızca bu bilgisayarda (`docs/arsiv/`), yedeği kullanıcıda; "ayrıntı arşivde" notları yerel dosyayı gösterir
-- **Karar (kullanıcı):** sonraki commit'lerde yazar adı `kaanocb` (bu depoya özel git ayarı); e-posta GitHub'ın gizli noreply adresi. Kullanıcı GitHub'da "Keep my email addresses private" ve "Block command line pushes that expose my email" ayarlarını açtı
+### 10 Ekim: Claude Code'a geçiş (ayrıntı arşivde)
+- Devir paketi `test` dalında; depo yerelde (Mac) klonlu. Koşu GPX'leri (`tools/veri/`) ve plan arşivleri (`docs/arsiv/`) kişisel veri içerdiği için git dışı, yalnızca yerelde
+- Commit yazarı `kaanocb`, e-posta GitHub noreply; GitHub'da e-posta gizleme ayarları açık. Geçmişteki e-posta ve eski arşiv commit'leri olduğu gibi kaldı (kullanıcı kararı)
+- 3B veri kaynakları yerelde hesapsız erişilebilir; OSM kapsamı: patikalar %83,9, tüm yollar %95,0 (15 m). Test adresi Netlify girişi istiyor; 404 kurallarını kullanıcı denedi, tamam
 
-### 10 Ekim (akşam): depo Claude Code'da klonlandı; koşu GPX'leri depo dışı (uygulama kodu değişmedi)
-- Devir paketi `test` dalına gönderildi; push öncesi kendini sına 40/40, akış hepsi OK, tahmin farkı < 1e-7
-- **Karar (kullanıcı):** koşu GPX'leri depoda olmasın (depo herkese açık; 404 kuralı yalnızca siteyi kapatır, GitHub'ı değil). `tools/.gitignore`'a `veri/` ve `__pycache__/` eklendi
-- **Sonucu:** `tools/veri/` yalnızca bu bilgisayarda; yeni bir klonda `npm run tahmin` GPX'ler elle kopyalanmadan çalışmaz (`selftest` ve `akis` etkilenmez mi, denenmedi)
-
-### 10 Ekim (akşam): Claude Code devir paketi hazır (uygulama kodu değişmedi)
-- **Karar (kullanıcı):** geliştirme dosyaları yayın kuralıyla gizlenir; deneme yayınları yine test dalına
-- **Paket:** `CLAUDE.md`; `docs/` (PLAN.md bu belge, arşivler, v0.17 test listesi, rehberler, 3B veri raporu, FIT dosyaları); `tools/` (jsdom ile kendini sına, arayüz akışı, tahmin JS = Python); `netlify.toml`'a `/docs/*`, `/tools/*`, `/CLAUDE.md`, `/.claude/*` için 404 kuralı ve `404.html`. Araçlar paketlenmiş depo kopyasında çalıştırıldı: 40/40, akış hepsi OK, tahmin farkı < 1e-7. 404 kuralı Netlify CLI ile yerelde denendi: `/docs/`, `/tools/`, `/CLAUDE.md` 404; uygulama dosyaları 200
-- **Kural değişikliği:** Claude Code'da plan belgesi `docs/PLAN.md`, test listeleri `docs/test-listeleri/`; bu sohbetteki plan artifact'i geçişten sonra arşiv
-
-### 9 Ekim (gece): 3B için veri araştırması (kod değişmedi)
-- Soru: 30 m'den iyisi ve tek patikalar. Sonuç: açık lisanslı, gömülebilir 30 m'den iyi yükseklik verisi yok; ayrıntıyı uydu görüntüsü (Sentinel-2 10 m) ve OSM patika çizgileri getirir. Tek patikalar görüntüde seçilmez, çizgi olarak çizilir
-- Önerim H2'de güncellendi; veri ~1 MB; üç kaynağı kullanıcının indirmesi gerekiyor (ortamdan erişim yok)
-- **Neden kullanıcı indiriyor:** çalışma ortamımın interneti izin listesiyle sınırlı (paket depoları, GitHub); web okuma aracım sayfayı metin özeti olarak getiriyor, ham veri dosyası (GeoTIFF, görüntü, koordinat) indiremiyor; Copernicus ve Sentinel ayrıca giriş istiyor, adına hesap açamam
-
-### 9 Ekim (akşam): M2 yayında; 3B harita fikri (kod değişmedi)
-- Kullanıcı v0.17'yi ana dala birleştirdi (M2). Yeni fikir: Profil'e 3B harita, 2B ile anahtar
-- **Doğrulanan:** bugünkü "2B" bir harita değil, km-rakım profil grafiği (SVG); uygulamada hiç harita yok. Parkurun kapladığı alan 9,1 × 8,4 km (küçük; yükseklik verisi yüzlerce KB). Çalışma ortamından Copernicus ve AWS yükseklik kaynakları erişilemiyor, npm erişilebilir
-- Önerim ve kararlar H1-H4 karar bekleyende
+### 9 Ekim: M2 yayında; 3B fikri ve veri araştırması (ayrıntı arşivde)
+- v0.17 ana dalda (M2). 3B için 30 m'den iyi açık veri yok; ayrıntıyı uydu görüntüsü ve OSM çizgileri getirir (`docs/arastirma/3b-veri-raporu.md`)
 
 ### 9 Ekim (öğle): yeni özellik fikirleri Ö1-Ö5, D1-D4 alınmadı (ayrıntı arşivde)
 - Kullanıcı: "ufak tefek, kalsın"; v0.17 son hâl
@@ -121,36 +95,9 @@
 ### v0.14-v0.15: beslenme takvimi, hata mesajı, ürün sınırları (ayrıntı arşivde)
 - Seçilen tuz tableti kullanılıyor; Progel tuzu 0,3 g = 120 mg (ambalajdan); sınırlar kaldırıldı
 
-### v0.13-test-1: GPX'ten kalibrasyon
-- Plan > Kalibrasyon: GPX yükle; tempo, düz-eşdeğer tempo, koşu içi yavaşlama; A/B/C'ye uygula (iki dokunuş); zamansız GPX reddedilir
-
-### v0.12.1: GitHub + Netlify yayın akışı
-- **Sorun:** Netlify ücretsiz planı 300 kredi, üretim yayını 15 kredi
-- **Çözüm:** ara sürümler test dalına (ücretsiz), kilometre taşları ana dala; test adresinde turuncu TEST ORTAMI şeridi
-
-### v0.12: katalog 24 ürün (Faz 2)
-- Beş satıcı ve üretici sayfaları karşılaştırıldı; arama ve filtre; sodyumu veya kafeini bilinmeyen ürünler otomatik öneriye girmez
-- Yiyecekler: 17'nin 9'u kaynaklı (TürKomp, Coca-Cola Türkiye)
-
-### v0.11: yarış öncesi kontrol listesi
-- Yarış sekmesinde 32 maddelik işaretlenebilir liste (zorunlu ekipman, telefon, saat, yarış sabahı)
-
-### v0.10: görünür ayarlar ve araçlar
-- Plan ve Beslenme'de durma toplamı ile Gelişmiş ayarlar görünür; yedekleme; yarışta "burada" kartı; **Kendini sına**; hava tahmininden sıcaklık
-
-### v0.9.x: sayı farkı dersi
-- Beslenme hedefleri beklenenden yüksek çıktı; ilk açıklamam bir varsayımdı (hata)
-- **Gerçek sebep:** tempo çarpanı Gelişmiş ağırlıklara bağlıydı; düzeltildi
-- Ders: "varsayım yapma, doğrula" kuralı
-
-### v0.5-v0.8
-- **v0.8:** her değişiklik anında; yiyecekler porsiyonla seçilir; hedefler plana ve ağırlığa bağlı
-- **v0.7:** Beslenme sekmesi, form uygulamada
-- **v0.6:** Garmin iş bölümü (Fenix 8), FIT kurs dosyaları, rehber
-- **v0.5:** yarış modu (CP'ye vardım, kesim payı, konum, rota dışı)
-
-### v0.1-v0.4 ve planlama
-- Çevrimdışı PWA; A/B/C planlayıcı; sektör bazlı model (Az 15, Orta 23, Çok 34); sadece tempo (dk/km); resmî GPX doğrulandı
+### v0.1-v0.13 (ayrıntı arşivde)
+- Çevrimdışı PWA, A/B/C planlayıcı, yarış modu, Garmin kurs dosyaları, Beslenme sekmesi, kendini sına, kontrol listesi, 24 ürünlük katalog, GitHub + Netlify akışı (test dalı ücretsiz, ana dal 15 kredi), GPX'ten kalibrasyon
+- Ders (v0.9.x): beklenmeyen sayıyı varsayımla açıkladım, gerçek sebep başkaydı; "varsayım yapma, doğrula" kuralı buradan
 
 ## Başvuru {#basvuru}
 
@@ -215,9 +162,9 @@
 
 ### Dosyalar ve rehberler
 - [GitHub + Netlify rehberi](https://claude.ai/artifact/ELNAiwa7EieNuGiqnw9FYc), [Garmin kurulum rehberi](https://claude.ai/artifact/T56PuY5jpTP6tJb7btnXad)
-- Arşiv (tüm ayrıntı, tablolar; git dışı, yalnızca yerelde): `docs/arsiv/plan-arsiv-2026-10-06.md`, `docs/arsiv/plan-arsiv-2026-10-02.md`; 3B araştırması: `docs/arastirma/3b-veri-raporu.md`; doğrulama araçları: `tools/`
+- Arşiv (tüm ayrıntı, tablolar; git dışı, yalnızca yerelde): `docs/arsiv/plan-arsiv-2026-10-10.md`, `...-10-06.md`, `...-10-02.md`; 3B araştırması: `docs/arastirma/3b-veri-raporu.md`; doğrulama araçları: `tools/`
 - Depo ZIP'leri: `kapadokya-63k-v0.17-degisenler.zip`, `...-tam.zip`; Garmin: `kapadokya-63k-kurs.fit`
-- Test listeleri: `docs/test-listeleri/v0.17.md` (eski: [v0.17 artifact](https://claude.ai/artifact/R4dz2Hvz3bAHyTv2TmVgvq))
+- Test listeleri: `docs/test-listeleri/v0.18.md`, `docs/test-listeleri/v0.17.md` (eski: [v0.17 artifact](https://claude.ai/artifact/R4dz2Hvz3bAHyTv2TmVgvq))
 - Tanıtım sunumu: `kapadokya-63k-planner-tanitim.pptx`, `kapadokya-63k-planner-tanitim.pdf` (ana adres: candid-zabaione-2be2ed.netlify.app)
 
 ### Kaynaklar

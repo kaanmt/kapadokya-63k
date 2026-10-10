@@ -12,7 +12,7 @@ Bu depo, Salomon Cappadocia Ultra-Trail 63K (17 Ekim 2026, 07:00, Ürgüp) için
 4. **Zaman kaygısıyla kapsam daraltma önerme.** Kendi görüşünü çekinmeden söyle; geri bildirimde fikir üret.
 5. **Uygulama girdileriyle ilgili sorular uygulamada sorulur**, sohbette değil.
 6. **Plan belgesi `docs/PLAN.md`:** her kullanıcı mesajından sonra önce oku, sonra güncelle, test dalına commit et. Onay isteme; yanıtında ne değiştiğini tek cümleyle söyle. Biçim korunur: en üstte checkbox'lı Sende / Karar bekleyen / Bende / Tamamlananlar / Takvim; Günlük en yeni üstte, her giriş 2-4 kısa madde; belge ~20 KB'ı geçerse eski girişler özetlenip `docs/arsiv/` altına taşınır.
-7. **Sürüm numarası** her yeni sürümde bir artar (şu an 0.17 → sıradaki 0.18), sonek yok. Değişecek yerler: `app.js` içindeki `BUILD`, `sw.js` içindeki `VERSION` (`k63-0.18`). Yeni dosya eklenirse `sw.js` `ASSETS` listesine ve `app.js` içindeki `EXPECTED` sayısına da eklenir.
+7. **Sürüm numarası** her yeni sürümde bir artar (şu an 0.18 → sıradaki 0.19), sonek yok. Değişecek yerler: `app.js` içindeki `BUILD`, `sw.js` içindeki `VERSION` (`k63-0.19`). Yeni dosya eklenirse `sw.js` `ASSETS` listesine ve `app.js` içindeki `EXPECTED` sayısına da eklenir.
 8. **Her sürüme ayrı test listesi:** `docs/test-listeleri/vX.md`, madde madde, kullanıcının o sürümde neyi denemesi gerektiği. Kullanıcı sonuçlarını aynı dosyaya işlenir (test günlüğü). Örnek: `docs/test-listeleri/v0.17.md`.
 9. Hız birimi yok, yalnızca tempo (dk/km).
 
@@ -27,8 +27,9 @@ Bu depo, Salomon Cappadocia Ultra-Trail 63K (17 Ekim 2026, 07:00, Ürgüp) için
 
 ```
 cd tools && npm install        # ilk seferde (jsdom)
-npm run selftest               # uygulamadaki "Kendini sına": şu an 40/40
-npm run akis                   # arayüz akışı (v0.17 senaryosu); yeni özellikte güncelle
+npm run selftest               # uygulamadaki "Kendini sına": şu an 43/43
+npm run akis                   # arayüz akışı (v0.17 senaryosu + 2B | 3B anahtarı); yeni özellikte güncelle
+npm run harita                 # 3B verisi: arazi = resmî GPX rakımı, yön, yollar, önbellek listesi
 npm run tahmin                 # veriden tahmin: JS sonuçları = bağımsız Python hesabı (fark < 1e-7)
 ```
 
@@ -40,16 +41,17 @@ npm run tahmin                 # veriden tahmin: JS sonuçları = bağımsız Py
 
 ## Uygulama yapısı
 
-- Düz JavaScript, derleme yok. Modüller `window.K63` altında: `app.js` (sekmeler, profil grafiği, tema, ortam), `plan.js` (A/B/C planlayıcı, `selected()`, `dataResult()`), `calib.js` (GPX analizi ve veriden tahmin), `nutrition.js` (beslenme hedefleri ve takvim, Open-Meteo hava tahmini), `race.js` (yarış modu, kontrol listesi), `products.js` (24 ürün kataloğu), `tools.js` (kendini sına, rapor, yedek), `data.js` (resmî parkur: 25 m adım, 2520 nokta, 6 nokta), `nosleep.js`.
+- Düz JavaScript, derleme yok. Modüller `window.K63` altında: `app.js` (sekmeler, profil grafiği, tema, ortam), `plan.js` (A/B/C planlayıcı, `selected()`, `dataResult()`), `calib.js` (GPX analizi ve veriden tahmin), `nutrition.js` (beslenme hedefleri ve takvim, Open-Meteo hava tahmini), `race.js` (yarış modu, kontrol listesi), `products.js` (24 ürün kataloğu), `map3d.js` (Profil'de 3B arazi görünümü, el yazımı WebGL 1), `tools.js` (kendini sına, rapor, yedek), `data.js` (resmî parkur: 25 m adım, 2520 nokta, 6 nokta), `nosleep.js`.
 - Sekmeler: Profil / Plan / Beslenme / Yarış / Test.
-- `localStorage` anahtarları `k63` ile başlar: `k63plan-v2`, `k63planview`, `k63calib-v3`, `k63nut-v2`, `k63race-v1`, `k63check-v1`, `k63tab`, `k63theme`. Yedek bu anahtarların hepsini taşır. Kayıt biçimi değişirse sürüm ekini artır ve eski kaydı açıkça geçersiz say.
+- `localStorage` anahtarları `k63` ile başlar: `k63plan-v2`, `k63planview`, `k63calib-v3`, `k63nut-v2`, `k63race-v1`, `k63check-v1`, `k63tab`, `k63theme`, `k63profview` (2B | 3B). Yedek bu anahtarların hepsini taşır. Kayıt biçimi değişirse sürüm ekini artır ve eski kaydı açıkça geçersiz say.
 - Service worker önbelleği `k63-<sürüm>`; çevrimdışı çalışma şart (yarışta çekim zayıf).
+- 3B verisi uygulama dosyasıdır (kökte, yayınlanır, `sw.js` önbelleğinde): `terrain.bin` (Copernicus GLO-30), `terrain.jpg` (Sentinel-2), `trails.json` (OpenStreetMap, ODbL). Elle düzenlenmez; `tools/3b/uret.py` üretir (rasterio, numpy, pillow ister; indirilenler `tools/out/3b/`). Yalnızca 3B ilk açıldığında okunur. Atıf metinleri `map3d.js` içindeki ⓘ notunda ve haritanın köşesinde; kaldırma. jsdom'da WebGL yok: görsel değişiklikte gerçek tarayıcıda (Playwright + Chrome) ekran görüntüsüyle bak
 - Hesap modelleri, yarış verisi (kesimler, ikmal) ve Garmin iş bölümü: `docs/PLAN.md` > Başvuru.
 
 ## Güncel durum (10 Ekim 2026)
 
-- Ana adreste **v0.17 (M2)**. Test dalı aynı kodda + bu devir dosyaları.
-- Konuşulan, karar bekleyen: Profil sekmesine **3B arazi görünümü** (2B | 3B anahtarı). Önerilen veri: Copernicus GLO-30 + Sentinel-2 10 m + OpenStreetMap patikaları, ~1 MB, uygulamaya gömülü, el yazımı WebGL. Lisanslar ve atıflar: `docs/arastirma/3b-veri-raporu.md`. Kod için "koda uygula" bekleniyor.
+- Ana adreste **v0.17 (M2)**. Test dalında **v0.18**: Profil sekmesinde 3B arazi görünümü (2B | 3B anahtarı). Kullanıcı denemesi bekleniyor: `docs/test-listeleri/v0.18.md`. Gerçek telefonda henüz denenmedi.
+- Sıradaki: kullanıcının v0.18 geri bildirimi; tamamsa M3 = v1.0 (`test` → `main` pull request'i, yalnızca kullanıcı isteyince).
 - Takvim: 12-13 Ekim dondurma (sonrası yalnızca hata düzeltme), 17 Ekim yarış.
 - Yarıştan sonra: yarış GPX'iyle plan karşılaştırması ve yorulma şeklinin doğrulanması.
 
@@ -61,4 +63,4 @@ npm run tahmin                 # veriden tahmin: JS sonuçları = bağımsız Py
 - `docs/rehberler/`: GitHub + Netlify, Garmin kurulum rehberleri
 - `docs/garmin/`: FIT kurs dosyaları (gerçek saatte henüz denenmedi)
 - `docs/arastirma/`: 3B veri ve lisans araştırması
-- `tools/`: doğrulama araçları (jsdom, Python referans hesapları, örnek GPX'ler)
+- `tools/`: doğrulama araçları (jsdom, Python referans hesapları); `tools/3b/` 3B veri üretimi; `tools/veri/` koşu GPX'leri (git dışı, yalnızca yerelde)

@@ -5,7 +5,8 @@
   "scripts": {
     "selftest": "node selftest.js",
     "akis": "node ui-akis.js",
-    "tahmin": "node tahmin-js.js && python3 -I ref/tahmin_karsilastir.py"
+    "tahmin": "node tahmin-js.js && python3 -I ref/tahmin_karsilastir.py",
+    "harita": "node harita.js"
   },
   "dependencies": { "jsdom": "^24.1.3" }
 }

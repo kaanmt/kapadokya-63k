@@ -158,6 +158,20 @@
           K.nutrition.GEL_STEPS.indexOf(sd3.gelMin) >= 0 && 60 / sd3.gelMin <= mg + 1e-9 && [0, 0.5, 1].indexOf(sd3.dose) >= 0 && sd3.flaskMin % 5 === 0,
           'jel ' + sd3.gelMin + ' dk, doz ' + sd3.dose + ', flask ' + sd3.flaskMin + ' dk');
       }
+      if (K.map3d) {
+        var m3 = K.map3d;
+        // kamera hedefi ekranın ortasına, 100 m doğusu sağına düşer (az 0, eğim 45°, uzaklık 1000 m, 200 x 200 px): x = 100 + 100 / tan(16°) * 0.1 = 134,874
+        var vp = m3.viewProj({ tx: 0, ty: 0, tz: 0, az: 0, tilt: Math.PI / 4, dist: 1000 }, 1);
+        var c0 = m3.project(vp, 0, 0, 0, 200, 200), c1 = m3.project(vp, 100, 0, 0, 200, 200), c2 = m3.project(vp, 0, 100, 0, 200, 200);
+        check('3B: izdüşüm (hedef ortada, doğu sağda, yüksek nokta yukarıda)', near(c0.x, 100, 1e-6) && near(c0.y, 100, 1e-6) && near(c1.x, 134.874, 0.001) && near(c1.y, 100, 1e-6) && c2.y < 100 && near(c0.w, 1000, 1e-6), c0.x.toFixed(3) + ', ' + c0.y.toFixed(3) + ' | ' + c1.x.toFixed(3) + ' | ' + c2.y.toFixed(3));
+        // 3 x 2 örnekli yapay arazi: kuzey satırı 1000, 1010, 1020 m; güney satırı 1030, 1040, 1050 m
+        var tb = new ArrayBuffer(64 + 12);
+        new Int32Array(tb, 0, 8).set([0x5433364B, 1, 3, 2, 10000, 1, 0, 0]); new Float64Array(tb, 32, 4).set([38, 38.001, 34, 34.002]); new Uint16Array(tb, 64, 6).set([0, 100, 200, 300, 400, 500]);
+        var tt = m3.parseTerrain(tb), h1 = m3.heightAt(tt, 38.001, 34), h2 = m3.heightAt(tt, 38.0005, 34.0005), h3 = m3.heightAt(tt, 38, 34.002);
+        check('3B: arazi dosyası çözümü ve ara değer', tt.w === 3 && tt.h === 2 && near(h1, 1000, 1e-9) && near(h2, 1020, 1e-9) && near(h3, 1050, 1e-9), h1 + ', ' + h2 + ', ' + h3 + ' m');
+        var tr = m3.decodeTrails({ yollar: [[0, 0, 65535, 65535, -65535], [1, 100, 200, 0, 0]] });
+        check('3B: yol çözümü (fark kodlaması)', tr.length === 2 && tr[0].t === 0 && tr[0].p.join(',') === '0,1,1,0' && tr[1].t === 1 && tr[1].p.length === 4, tr[0].p.join(',') + ' | ' + tr[1].p.length);
+      }
     } catch (e) { check('Beklenmeyen hata', false, e.message); }
     return res;
   }

@@ -1,4 +1,4 @@
-const VERSION = 'k63-0.17';
+const VERSION = 'k63-0.18';
 const ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,10 @@ const ASSETS = [
   './tools.js',
   './products.js',
   './nutrition.js',
+  './map3d.js',
+  './terrain.bin',
+  './terrain.jpg',
+  './trails.json',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png',

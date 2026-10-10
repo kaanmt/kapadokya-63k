@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  var BUILD = '0.17';
+  var BUILD = '0.18';
   var C = window.COURSE;
   var N = C.n, STEP = C.step, TOTAL = C.total, K = C.k;
   var ele = C.ele;
@@ -177,6 +177,7 @@
     $('rGain').textContent = f(gain[cur], 0);
     chartEl.setAttribute('aria-label', 'Yükseklik profili, ' + f(km, 1) + ' km, eğim yüzde ' + signed(grade[cur], 1));
     moveCursor();
+    if (window.K63 && window.K63.map3d) window.K63.map3d.onCursor(cur);
 
     var next = null, n = 0;
     for (n = 0; n < cps.length; n++) { if (cps[n].idx > cur) { next = cps[n]; break; } }
@@ -194,7 +195,7 @@
         '<span>Tırmanış ' + f(remUp, 0) + ' m, iniş ' + f(remDn, 0) + ' m</span>' +
         '<span class="dim">Kesim ' + hhmm(next.cut) + ' (saat ' + hhmm(C.startHour + next.cut) + ')</span>';
     }
-    var chips = document.querySelectorAll('.chip');
+    var chips = document.querySelectorAll('#chips .chip');
     Array.prototype.forEach.call(chips, function (c) {
       var ci = Number(c.getAttribute('data-idx'));
       c.setAttribute('aria-pressed', String(Math.abs(ci - cur) <= 2));
@@ -259,7 +260,7 @@
   if (standalone) setSt('tStand', 'Evet', 'ok'); else setSt('tStand', 'Hayır, tarayıcıda açık. Ana ekrana ekleyip oradan aç.', 'warn');
 
   // service worker + cache
-  var EXPECTED = 17;
+  var EXPECTED = 21;
   function checkCache(tries) {
     if (!('caches' in window)) { setSt('tCache', 'Bu tarayıcıda desteklenmiyor', 'bad'); return; }
     caches.keys().then(function (keys) {
@@ -480,5 +481,5 @@
   window.addEventListener('resize', function () { clearTimeout(resizeT); resizeT = setTimeout(drawChart, 120); });
   drawChart();
   update();
-  window.K63 = { ENV: ENV, BUILD: BUILD, EXPECTED: EXPECTED, ele: ele, grade: grade, C: C, N: N, STEP: STEP, TOTAL: TOTAL, dist: dist, gain: gain, loss: loss, cps: cps, f: f, hhmm: hhmm, $: $, infoBtn: infoBtn, store: store, drawChart: drawChart, update: update };
+  window.K63 = { ENV: ENV, BUILD: BUILD, EXPECTED: EXPECTED, ele: ele, grade: grade, C: C, N: N, STEP: STEP, TOTAL: TOTAL, dist: dist, gain: gain, loss: loss, cps: cps, f: f, hhmm: hhmm, $: $, infoBtn: infoBtn, store: store, drawChart: drawChart, update: update, setIdx: setIdx, cur: function () { return cur; } };
 })();

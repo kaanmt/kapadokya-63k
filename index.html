@@ -44,8 +44,20 @@
   </section>
 
   <section class="chartwrap">
+    <div class="viewsw" id="profView"><div class="chips" role="group" aria-label="Görünüm"></div></div>
     <div id="chart" class="chart" role="img" aria-label="Yükseklik profili"></div>
-    <div class="legend" aria-hidden="true">
+    <div id="map3d" class="map3d" hidden>
+      <canvas id="m3c" role="img" aria-label="3B arazi görünümü: parkur, patikalar ve kontrol noktaları"></canvas>
+      <div id="m3ov" class="m3-ov" aria-hidden="true"></div>
+      <p id="m3msg" class="m3-msg" hidden></p>
+      <p class="m3-attr">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, Copernicus</p>
+    </div>
+    <div class="legend" id="legend3" hidden>
+      <span><i class="sw m3course"></i>Parkur</span>
+      <span><i class="sw m3path"></i>Patika</span>
+      <span><i class="sw m3road"></i>Yol</span>
+    </div>
+    <div class="legend" id="legend2" aria-hidden="true">
       <span><i class="sw up2"></i>Dik çıkış</span>
       <span><i class="sw up1"></i>Tırmanış</span>
       <span><i class="sw flat"></i>Düz</span>
@@ -163,6 +175,7 @@
 <script src="data.js"></script>
 <script src="nosleep.js"></script>
 <script src="app.js"></script>
+<script src="map3d.js"></script>
 <script src="plan.js"></script>
 <script src="calib.js"></script>
 <script src="products.js"></script>

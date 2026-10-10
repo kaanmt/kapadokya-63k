@@ -5,9 +5,24 @@ const GPX=path.join(__dirname,'veri','kosu-27eylul.gpx');
   const T=(id)=>doc.getElementById(id).textContent.replace(/\s+/g,' ');
   let nf=0;const ok=(n,c,d)=>{if(!c)nf++;console.log((c?'OK   ':'FAIL ')+n+(d!==undefined?'  ['+d+']':''))};
   const hs=()=>Array.from(doc.querySelectorAll('#tab-plan h2')).map(h=>h.textContent);
-  ok('Başlık: sürüm 0.17, "test sürümü" yok',/sürüm 0\.17/.test(doc.querySelector('header').textContent)&&!/test sürümü/.test(doc.body.textContent.replace(/TEST ORTAMI[^.]*\./,'')),doc.querySelector('header .sub').textContent);
+  ok('Başlık: sürüm 0.18, "test sürümü" yok',/sürüm 0\.18/.test(doc.querySelector('header').textContent)&&!/test sürümü/.test(doc.body.textContent.replace(/TEST ORTAMI[^.]*\./,'')),doc.querySelector('header .sub').textContent);
   // Profil ⓘ
   ok('Profil: "Start 07:00" notu ⓘ arkasında',!/Start 07:00\. Kesim saati/.test(T('tab-profile'))&&!!doc.querySelector('#tab-profile h2 .tipbtn'));
+  // 2B | 3B anahtarı (jsdom'da WebGL ve fetch yok: 3B açıklayıcı mesaj gösterir, 2B çalışır)
+  const pv=()=>Array.from(doc.querySelectorAll('#profView .chip')),vis=id=>!doc.getElementById(id).hidden;
+  ok('3B: anahtar "2B | 3B", açılışta 2B',pv().map(c=>c.textContent+':'+c.getAttribute('aria-pressed')).join(' ')==='2B:true 3B:false'&&vis('chart')&&!vis('map3d'));
+  pv()[1].click();
+  ok('3B seçilince grafik gizlenir, harita kutusu ve kendi açıklaması gelir',!vis('chart')&&vis('map3d')&&!vis('legend2')&&vis('legend3')&&pv()[1].getAttribute('aria-pressed')==='true'&&w.localStorage.getItem('k63profview')==='3');
+  ok('3B açılamazsa mesaj: 2B çalışmaya devam eder',/2B görünüm çalışmaya devam eder/.test(T('m3msg')),T('m3msg'));
+  ok('3B: atıf görünür, lisans metinleri ⓘ\'de',/OpenStreetMap contributors/.test(doc.querySelector('.m3-attr').textContent)&&!/WorldDEM-30/.test(T('tab-profile'))&&!!doc.querySelector('#legend3 .tipbtn'));
+  doc.querySelector('#legend3 .tipbtn').click();
+  ok('3B ⓘ: Copernicus, Sentinel ve ODbL metinleri',/Copernicus WorldDEM-30 © DLR/.test(T('tab-profile'))&&/modified Copernicus Sentinel data 2026/.test(T('tab-profile'))&&/ODbL/.test(T('tab-profile')));
+  doc.querySelector('#legend3 .tipbtn').click();
+  const geri=doc.getElementById('fwd');geri.click();
+  ok('3B seçiliyken İleri 500 m: km satırı değişir, anahtar bozulmaz',doc.getElementById('rKm').textContent==='0,5'&&pv()[1].getAttribute('aria-pressed')==='true'&&pv()[0].getAttribute('aria-pressed')==='false');
+  pv()[0].click();
+  ok('2B\'ye dönünce grafik çizili, seçim kaydedildi',vis('chart')&&!vis('map3d')&&!!doc.querySelector('#chart svg path.g-area')&&w.localStorage.getItem('k63profview')==='2');
+  K.setIdx(0);
   K.showTab('plan');
   let t=T('tab-plan');
   ok('fb1: "Plan bir tahmin değildir" yok',!/tahmin değildir/.test(t));

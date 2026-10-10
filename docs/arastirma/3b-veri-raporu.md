@@ -72,3 +72,18 @@ claude.ai sohbet ortamından Copernicus, Sentinel ve Overpass erişilemedi (izin
 - EOX Sentinel-2 cloudless lisansları: eox.at, cloudless.eox.at/pricing
 - OSMF Produced Work kılavuzu: osmfoundation.org; OSM wiki Strava sayfası
 - Esri, Google Map Tiles politikaları; Wikiloc kullanım koşulları
+
+## Uygulama sonucu (10 Ekim 2026, v0.18)
+
+Üç kaynak da yerel bilgisayardan hesap açmadan indirildi; üretim `tools/3b/uret.py`.
+
+| Dosya | İçerik | Boyut |
+|---|---|---|
+| `terrain.bin` | GLO-30, karo N38 E034, 462 x 340 örnek (24,2 x 30,7 m), enlem 38,5869-38,6811, boylam 34,7931-34,9211 | 307 KB |
+| `terrain.jpg` | Sentinel-2 L2A, 16 Temmuz - 9 Eylül 2026 arası bulutu %1'in altında 7 sahnenin medyanı, 1024 x 1024 px (~11 m) | 282 KB |
+| `trails.json` | OSM `highway=*`, veri tarihi 10 Ekim 2026; 1.543 patika / toprak yol, 1.159 araç yolu; 2-3 m toleransla sadeleştirilmiş 20.974 nokta | 181 KB |
+
+- Parkur noktalarında arazi rakımı ile resmî GPX rakımı: ortalama mutlak fark 1,4 m, en büyük 11 m, korelasyon 0,9998. Bu kadar yakın olması resmî GPX rakımının da aynı kaynaktan (ya da çok benzerinden) geldiğini düşündürüyor; doğrulanmadı.
+- OSM kapsamı (parkurun 15 m yakınında yol olan kısmı): patika ve toprak yollar %83,9, tüm yollar %95,0. OSM'de olmayan 3,1 km'nin en uzunları km 16,1'de 650 m, km 11,5'te 550 m, km 2,7'de 425 m.
+- Görüntü atfındaki yıl 2026 ("Contains modified Copernicus Sentinel data 2026").
+- İsteğe bağlı 15 m'ye yükseltme uygulanmadı (ağ 30 m'de; ayrıntıyı görüntü taşıyor).
