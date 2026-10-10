@@ -50,8 +50,8 @@ npm run tahmin                 # veriden tahmin: JS sonuçları = bağımsız Py
 
 ## Güncel durum (10 Ekim 2026)
 
-- Ana adreste **v0.17 (M2)**. Test dalında **v0.19** (11 Ekim): v0.18'in 3B görünümü (Android'de denendi, tamam) + geri bildirim: yollar daha silik, parkura koyu kenar, kuzey oku, telefon yatayken Profil'de 2B grafik ya da 3B harita tam ekran (`app.js` `FULLQ` ve `style.css` ortam sorgusu aynı kalmalı), `manifest` dönme kilidi kalktı. Kullanıcı denemesi bekleniyor: `docs/test-listeleri/v0.19.md`. iPhone'da hiç denenmedi.
-- Sıradaki: kullanıcının v0.19 geri bildirimi; tamamsa M3 = v1.0 (`test` → `main` pull request'i, yalnızca kullanıcı isteyince).
+- Ana adreste **v0.17 (M2)**. Test dalında **v0.19** (11 Ekim): v0.18'in 3B görünümü (Android'de denendi, tamam) + geri bildirim: yollar daha silik, parkura koyu kenar, kuzey oku, telefon yatayken Profil'de 2B grafik ya da 3B harita tam ekran (`app.js` `FULLQ` ve `style.css` ortam sorgusu aynı kalmalı), `manifest` dönme kilidi kalktı. Kullanıcı denedi, test listesi tamam (`docs/test-listeleri/v0.19.md`); iPhone'da denenip denenmediği doğrulanmadı.
+- Sıradaki: M3 = v1.0 (`test` → `main` pull request'i, yalnızca kullanıcı isteyince).
 - Takvim: 12-13 Ekim dondurma (sonrası yalnızca hata düzeltme), 17 Ekim yarış.
 - Yarıştan sonra: yarış GPX'iyle plan karşılaştırması ve yorulma şeklinin doğrulanması.
 
