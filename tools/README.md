@@ -4,7 +4,7 @@ Uygulamayı tarayıcı olmadan (jsdom) yükleyip sınar. Uygulama dosyaları bu 
 
 ```
 npm install          # ilk seferde
-npm run selftest     # uygulamadaki "Kendini sına" (v0.19: 44/44)
+npm run selftest     # uygulamadaki "Kendini sına" (v0.20: 44/44)
 npm run akis         # arayüz akışı senaryosu (ui-akis.js; v0.17 senaryosu + 2B | 3B anahtarı)
 npm run harita       # 3B verisi uygulamanın çözücüleriyle: arazi = resmî GPX rakımı, yön, yollar, önbellek listesi
 npm run tahmin       # veriden tahmin: JS (tahmin-js.js) ile bağımsız Python (ref/) aynı mı

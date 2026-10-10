@@ -1,6 +1,6 @@
 # Kapadokya Trail Uygulaması
 
-*11 Ekim 2026. Ana adres: **v0.17 (M2)**. Test dalı: **v0.19** (3B geri bildirimi: silik yollar, kuzey oku, yatay tam ekran; denendi, tamam), [test listesi](test-listeleri/v0.19.md). Sırada M3 = v1.0, kullanıcının isteğini bekliyor. Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
+*11 Ekim 2026. Ana adres: **v0.17 (M2)**. Test dalı: **v0.20** (v0.19 + inceleme düzeltmeleri), [test listesi](test-listeleri/v0.20.md). Sırada: v0.20 denemesi, sunum, M3 = v1.0. Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
 
 *M = milestone (kilometre taşı): ana adrese (herkese açık sürüm) çıkan sürüm; M1 = v0.12.1, M2 = v0.17, M3 = v1.0 (yalnızca hata çıkarsa). Ara sürümler yalnızca test dalına gider.*
 
@@ -9,8 +9,9 @@
 ## Yapılacaklar {#yapilacaklar}
 
 ### Sende
-- [ ] **Sunum dosyasını proje klasörüne koy** (`kapadokya-63k-planner-tanitim.pptx`; bu bilgisayarda yok, claude.ai sohbetinde üretilmişti), ör. `docs/sunum/`
-- [ ] **M3 = v1.0 için karar ver** (aşağıda); iPhone'da denendi mi, söyle
+- [ ] **v0.20'yi dene** (`docs/test-listeleri/v0.20.md`); en önemlisi yüklü uygulamada yarış ekranı yan çevrilince dikeyde kalıyor mu
+- [ ] iPhone'u olan bir arkadaş test listesindeki iPhone bölümünü denesin
+- [ ] M3 = v1.0 için karar ver (aşağıda)
 - [ ] iPhone'u olan bir arkadaş 3B'yi denesin (iPhone / Safari hiç denenmedi)
 - [ ] Ana adreste başlık "sürüm 0.17" mi bak; verileri taşımak için test dalında Test > "Yedeği dosya olarak indir", ana adreste geri yükle
 - [ ] **Garmin FIT kursunu Fenix 8'de dene**, yarıştan önceki en önemli açık; sorun çıkarsa v1.0'da düzeltilir ([rehber](https://claude.ai/artifact/T56PuY5jpTP6tJb7btnXad), Yol A)
@@ -21,17 +22,17 @@
 - [ ] (Düşük öncelik) Dışarıda "Konumumu göster" ve rota dışı uyarısı; Az/Çok ayrıntı seviyeleri
 
 ### Karar bekleyen
-- [ ] **v0.20 düzeltme paketi** (inceleme bulguları, günlükte İ1-İ9): "koda uygula" ya da seçim; İ2'de yarışta dikey kilit denensin mi
 - [ ] **M3 = v1.0:** v0.19 denendi; sürüm adı 1.0 yapılıp ("koda uygula") `test` → `main` pull request'i (15 kredi); dondurma 12-13 Ekim
 
 ### Bende (Claude)
-- [ ] v0.20 ("koda uygula" gelince): inceleme düzeltmeleri, test listesi (iPhone maddeleri dahil)
-- [ ] Sunum (dosya gelince): Türkçe denetimi ve düzeltme, v0.19'a güncelleme, 2B / 3B sayfası (önerim günlükte)
+- [ ] İ9 (iPhone'da bağlam geri gelmezse takılma): cihaz denemesinin sonucuna göre
+- [ ] Sunum: Türkçe denetimi (sürüyor), sonra 2B / 3B sayfası
 - [ ] İstenince: sürüm 1.0, test listesi, `test` → `main` pull request'i "v1.0 (M3)"
 - [ ] Yarıştan sonra: Garmin GPX'iyle plan karşılaştırması ve 17 Ekim GPX'iyle yorulma şekli (1,5 / 2 üsleri varsayım)
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
 
 ### Tamamlananlar
+- [x] **v0.20 yazıldı, doğrulandı, test dalında** (11 Ekim): inceleme düzeltmeleri İ1-İ8
 - [x] v0.19 ayrı ajan incelemesi (11 Ekim): 4 ajan (2 Opus, 2 Sonnet), salt okunur; yüksek önemde hata yok
 - [x] **v0.19 denendi, test listesinin tamamı tamam** (11 Ekim)
 - [x] **v0.19 yazıldı, doğrulandı, test dalında** (11 Ekim): silik yollar + koyu parkur kenarı, kuzey oku, yatay tutuşta 2B / 3B tam ekran ve özet satırı, dönme kilidi kalktı, ⓘ metni
@@ -62,6 +63,12 @@
 - **17 Ekim:** yarış, start 07:00 (start alanı en geç 06:30)
 
 ## Günlük (en yeni en üstte) {#gunluk}
+
+### 11 Ekim (devam): v0.20 yazıldı (test dalında); sunum geldi
+- **Karar (kullanıcı):** İ1-İ9 önerilerinin hepsi kabul, dikey kilit denensin, "koda uygula". Sunum `docs/tanıtım-sunumu/` içinde; önce Türkçe (dil bilgisi ve akıcılık) denetimi, sonra 3B eklemesi
+- **Yapılan:** İ1 ⓘ cümlesi; İ2 yarış ekranı açıkken `screen.orientation.lock('portrait')` denenir, sekmeden çıkınca bırakılır; İ3 tam ekran sorgusuna `pointer: coarse`; İ4 yatayda yükleme / hata mesajı görünür, "Geçmek için telefonu dik çevir", yüklenirken ok gizli; İ5 `.m3-ov` dört kenar; İ6 boyut değişince `clampCam`, boyut aynıysa tuvale dokunulmaz; İ7 çift dokunuş 30 px içinde; İ8 grafiğe `ResizeObserver`
+- **Doğrulama:** 44/44, akış, harita, tahmin; Chrome'da 9 yeni denetim (dokunmatik olmayan pencere, yatayda yükleme ve hata, kamera payı, çift dokunuş, kilit çağrısı sahte nesneyle) + v0.19'un 26 denetimi
+- **Denenmeyen:** kilidin gerçek cihazda çalışması, iPhone. İ9 cihaz denemesini bekliyor. Sunum klasörü şimdilik git dışı (`docs/.gitignore`)
 
 ### 11 Ekim (devam): v0.19 dört ajanlı inceleme
 - **Karar (kullanıcı):** alt ajanların idaresi Claude'da (en çok 4; 2 Opus + 2 Sonnet), gerektikçe

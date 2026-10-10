@@ -94,13 +94,15 @@
   var labels = [], curEl = null;
 
   function say(text) { msg.textContent = text || ''; msg.hidden = !text; }
-  function fail(text) { failed = true; loading = false; canvas.hidden = true; ov.hidden = true; say(text + ' 2B görünüm çalışmaya devam eder.'); }
+  // yatay tam ekranda 2B | 3B anahtarı görünmez: çıkış yolu da söylenir
+  function back2() { return ' 2B görünüm çalışmaya devam eder.' + (K.profFull() ? ' Geçmek için telefonu dik çevir.' : ''); }
+  function fail(text) { failed = true; loading = false; canvas.hidden = true; ov.hidden = true; say(text + back2()); }
 
   /* ---------- yükleme ---------- */
   function load() {
     if (loading || failed || T) return;
     if (!window.fetch) { fail('3B görünüm bu tarayıcıda desteklenmiyor.'); return; }
-    loading = true; say('3B görünüm yükleniyor');
+    loading = true; ov.hidden = true; say('3B görünüm yükleniyor');
     var pT = fetch('terrain.bin').then(function (r) { if (!r.ok) throw new Error('terrain.bin ' + r.status); return r.arrayBuffer(); }).then(parseTerrain);
     var pI = new Promise(function (res, rej) { var im = new Image(); im.onload = function () { res(im); }; im.onerror = function () { rej(new Error('terrain.jpg')); }; im.src = 'terrain.jpg'; });
     // yollar olmadan da harita çizilir
@@ -113,7 +115,7 @@
     }).catch(function (e) {
       // geçici olabilir (zayıf çekim, önbellek henüz dolmamış): kalıcı işaretlenmez, 3B'ye yeniden dokununca tekrar denenir
       loading = false; canvas.hidden = true; ov.hidden = true;
-      say('3B görünüm yüklenemedi (' + (e && e.message ? e.message : 'hata') + '). Yeniden denemek için 3B\'ye dokun. 2B görünüm çalışmaya devam eder.');
+      say('3B görünüm yüklenemedi (' + (e && e.message ? e.message : 'hata') + '). Yeniden denemek için 3B\'ye dokun.' + back2());
     });
   }
 
@@ -262,11 +264,12 @@
     if (!T || !gl) return false;
     var w = Math.round(canvas.clientWidth), h = Math.round(canvas.clientHeight);
     if (w < 2 || h < 2) return false;            // sekme gizli
-    var first = !vpW, zoom = first ? 1 : cam.dist / fit;
-    vpW = w; vpH = h; dpr = Math.min(2, window.devicePixelRatio || 1);
+    var first = !vpW, zoom = first ? 1 : cam.dist / fit, d = Math.min(2, window.devicePixelRatio || 1);
+    if (w === vpW && h === vpH && d === dpr && canvas.width === Math.round(w * d)) return true;   // boyut aynı: tuvale dokunma (atama tuvali siler)
+    vpW = w; vpH = h; dpr = d;
     canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
     fit = fitView();
-    if (first) resetView(); else cam.dist = fit * zoom;
+    if (first) resetView(); else { cam.dist = fit * zoom; clampCam(); }   // en-boy değişince göz araziye girmesin
     return true;
   }
 
@@ -350,7 +353,7 @@
   }
 
   /* ---------- etkileşim: tek parmak döndür, iki parmak yakınlaştır ve kaydır, dokun = nokta seç ---------- */
-  var pts = {}, nPts = 0, tap = null, lastTap = 0, pinch = null;
+  var pts = {}, nPts = 0, tap = null, lastTap = 0, lastX = 0, lastY = 0, pinch = null;
   function pan(dx, dy) {
     var s = 2 * cam.dist * Math.tan(FOVY / 2) / vpH, sa = Math.sin(cam.az), ca = Math.cos(cam.az), f = dy * s / Math.max(0.3, Math.sin(cam.tilt));
     cam.tx += -dx * s * ca - f * sa; cam.tz += dx * s * sa - f * ca;
@@ -395,8 +398,9 @@
     delete pts[ev.pointerId]; nPts = Object.keys(pts).length; pinch = null;
     if (tap && ev.type === 'pointerup' && Date.now() - tap.t < 500) {
       var now = Date.now(), r = canvas.getBoundingClientRect();
-      if (now - lastTap < 320) { resetView(); lastTap = 0; redraw(); }       // çift dokunuş: görünümü sıfırla
-      else { lastTap = now; var i = pick(ev.clientX - r.left, ev.clientY - r.top); if (i >= 0) { fromMap = true; K.setIdx(i); fromMap = false; } }
+      var x = ev.clientX - r.left, y = ev.clientY - r.top;
+      if (now - lastTap < 320 && Math.hypot(x - lastX, y - lastY) < 30) { resetView(); lastTap = 0; redraw(); }       // çift dokunuş (aynı yere): görünümü sıfırla
+      else { lastTap = now; lastX = x; lastY = y; var i = pick(x, y); if (i >= 0) { fromMap = true; K.setIdx(i); fromMap = false; } }
     }
     tap = null;
   }
@@ -446,7 +450,7 @@
   }
   K.infoBtn($('legend3'),
     'Tek parmakla döndür. İki parmakla yakınlaştır, iki parmağını sürükleyerek kaydır. Parkura dokununca o nokta seçilir. ' +
-    'Sağ üstteki ok kuzeyi gösterir; oka ya da haritaya çift dokununca görünüm başa döner. Telefonu yan çevirince harita ekranı kaplar. ' +
+    'Sağ üstteki ok kuzeyi gösterir; oka dokununca ya da haritaya çift dokununca görünüm başa döner. Telefonu yan çevirince harita ekranı kaplar. ' +
     'Yükseklik x1,5. Arazi 30 m, görüntü 10 m ayrıntıdadır: dar vadi tabanları yuvarlanır, peribacaları görünmez. Sayılar (km, rakım, eğim) resmî GPX\'ten gelir. ' +
     'Yollar OpenStreetMap\'ten; parkurun bir kısmı orada çizili değil, mavi parkur çizgisi ise eksiksizdir.<br>' +
     'Arazi: produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. ' +

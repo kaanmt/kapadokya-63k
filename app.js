@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  var BUILD = '0.19';
+  var BUILD = '0.20';
   var C = window.COURSE;
   var N = C.n, STEP = C.step, TOTAL = C.total, K = C.k;
   var ele = C.ele;
@@ -107,8 +107,9 @@
     if (g <= -4) return 'g-dn1';
     return 'g-flat';
   }
-  // telefon yatay tutulunca Profil'deki grafik ya da 3B harita ekranı kaplar (style.css'teki aynı ortam sorgusu)
-  var FULLQ = '(orientation: landscape) and (max-height: 500px)';
+  // telefon yatay tutulunca Profil'deki grafik ya da 3B harita ekranı kaplar (style.css'teki aynı ortam sorgusu).
+  // pointer: coarse = dokunmatik; kısa bir bilgisayar penceresinde açılmasın (orada çevirerek çıkılamaz)
+  var FULLQ = '(orientation: landscape) and (max-height: 500px) and (pointer: coarse)';
   function profFull() { return !!(window.matchMedia && window.matchMedia(FULLQ).matches) && !$('tab-profile').hidden; }
   function drawChart() {
     var full = profFull(), cs = full ? getComputedStyle(chartEl) : null;
@@ -122,9 +123,10 @@
     var y0 = Math.floor((mn - 10) / 100) * 100, y1 = Math.ceil((mx + 10) / 100) * 100;
     function X(m) { return pl + (m / TOTAL) * pw; }
     function Y(e) { return pt + (1 - (e - y0) / (y1 - y0)) * ph; }
+    var boxH = chartEl.clientHeight;
     chartEl.textContent = '';
     var svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, width: W, height: H }, chartEl);
-    geo = { W: W, pl: pl, pw: pw, pt: pt, ph: ph, X: X, Y: Y };
+    geo = { W: W, pl: pl, pw: pw, pt: pt, ph: ph, X: X, Y: Y, boxW: chartEl.clientWidth, boxH: full ? boxH : 0 };
 
     // y grid + labels
     for (var v = y0; v <= y1; v += 100) {
@@ -486,6 +488,11 @@
   var resizeT = null;
   window.addEventListener('resize', function () { clearTimeout(resizeT); resizeT = setTimeout(drawChart, 120); });
   if (window.matchMedia) { var fq = window.matchMedia(FULLQ); if (fq.addEventListener) fq.addEventListener('change', drawChart); }
+  // kutu boyutu olaylardan sonra oturursa (ör. telefon dönerken): çizildiği boyuttan farklıysa yeniden çiz
+  if (window.ResizeObserver) new ResizeObserver(function () {
+    var w = chartEl.clientWidth; if (!w || !geo) return;
+    if (w !== geo.boxW || (profFull() ? chartEl.clientHeight : 0) !== geo.boxH) drawChart();
+  }).observe(chartEl);
   drawChart();
   update();
   window.K63 = { ENV: ENV, BUILD: BUILD, EXPECTED: EXPECTED, ele: ele, grade: grade, C: C, N: N, STEP: STEP, TOTAL: TOTAL, dist: dist, gain: gain, loss: loss, cps: cps, f: f, hhmm: hhmm, $: $, infoBtn: infoBtn, profFull: profFull, store: store, drawChart: drawChart, update: update, setIdx: setIdx, cur: function () { return cur; } };

@@ -5,7 +5,7 @@ const GPX=path.join(__dirname,'veri','kosu-27eylul.gpx');
   const T=(id)=>doc.getElementById(id).textContent.replace(/\s+/g,' ');
   let nf=0;const ok=(n,c,d)=>{if(!c)nf++;console.log((c?'OK   ':'FAIL ')+n+(d!==undefined?'  ['+d+']':''))};
   const hs=()=>Array.from(doc.querySelectorAll('#tab-plan h2')).map(h=>h.textContent);
-  ok('Başlık: sürüm 0.19, "test sürümü" yok',/sürüm 0\.19/.test(doc.querySelector('header').textContent)&&!/test sürümü/.test(doc.body.textContent.replace(/TEST ORTAMI[^.]*\./,'')),doc.querySelector('header .sub').textContent);
+  ok('Başlık: sürüm 0.20, "test sürümü" yok',/sürüm 0\.20/.test(doc.querySelector('header').textContent)&&!/test sürümü/.test(doc.body.textContent.replace(/TEST ORTAMI[^.]*\./,'')),doc.querySelector('header .sub').textContent);
   // Profil ⓘ
   ok('Profil: "Start 07:00" notu ⓘ arkasında',!/Start 07:00\. Kesim saati/.test(T('tab-profile'))&&!!doc.querySelector('#tab-profile h2 .tipbtn'));
   // 2B | 3B anahtarı (jsdom'da WebGL ve fetch yok: 3B açıklayıcı mesaj gösterir, 2B çalışır)
