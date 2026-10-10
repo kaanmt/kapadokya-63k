@@ -9,6 +9,7 @@
 ## Yapılacaklar {#yapilacaklar}
 
 ### Sende
+- [ ] **Sunuma bak** (`docs/tanıtım-sunumu/`, 13 sayfa; özellikle yeni 5. sayfa) ve PowerPoint'te bir kez aç (yerleşim yalnızca Keynote çıktısıyla denetlendi)
 - [ ] **v0.20'yi dene** (`docs/test-listeleri/v0.20.md`); en önemlisi yüklü uygulamada yarış ekranı yan çevrilince dikeyde kalıyor mu
 - [ ] iPhone'u olan bir arkadaş test listesindeki iPhone bölümünü denesin
 - [ ] iPhone'u olan bir arkadaş 3B'yi denesin (iPhone / Safari hiç denenmedi)
@@ -21,15 +22,16 @@
 - [ ] (Düşük öncelik) Dışarıda "Konumumu göster" ve rota dışı uyarısı; Az/Çok ayrıntı seviyeleri
 
 ### Karar bekleyen
+- [ ] Sunum, son okumanın isteğe bağlı önerileri: s5 başlık "Parkura iki türlü bak"; s9 ve s13 "arazi" yerine "zemin"; s8 "Beyaz kesikli çizgi"; "2030 m" / "2.030 m"
 - [ ] M3 = v1.0: kullanıcı söyleyene kadar yok, önerilmez (11 Ekim kuralı)
 
 ### Bende (Claude)
 - [ ] İ9 (iPhone'da bağlam geri gelmezse takılma): cihaz denemesinin sonucuna göre
-- [ ] Sunum (sürüyor, alt ajanlarla): S1-S9, sürüm yazıları 0.20, Profil ekranı, 2B / 3B sayfası, PDF
 - [ ] Yarıştan sonra: Garmin GPX'iyle plan karşılaştırması ve 17 Ekim GPX'iyle yorulma şekli (1,5 / 2 üsleri varsayım)
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
 
 ### Tamamlananlar
+- [x] **Tanıtım sunumu v0.20'ye güncellendi** (11 Ekim): 13 sayfa, yeni 5. sayfa "Parkuru iki gözle gör: 2B | 3B", S1-S9, kapak ve Profil ekranı v0.20, pptx + pdf
 - [x] Kararlar (11 Ekim): sunum akıcılık önerileri S1-S9 kabul; sunum depoya girmez; sunumda sürüm 0.20; v1.0 kullanıcı söyleyene kadar önerilmez; Claude orkestra şefi gibi çalışır (kendin yapmak yerine delege et); push / deploy yalnızca sürüm numarası artınca
 - [x] **v0.20 yazıldı, doğrulandı, test dalında** (11 Ekim): inceleme düzeltmeleri İ1-İ8
 - [x] v0.19 ayrı ajan incelemesi (11 Ekim): 4 ajan (2 Opus, 2 Sonnet), salt okunur; yüksek önemde hata yok
@@ -63,9 +65,13 @@
 
 ## Günlük (en yeni en üstte) {#gunluk}
 
-### 11 Ekim (devam): sunum kararları ve iki genel kural
-- **Karar (kullanıcı):** S1-S9 hepsi; sunum depoya girmesin; 3B sayfası eklensin; sürüm yazısı 0.20. Kurallar: v1.0 kullanıcı söyleyene kadar yok ve önerilmez; Claude işleri alt ajanlara dağıtan şef gibi çalışır (CLAUDE.md kural 10-11). Devamı: kendin yapmak yerine delege et; push yalnızca yazılım sürümü artınca, belge değişiklikleri o push'la birlikte (CLAUDE.md kural 12)
-- **Sürüyor:** iki ajan paralel (ekran görüntüleri; metin ve sürüm yazıları), ardından sayfa yapımı ve son okuma
+### 11 Ekim (devam): sunum v0.20, 13 sayfa (alt ajanlarla)
+- **Dağıtım:** Sonnet: ekran görüntüleri, metin (S1-S9 + sürüm yazıları), kapak görüntüsü (örnek koşu yüklü). Opus: sayfa yapımı (3 tur), bağımsız son okuma
+- **Sonuç:** yeni s5 üç sütun (yatay 3B + yatay 2B, dört madde, dikey 3B telefon); s4 Profil ve kapak ekranı v0.20; s9 başlık "Yorulmayı ekler" ("hesaba katar" sığmadı). Son okumadan: s4 "dokunduğun yerin", s5 "Arazi ayrıntısı 30 m; ...", "Telefonu yan çevir", s13 notu
+- **Bilinen:** PDF bu bilgisayarda Keynote ile üretiliyor; Keynote s9 grafiğini çizmediği için PDF'te grafik özgün PDF'ten alınan resim, pptx'te gerçek grafik. PowerPoint'te açılıp bakılmadı. Ara dosyalar `tools/out/sunum/` (git dışı)
+
+### 11 Ekim: sunum kararları ve genel kurallar (ayrıntı arşivde)
+- S1-S9 kabul, sunum depoya girmez, sürüm 0.20. CLAUDE.md kural 10-12: v1.0 önerilmez; şef gibi çalış, delege et; push yalnızca sürüm artınca
 
 ### 11 Ekim: sunum Türkçe denetimi (ayrıntı arşivde)
 - 12 sayfa ve notlar okundu; dört dil bilgisi düzeltmesi işlendi (s3, s4, s8, s10); akıcılık önerileri S1-S9 sonradan onaylandı. Özgün dosya `...-v0.17-orijinal.pptx`
