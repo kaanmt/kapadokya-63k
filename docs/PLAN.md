@@ -69,20 +69,9 @@
 - **Düzeltme önerileri (kod yok):** İ1 ⓘ cümlesi ("oka dokununca ya da haritaya çift dokununca"); İ2 dönme kilidi kalkınca Yarış sekmesi de yataya dönüyor: yarış etkinken dikey kilit denenir (çalıştığı doğrulanmadı); İ3 tam ekran yalnızca dokunmatik cihazda (`pointer: coarse`); İ4 yatayda "yükleniyor" / hata mesajı görünür, mesaja "telefonu dik çevir", yüklemede ok gizli; İ5 `.m3-ov` `inset` yerine dört kenar (eski tarayıcı); İ6 boyut değişince `clampCam`, boyut aynıysa tuvale dokunma; İ7 çift dokunuşa uzaklık koşulu; İ8 grafiğe `ResizeObserver`; İ9 iPhone'da bağlam geri gelmezse takılma (hipotez): önce cihazda denensin
 - **Belge düzeltmeleri (yapıldı):** `README.md` için 404 kuralı, test listesindeki ok cümlesi, CLAUDE.md tarih başlığı
 
-### 11 Ekim (devam): sunum güncelleme isteği
-- **İstek (kullanıcı):** sunum v0.19'a güncellensin, Türkçesi denetlenip düzeltilsin, 2B / 3B'yi tanıtan bir sayfa eklensin
-- **Durum:** dosya bu bilgisayarda bulunamadı (proje klasörü, Masaüstü, İndirilenler, Belgeler, Spotlight); kullanıcıdan bekleniyor
-- **Önerim:** Profil sayfasından hemen sonra tek sayfa "Parkuru iki gözle gör: 2B | 3B"; solda dikey 2B ve 3B ekranı, sağda yatay tam ekran 3B; dört numaralı balon (anahtar, hareketler, kuzey oku, yan çevir). 13 sayfa olur
-
-### 11 Ekim (devam): v0.19 test sonucu
-- **Test (kullanıcı):** "test listesindeki tüm adımlar denendi, ok". Yeni geri bildirim yok
-- **Açık:** iPhone'da denenip denenmediği belirsiz. Sıradaki adım M3 = v1.0; kullanıcı isteyince
-
-### 11 Ekim (devam): v0.19 yazıldı (test dalında)
-- **Karar (kullanıcı):** "koda uygula"
-- **Yapılan:** patika opaklığı 0,42-0,85 → 0,22-0,60, yol 0,22-0,55 → 0,10-0,32; parkur kenarı koyu. Kuzey oku (`#m3north`): kameranın yönünü izler, dokununca görünüm başa döner. Telefon yatayken (yatay ve yükseklik < 500 px) Profil'de grafik ya da harita ekranı kaplar, sol üstte özet satırı (`#profHud`); grafik ekran yüksekliğine göre çizilir. `manifest` "orientation": "any". ⓘ metni yeni. Yeni dosya yok, önbellek 21 dosya
-- **Doğrulama:** kendini sına 44/44 (yeni: kuzey oku yönü), arayüz akışı, harita, tahmin. Chrome'da 360 x 780 ve 780 x 360, açık ve koyu: tam ekrana giriş ve çıkış, yatay grafikte nokta seçimi, tuvalin yeniden boyutlanması, okun dönmesi ve sıfırlaması, yatayda başka sekmede tam ekran olmaması
-- **Denenmeyen:** gerçek telefon (çentik payları, yüklü uygulamanın dönmesi), iPhone. Ayrı ajan incelemesi yapılmadı (değişiklik küçük); kendi gözden geçirmem
+### 11 Ekim: v0.19 yazıldı ve denendi; sunum isteği (ayrıntı arşivde)
+- v0.19: silik yollar + koyu parkur kenarı, kuzey oku, yatay tutuşta 2B / 3B tam ekran, dönme kilidi kalktı; 44/44; kullanıcı test listesinin tamamını denedi, tamam (iPhone belirsiz)
+- Sunum: dosya bu bilgisayarda yok, kullanıcıdan bekleniyor; önerim Profil'den sonra tek sayfa "Parkuru iki gözle gör: 2B | 3B" (dikey 2B + 3B, yatay tam ekran 3B, dört balon)
 
 ### 11 Ekim: v0.18 Android'de tamam; geri bildirim 018fb1-3 ve v0.19 kararları (ayrıntı arşivde)
 - Yollar daha silik, yatay tutuşta tam ekran (2B ve 3B), ⓘ metni "x1,5", kuzey oku, `manifest` dönme kilidi kalkar; hepsi v0.19'da uygulandı
