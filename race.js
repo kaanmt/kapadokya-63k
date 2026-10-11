@@ -229,9 +229,19 @@
   }
 
   /* ---------- body classes ---------- */
+  // yarış ekranı açıkken telefon cepte ya da elde yan dönmesin: dikeye kilitlemeyi dener (yüklü uygulamada; desteklenmiyorsa sessizce geçer)
+  var locked = false;
+  function orient(lock) {
+    try {
+      var o = window.screen && screen.orientation; if (!o) return;
+      if (lock) { var p = o.lock && o.lock('portrait'); if (p && p.catch) p.catch(function () {}); }
+      else if (o.unlock) o.unlock();
+    } catch (e) {}
+  }
   function syncBody() {
     var racing = onRaceTab && active();
     document.body.classList.toggle('racing', racing);
+    if (racing !== locked) { locked = racing; orient(racing); }
     if (!racing) document.body.classList.remove('navopen');
   }
 

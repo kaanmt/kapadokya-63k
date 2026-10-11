@@ -120,6 +120,41 @@ h2 { margin: 0 0 8px; font-size: 20px; font-weight: 700; }
 .legend .sw { display: inline-block; width: 18px; height: 6px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
 .sw.up2 { background: var(--up2); } .sw.up1 { background: var(--up1); }
 .sw.flat { background: var(--flat); } .sw.dn1 { background: var(--dn1); } .sw.dn2 { background: var(--dn2); }
+.legend[hidden] { display: none; }
+/* 3B arazi görünümü (map3d.js) */
+.map3d { position: relative; width: 100%; background: var(--surface); border: 2px solid var(--line); border-radius: 14px; overflow: hidden; }
+.map3d [hidden] { display: none; }
+.map3d canvas { display: block; width: 100%; height: min(78vw, 360px, 62vh); touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+.m3-ov { position: absolute; top: 0; right: 0; bottom: 0; left: 0; overflow: hidden; pointer-events: none; }
+.m3-lab, .m3-cur { position: absolute; left: 0; top: 0; }
+.m3-lab { min-width: 22px; height: 22px; margin: -30px 0 0 -11px; padding: 0 5px; border-radius: 11px; background: var(--surface); color: var(--ink); border: 2px solid var(--ink); font-size: 12px; font-weight: 700; line-height: 18px; text-align: center; }
+.m3-cur { width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--accent); border: 3px solid var(--surface); box-shadow: 0 0 0 1px var(--ink); }
+.m3-lab.behind, .m3-cur.behind { opacity: .4; }
+.m3-msg { margin: 0; padding: 40px 16px; text-align: center; color: var(--muted); }
+.m3-attr { position: absolute; right: 0; bottom: 0; margin: 0; padding: 2px 8px; font-size: 11px; line-height: 16px; background: var(--surface); color: var(--muted); border-top-left-radius: 8px; opacity: .88; }
+.m3-attr a { color: inherit; }
+.m3-north { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; padding: 0; border: 2px solid var(--line); border-radius: 50%; background: var(--surface); opacity: .92; touch-action: manipulation; cursor: pointer; }
+.m3-ov[hidden] + .m3-north { display: none; }
+.m3-north svg { display: block; margin: -2px; }
+.m3-north text { fill: var(--ink); font-size: 9px; font-weight: 800; font-family: inherit; }
+.m3-north .n { fill: #D2332B; } .m3-north .s { fill: var(--muted); }
+.m3-north:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.profhud { display: none; }
+/* telefon yatay: Profil'deki grafik ya da 3B harita ekranı kaplar; dikeye dönünce normale döner (app.js FULLQ ile aynı sorgu) */
+@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
+  #tab-profile:not([hidden]) .chart, #tab-profile:not([hidden]) .map3d { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 40; border: 0; border-radius: 0; }
+  #tab-profile:not([hidden]) .chart { touch-action: none; padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+  #tab-profile:not([hidden]) .chart[hidden], #tab-profile:not([hidden]) .map3d[hidden] { display: none; }
+  #tab-profile:not([hidden]) .map3d canvas { height: 100%; }
+  #tab-profile:not([hidden]) .m3-msg { position: absolute; top: 0; left: 0; right: 0; padding-left: calc(16px + env(safe-area-inset-left, 0px)); padding-right: calc(16px + env(safe-area-inset-right, 0px)); }
+  #tab-profile:not([hidden]) .profhud { display: block; position: fixed; z-index: 41; top: 8px; left: calc(8px + env(safe-area-inset-left, 0px)); margin: 0; padding: 4px 10px; border-radius: 10px; background: var(--surface); color: var(--ink); border: 2px solid var(--line); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; opacity: .92; pointer-events: none; }
+  .m3-north { right: calc(8px + env(safe-area-inset-right, 0px)); }
+  .m3-attr { right: env(safe-area-inset-right, 0px); bottom: env(safe-area-inset-bottom, 0px); }
+}
+.sw.m3course { background: #2449E8; box-shadow: 0 0 0 1px #0D1226; }
+.sw.m3path { background: #FFFFFF; height: 3px; box-shadow: 0 0 0 1px var(--muted); }
+.sw.m3road { background: #E6DCC0; height: 3px; box-shadow: 0 0 0 1px var(--muted); }
+#profView .chips { margin-bottom: 8px; }
 
 .controls { margin: 10px 0; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -259,8 +294,9 @@ body.racing { padding-bottom: calc(136px + env(safe-area-inset-bottom, 0px)); }
 body.racing:not(.navopen) .nav { display: none; }
 body.racing.navopen .bigbtn, body.racing.navopen .rtoast { display: none; }
 .rtop { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 0 8px; }
-.rtime { display: flex; flex-direction: column; }
-.rtime b { font-size: 52px; line-height: 1.05; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+/* büyük sayılar kutusuna göre küçülür (cqi), taşmaz; son çare satır kırılır */
+.rtime { display: flex; flex-direction: column; flex: 1 1 0; min-width: 0; container-type: inline-size; }
+.rtime b { font-size: 52px; font-size: min(52px, 19cqi); overflow-wrap: anywhere; line-height: 1.05; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 .rlab { color: var(--muted); font-size: 16px; }
 .rsub { color: var(--muted); font-size: 16px; }
 .rsub.ok, .kpi b.ok { color: var(--ok); } .rsub.warn, .kpi b.warn { color: var(--warn); } .rsub.bad, .kpi b.bad { color: var(--bad); }
@@ -270,9 +306,9 @@ body.racing.navopen .bigbtn, body.racing.navopen .rtoast { display: none; }
 .wakebar.warn { color: var(--warn); border-color: var(--warn); }
 .wakebar.bad { color: var(--bad); border-color: var(--bad); }
 .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0 12px; }
-.kpi { display: flex; flex-direction: column; gap: 2px; background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 10px 12px; min-width: 0; }
+.kpi { display: flex; flex-direction: column; gap: 2px; background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 10px 12px; min-width: 0; container-type: inline-size; }
 .kpi.wide { grid-column: 1 / -1; }
-.kpi b { font-size: 44px; line-height: 1.05; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.kpi b { font-size: 44px; font-size: min(44px, 22cqi); overflow-wrap: anywhere; line-height: 1.05; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 .kpi .rsub { font-size: 15px; }
 .rline { font-size: 18px; margin: 4px 0; font-variant-numeric: tabular-nums; }
 .locmsg { margin: 10px 0 0; font-size: 17px; font-weight: 600; }
