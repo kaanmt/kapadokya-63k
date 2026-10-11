@@ -10,7 +10,7 @@
 
 ### Sende
 - [ ] **Sunuma bak** (`docs/tanıtım-sunumu/`, 13 sayfa; özellikle yeni 5. sayfa) ve PowerPoint'te bir kez aç (yerleşim yalnızca Keynote çıktısıyla denetlendi)
-- [ ] **v0.20'yi dene** (`docs/test-listeleri/v0.20.md`); en önemlisi yüklü uygulamada yarış ekranı yan çevrilince dikeyde kalıyor mu
+- [ ] Söyle: dikey kilidi yüklü uygulamada mı, tarayıcı sekmesinde mi denedin?
 - [ ] iPhone'u olan bir arkadaş test listesindeki iPhone bölümünü denesin
 - [ ] iPhone'u olan bir arkadaş 3B'yi denesin (iPhone / Safari hiç denenmedi)
 - [ ] Ana adreste başlık "sürüm 0.17" mi bak; verileri taşımak için test dalında Test > "Yedeği dosya olarak indir", ana adreste geri yükle
@@ -22,6 +22,7 @@
 - [ ] (Düşük öncelik) Dışarıda "Konumumu göster" ve rota dışı uyarısı; Az/Çok ayrıntı seviyeleri
 
 ### Karar bekleyen
+- [ ] **Yarış ekranı dönüyor (kilit çalışmadı):** öneri K1 (kilit sonucunu Test raporuna yaz, nedeni görelim) + K2 (yarış ekranı yatayda da kullanışlı olsun); ya da K3 (telefonun yön kilidi, kod yok). "Koda uygula" bekliyor
 - [ ] M3 = v1.0: kullanıcı söyleyene kadar yok, önerilmez (11 Ekim kuralı)
 
 ### Bende (Claude)
@@ -30,6 +31,7 @@
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
 
 ### Tamamlananlar
+- [x] v0.20 Android'de denendi (11 Ekim): dikey kilit dışında tamam. iPhone: kullanıcı "denendi" diyene kadar denenmedi sayılır
 - [x] **Tanıtım sunumu v0.20'ye güncellendi** (11 Ekim): 13 sayfa, yeni 5. sayfa "Parkura iki türlü bak: 2B | 3B", S1-S9, kapak ve Profil ekranı v0.20, pptx + pdf
 - [x] Kararlar (11 Ekim): sunum akıcılık önerileri S1-S9 kabul; sunum depoya girmez; sunumda sürüm 0.20; v1.0 kullanıcı söyleyene kadar önerilmez; Claude orkestra şefi gibi çalışır (kendin yapmak yerine delege et); push / deploy yalnızca sürüm numarası artınca
 - [x] **v0.20 yazıldı, doğrulandı, test dalında** (11 Ekim): inceleme düzeltmeleri İ1-İ8
@@ -64,6 +66,11 @@
 
 ## Günlük (en yeni en üstte) {#gunluk}
 
+### 11 Ekim (devam): v0.20 test sonucu
+- **Test (kullanıcı, Android):** yarış başlayınca ekran yan çevrilince dönüyor (İ2 kilidi çalışmıyor); telefonun yön kilidi açıkken dönmüyor. Gerisi tamam. "Yarışta Profil'e geç" maddesi eksik yazılmıştı (Menü düğmesi), düzeltildi
+- **Kural (kullanıcı):** iPhone, kullanıcı "denendi" diyene kadar denenmedi kabul edilir
+- **Bilinmeyen:** kilit neden reddedildi (kod hatayı sessizce yutuyor); yüklü uygulamada mı sekmede mi denendi
+
 ### 11 Ekim (devam): sunum son kararlar
 - **Karar (kullanıcı):** s5 başlık "Parkura iki türlü bak: 2B | 3B"; s9 ve s13 "arazi" yerine "zemin"; s8 "Kesikli çizgi" kalır; "2030 m" kalır. Uygulandı (Sonnet ajanı), pptx + pdf klasörde
 
@@ -71,9 +78,6 @@
 - **Dağıtım:** Sonnet: ekran görüntüleri, metin (S1-S9 + sürüm yazıları), kapak görüntüsü (örnek koşu yüklü). Opus: sayfa yapımı (3 tur), bağımsız son okuma
 - **Sonuç:** yeni s5 üç sütun (yatay 3B + yatay 2B, dört madde, dikey 3B telefon); s4 Profil ve kapak ekranı v0.20; s9 başlık "Yorulmayı ekler" ("hesaba katar" sığmadı). Son okumadan: s4 "dokunduğun yerin", s5 "Arazi ayrıntısı 30 m; ...", "Telefonu yan çevir", s13 notu
 - **Bilinen:** PDF bu bilgisayarda Keynote ile üretiliyor; Keynote s9 grafiğini çizmediği için PDF'te grafik özgün PDF'ten alınan resim, pptx'te gerçek grafik. PowerPoint'te açılıp bakılmadı. Ara dosyalar `tools/out/sunum/` (git dışı)
-
-### 11 Ekim: sunum kararları ve genel kurallar (ayrıntı arşivde)
-- S1-S9 kabul, sunum depoya girmez, sürüm 0.20. CLAUDE.md kural 10-12: v1.0 önerilmez; şef gibi çalış, delege et; push yalnızca sürüm artınca
 
 ### 11 Ekim: v0.20 yazıldı, test dalında (ayrıntı arşivde)
 - İ1-İ8 uygulandı (yarış ekranında dikey kilit denemesi, tam ekran yalnızca dokunmatikte, yatayda mesajlar, kamera sınırı, çift dokunuş, grafik boyut izleyici); 44/44 + Chrome'da 35 denetim. Denenmeyen: kilidin gerçek cihazda çalışması, iPhone; İ9 cihaz denemesini bekliyor
