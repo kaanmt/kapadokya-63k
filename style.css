@@ -294,8 +294,9 @@ body.racing { padding-bottom: calc(136px + env(safe-area-inset-bottom, 0px)); }
 body.racing:not(.navopen) .nav { display: none; }
 body.racing.navopen .bigbtn, body.racing.navopen .rtoast { display: none; }
 .rtop { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 0 8px; }
-.rtime { display: flex; flex-direction: column; }
-.rtime b { font-size: 52px; line-height: 1.05; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+/* büyük sayılar kutusuna göre küçülür (cqi), taşmaz; son çare satır kırılır */
+.rtime { display: flex; flex-direction: column; flex: 1 1 0; min-width: 0; container-type: inline-size; }
+.rtime b { font-size: 52px; font-size: min(52px, 19cqi); overflow-wrap: anywhere; line-height: 1.05; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 .rlab { color: var(--muted); font-size: 16px; }
 .rsub { color: var(--muted); font-size: 16px; }
 .rsub.ok, .kpi b.ok { color: var(--ok); } .rsub.warn, .kpi b.warn { color: var(--warn); } .rsub.bad, .kpi b.bad { color: var(--bad); }
@@ -305,9 +306,9 @@ body.racing.navopen .bigbtn, body.racing.navopen .rtoast { display: none; }
 .wakebar.warn { color: var(--warn); border-color: var(--warn); }
 .wakebar.bad { color: var(--bad); border-color: var(--bad); }
 .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0 12px; }
-.kpi { display: flex; flex-direction: column; gap: 2px; background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 10px 12px; min-width: 0; }
+.kpi { display: flex; flex-direction: column; gap: 2px; background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 10px 12px; min-width: 0; container-type: inline-size; }
 .kpi.wide { grid-column: 1 / -1; }
-.kpi b { font-size: 44px; line-height: 1.05; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.kpi b { font-size: 44px; font-size: min(44px, 22cqi); overflow-wrap: anywhere; line-height: 1.05; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 .kpi .rsub { font-size: 15px; }
 .rline { font-size: 18px; margin: 4px 0; font-variant-numeric: tabular-nums; }
 .locmsg { margin: 10px 0 0; font-size: 17px; font-weight: 600; }

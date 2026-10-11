@@ -1,20 +1,21 @@
 # Kapadokya Trail Uygulaması
 
-*11 Ekim 2026. Ana adres: **v0.17 (M2)**. Test dalı: **v0.20** (v0.19 + inceleme düzeltmeleri), [test listesi](test-listeleri/v0.20.md). Sırada: v0.20 denemesi, sunum, M3 = v1.0. Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
+*11 Ekim 2026. Ana adres: **v0.17 (M2)**. Test dalı: **v0.20** (v0.19 + inceleme düzeltmeleri), [test listesi](test-listeleri/v0.20.md). Yerelde **v0.21** hazır (yarış ekranı taşma düzeltmesi), [test listesi](test-listeleri/v0.21.md); kullanıcı "gönder" deyince test dalına gider. Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
 
-*M = milestone (kilometre taşı): ana adrese (herkese açık sürüm) çıkan sürüm; M1 = v0.12.1, M2 = v0.17, M3 = v1.0 (yalnızca hata çıkarsa). Ara sürümler yalnızca test dalına gider.*
+*M = milestone (kilometre taşı): ana adrese (herkese açık sürüm) çıkan sürüm; M1 = v0.12.1, M2 = v0.17; sonraki kilometre taşı kullanıcı söyleyince. Ara sürümler yalnızca test dalına gider.*
 
 <nav class="top"><a href="#yapilacaklar">Yapılacaklar</a> | <a href="#gunluk">Günlük</a> | <a href="#basvuru">Başvuru</a></nav>
 
 ## Yapılacaklar {#yapilacaklar}
 
 ### Sende
+- [ ] **"Gönder" de:** v0.21 yerelde hazır; deyince test dalına push edilir, sonra `docs/test-listeleri/v0.21.md`'yi dene
 - [ ] **Sunuma bak** (`docs/tanıtım-sunumu/`, 13 sayfa; özellikle yeni 5. sayfa) ve PowerPoint'te bir kez aç (yerleşim yalnızca Keynote çıktısıyla denetlendi)
 - [ ] **Yarış sabahı telefonun yön kilidini aç** (uygulamadaki kilit çalışmıyor)
 - [ ] iPhone'u olan bir arkadaş test listesindeki iPhone bölümünü denesin
 - [ ] iPhone'u olan bir arkadaş 3B'yi denesin (iPhone / Safari hiç denenmedi)
 - [ ] Ana adreste başlık "sürüm 0.17" mi bak; verileri taşımak için test dalında Test > "Yedeği dosya olarak indir", ana adreste geri yükle
-- [ ] **Garmin FIT kursunu Fenix 8'de dene**, yarıştan önceki en önemli açık; sorun çıkarsa v1.0'da düzeltilir ([rehber](https://claude.ai/artifact/T56PuY5jpTP6tJb7btnXad), Yol A)
+- [ ] **Garmin FIT kursunu Fenix 8'de dene**, yarıştan önceki en önemli açık; sorun çıkarsa sonraki sürümde düzeltilir ([rehber](https://claude.ai/artifact/T56PuY5jpTP6tJb7btnXad), Yol A)
     - [ ] Connect'e yüklendi
     - [ ] Up Ahead'de kontrol noktaları göründü
     - [ ] ClimbPro çalıştı
@@ -31,6 +32,9 @@
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
 
 ### Tamamlananlar
+- [x] **v0.21 yazıldı, doğrulandı, yerelde** (11 Ekim): yarış ekranında "kesimine kalan" ve "geçen süre" sayıları kutusuna göre küçülüyor, taşmıyor
+- [x] Kararlar (11 Ekim): "85 kg" örneği depoda kalabilir; yeni 404 kuralları kullanıcıda çalıştı; kullanıcı "commit" derken GitHub'a göndermeyi kastediyor (yerel commit serbest, push kullanıcı deyince)
+- [x] Commit öncesi genel kontrol (11 Ekim, 3 ajan): doğrulama, gizlilik / yayın, tarayıcı; engel yok, bir arayüz hatası bulundu
 - [x] Karar (11 Ekim): yarışta ekranın dönmesi için K3, telefonun kendi yön kilidi; kod değişikliği yok
 - [x] v0.20 Android'de denendi (11 Ekim): dikey kilit dışında tamam. iPhone: kullanıcı "denendi" diyene kadar denenmedi sayılır
 - [x] **Tanıtım sunumu v0.20'ye güncellendi** (11 Ekim): 13 sayfa, yeni 5. sayfa "Parkura iki türlü bak: 2B | 3B", S1-S9, kapak ve Profil ekranı v0.20, pptx + pdf
@@ -67,73 +71,28 @@
 
 ## Günlük (en yeni en üstte) {#gunluk}
 
+### 11 Ekim (devam): v0.21, yarış ekranı taşma düzeltmesi (yerelde)
+- **Karar (kullanıcı):** taşma düzeltilsin, "koda uygula". Kapsam yalnızca bu; kontrol listesi maddesi ve `orient` kodunun kaldırılması istenmedi
+- **Yapılan (Opus ajanı + benim ayarım):** kök neden `.kpi b { font-size: 44px }` sabit boyut (360 px'te kutu 131, sayı 164 px). Çözüm yalnızca CSS: `.kpi` ve `.rtime` kapsayıcı, sayı `min(44px, 22cqi)` ve `min(52px, 19cqi)`, son çare satır kırılması. Ajan 20cqi önermişti (8 karakterlik değere göre); gerçekte sayı en çok 7 karakter (kesimler arası en çok 4 saat), 22cqi yaptım. 360 px'te sayı 44 → 28,8 px
+- **Doğrulama:** 44/44, akış, harita, tahmin; Chrome'da 14 birleşim x 18 ölçüm, 248/252 (kalan 4: gerçekte oluşmayan "11:59:58", geniş yazı tipinde alt satıra kırılıyor, taşmıyor). Eski CSS aynı testte kalıyor
+- **Denenmeyen:** gerçek telefon. Yatayda büyük düğme kutuları örtüyor (düzeltilmedi)
+
+### 11 Ekim (devam): commit öncesi genel kontrol
+- **Kural (kullanıcı):** kullanıcı demeden commit yok (yerel de). Önceden atılmış beş yerel commit duruyor, push edilmedi
+- **Doğrulama (Sonnet):** 44/44, akış, harita, tahmin (en büyük fark 2,9e-08); sürüm 0.20 her yerde; önbellek 21/21; GitHub'dan fark yalnızca üç belge; kodda artık yok; etkisiz `orient` zararsız
+- **Gizlilik / yayın (Opus):** izlenen 52 dosyada GPX, arşiv, sunum, .DS_Store yok; bekleyen farkta kişisel bilgi yok; kimlik `kaanocb` + noreply. Not: "85 kg, çok terleme" örneği depoda; ana adreste `/README.md` açık (v0.17, zararsız); test adresindeki yeni 404 kuralları sınanamadı (401)
+- **Tarayıcı (Sonnet):** 7 senaryo geçti (çevrimdışı 3B, 5 sekme açık ve koyu, yatay tam ekran, yarış akışı ve Menü, plan ve beslenme). **Bulgu:** yarış ekranında "kesimine kalan" sayısı 360 px'te taşıyor (`#rCutLeft` içerik 164, kutu 131 px); v0.17'den beri var olmalı (yarış kodu değişmedi), telefonda doğrulanmadı
+
 ### 11 Ekim (devam): v0.20 test sonucu
 - **Test (kullanıcı, Android):** yarış başlayınca ekran yan çevrilince dönüyor (İ2 kilidi çalışmıyor); telefonun yön kilidi açıkken dönmüyor. Gerisi tamam. "Yarışta Profil'e geç" maddesi eksik yazılmıştı (Menü düğmesi), düzeltildi
 - **Kural (kullanıcı):** iPhone, kullanıcı "denendi" diyene kadar denenmedi kabul edilir
 - **Ek:** yüklü uygulamada da sekmede de dönüyor. **Karar: K3** (telefonun yön kilidi). Neden reddedildiği ölçülmedi
 
-### 11 Ekim (devam): sunum son kararlar
-- **Karar (kullanıcı):** s5 başlık "Parkura iki türlü bak: 2B | 3B"; s9 ve s13 "arazi" yerine "zemin"; s8 "Kesikli çizgi" kalır; "2030 m" kalır. Uygulandı (Sonnet ajanı), pptx + pdf klasörde
+### 10-11 Ekim: v0.18-v0.20, sunum, inceleme (arşivde)
+- 3B arazi görünümü (v0.18), geri bildirim ve yatay tam ekran (v0.19), dört ajanlı inceleme ve düzeltmeler (v0.20), sunumun v0.20'ye güncellenmesi, kurallar 10-12: `docs/arsiv/plan-arsiv-2026-10-11.md`
 
-### 11 Ekim: sunum v0.20, 13 sayfa (ayrıntı arşivde)
-- Alt ajanlarla: S1-S9, kapak ve Profil ekranı v0.20, yeni s5 "Parkura iki türlü bak: 2B | 3B" (üç sütun), s9 "Yorulmayı ekler", "zemin". PDF Keynote ile; s9 grafiği PDF'te resim. PowerPoint'te bakılmadı
-
-### 11 Ekim: v0.20 yazıldı, test dalında (ayrıntı arşivde)
-- İ1-İ8 uygulandı (yarış ekranında dikey kilit denemesi, tam ekran yalnızca dokunmatikte, yatayda mesajlar, kamera sınırı, çift dokunuş, grafik boyut izleyici); 44/44 + Chrome'da 35 denetim. Denenmeyen: kilidin gerçek cihazda çalışması, iPhone; İ9 cihaz denemesini bekliyor
-
-### 11 Ekim: v0.19 dört ajanlı inceleme (ayrıntı arşivde)
-- Alt ajanların idaresi Claude'da (en çok 4; 2 Opus + 2 Sonnet). Yüksek önemde hata yok; düzeltme önerileri İ1-İ9, İ1-İ8 v0.20'de uygulandı
-
-### 11 Ekim: v0.19 yazıldı ve denendi; sunum isteği (ayrıntı arşivde)
-- v0.19: silik yollar + koyu parkur kenarı, kuzey oku, yatay tutuşta 2B / 3B tam ekran, dönme kilidi kalktı; 44/44; kullanıcı test listesinin tamamını denedi, tamam (iPhone belirsiz)
-- Sunum: dosya bu bilgisayarda yok, kullanıcıdan bekleniyor; önerim Profil'den sonra tek sayfa "Parkuru iki gözle gör: 2B | 3B" (dikey 2B + 3B, yatay tam ekran 3B, dört balon)
-
-### 11 Ekim: v0.18 Android'de tamam; geri bildirim 018fb1-3 ve v0.19 kararları (ayrıntı arşivde)
-- Yollar daha silik, yatay tutuşta tam ekran (2B ve 3B), ⓘ metni "x1,5", kuzey oku, `manifest` dönme kilidi kalkar; hepsi v0.19'da uygulandı
-
-### 10 Ekim (gece): v0.18 yazıldı, 3B arazi görünümü (ayrıntı arşivde)
-- Kararlar H1-H4 önerildiği gibi; Profil'de "2B | 3B" anahtarı, `map3d.js` el yazımı WebGL 1, veri gömülü (GLO-30 + Sentinel-2 + OSM, 797 KB), üretim `tools/3b/uret.py`
-- Doğrulama: 43/43, arazi - GPX rakımı ortalama 1,4 m; ayrı ajan incelemesinin 8 bulgusu düzeltildi
-
-### 10 Ekim: Claude Code'a geçiş (ayrıntı arşivde)
-- Devir paketi `test` dalında; depo yerelde (Mac) klonlu. Koşu GPX'leri (`tools/veri/`) ve plan arşivleri (`docs/arsiv/`) kişisel veri içerdiği için git dışı, yalnızca yerelde
-- Commit yazarı `kaanocb`, e-posta GitHub noreply; GitHub'da e-posta gizleme ayarları açık. Geçmişteki e-posta ve eski arşiv commit'leri olduğu gibi kaldı (kullanıcı kararı)
-- 3B veri kaynakları yerelde hesapsız erişilebilir; OSM kapsamı: patikalar %83,9, tüm yollar %95,0 (15 m). Test adresi Netlify girişi istiyor; 404 kurallarını kullanıcı denedi, tamam
-
-### 9 Ekim: M2 yayında; 3B fikri ve veri araştırması (ayrıntı arşivde)
-- v0.17 ana dalda (M2). 3B için 30 m'den iyi açık veri yok; ayrıntıyı uydu görüntüsü ve OSM çizgileri getirir (`docs/arastirma/3b-veri-raporu.md`)
-
-### 9 Ekim (öğle): yeni özellik fikirleri Ö1-Ö5, D1-D4 alınmadı (ayrıntı arşivde)
-- Kullanıcı: "ufak tefek, kalsın"; v0.17 son hâl
-
-### 9 Ekim (sabah): arkadaşlar için tanıtım sunumu (ayrıntı arşivde)
-- 12 sayfa pptx + pdf, v0.17 ekranları (bir kısmı koyu tema), QR, "Tahmin nasıl hesaplanır?" sayfası; geri bildirimler uygulandı
-
-### 8 Ekim (gece): v0.17 yazıldı, doğrulandı, test listesi tamam (ayrıntı arşivde)
-- Kendini sına 40/40; tahmin JS = bağımsız Python (fark < 1e-7 dk); jsdom akışları; ayrı ajan kod incelemesi
-
-### 8 Ekim: v0.16-test-2 denendi; geri bildirim fb1-fb8 tartışılıp onaylandı (ayrıntı arşivde)
-- fb1-fb6 kullanıcının geri bildirimi; fb7 Beslenme'de Veri, fb8 tek seçim (Plan sekmesi); tartışmada bulduğum Beslenme-Yarış tutarsızlığı fb8 ile çözüldü
-
-### 7 Ekim: v0.16-test-2 yazıldı; arayüz sadeleştirme Gr1-Gr4 (ayrıntı arşivde)
-- Tahmin şekilleri, tek tablo + anahtar, kesim payı kuralı; Gr1 ⓘ, Gr2-Gr4 kaldırmalar; öneri kafeinli ürün seçmez
-
-### 7 Ekim: v0.16-test-1 geri bildirimi (ayrıntı arşivde)
-- Tahmin şekilleri iyi doğrusal / ana x^1,5 / kötü x²; iyi/ana/kötü A/B/C'nin yerine geçmez, yardımcı ölçüt
-
-### v0.16-test-1: sodyum C, %90 kuralı, veriden tahmin (ayrıntı arşivde)
-- Ter tuzluluğu seçimi (600 / 825 / 1100 mg/L), %90 kuralı, GPX'ten tahmin; JS = Python (fark 0,000)
-
-### 4-6 Ekim: koşu GPX'i analizi (ayrıntı arşivde)
-- 30,34 km koşu uygulamada Garmin'le tutarlı (süre 11 sn, hareket 5 sn); kalibre: tırmanış 0,88, iniş -0,24, yorulma 0,50
-- Sınırlar: tek koşu; rakım (koşu 77-307 m, yarış 1026-1471 m); arazi; yorulma basamaklı
-
-### v0.14-v0.15: beslenme takvimi, hata mesajı, ürün sınırları (ayrıntı arşivde)
-- Seçilen tuz tableti kullanılıyor; Progel tuzu 0,3 g = 120 mg (ambalajdan); sınırlar kaldırıldı
-
-### v0.1-v0.13 (ayrıntı arşivde)
-- Çevrimdışı PWA, A/B/C planlayıcı, yarış modu, Garmin kurs dosyaları, Beslenme sekmesi, kendini sına, kontrol listesi, 24 ürünlük katalog, GitHub + Netlify akışı (test dalı ücretsiz, ana dal 15 kredi), GPX'ten kalibrasyon
-- Ders (v0.9.x): beklenmeyen sayıyı varsayımla açıkladım, gerçek sebep başkaydı; "varsayım yapma, doğrula" kuralı buradan
+### 9 Ekim ve öncesi (arşivde)
+- v0.1-v0.17, koşu GPX analizleri, tanıtım sunumunun ilk hâli, M1 ve M2: özetleri `docs/arsiv/plan-arsiv-2026-10-11.md`, ayrıntıları önceki arşiv dosyalarında
 
 ## Başvuru {#basvuru}
 

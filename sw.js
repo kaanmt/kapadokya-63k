@@ -1,4 +1,4 @@
-const VERSION = 'k63-0.20';
+const VERSION = 'k63-0.21';
 const ASSETS = [
   './',
   './index.html',
