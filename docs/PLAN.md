@@ -1,6 +1,6 @@
 # Kapadokya Trail Uygulaması
 
-*11 Ekim 2026. Ana adres: **v0.17 (M2)**. Test dalı: **v0.20** (v0.19 + inceleme düzeltmeleri), [test listesi](test-listeleri/v0.20.md). Yerelde **v0.21** hazır (yarış ekranı taşma düzeltmesi), [test listesi](test-listeleri/v0.21.md); kullanıcı "gönder" deyince test dalına gider. Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
+*11 Ekim 2026. Ana adres: **v0.17 (M2)**. Test dalı: **v0.21** (yarış ekranı taşma düzeltmesi; 11 Ekim'de gönderildi), [test listesi](test-listeleri/v0.21.md). Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
 
 *M = milestone (kilometre taşı): ana adrese (herkese açık sürüm) çıkan sürüm; M1 = v0.12.1, M2 = v0.17; sonraki kilometre taşı kullanıcı söyleyince. Ara sürümler yalnızca test dalına gider.*
 
@@ -9,7 +9,7 @@
 ## Yapılacaklar {#yapilacaklar}
 
 ### Sende
-- [ ] **"Gönder" de:** v0.21 yerelde hazır; deyince test dalına push edilir, sonra `docs/test-listeleri/v0.21.md`'yi dene
+- [ ] **v0.21'i test adresinde dene** (`docs/test-listeleri/v0.21.md`); en önemlisi yarış ekranındaki sayılar kutusunda mı, yeterince büyük mü
 - [ ] **Sunuma bak** (`docs/tanıtım-sunumu/`, 13 sayfa; özellikle yeni 5. sayfa) ve PowerPoint'te bir kez aç (yerleşim yalnızca Keynote çıktısıyla denetlendi)
 - [ ] **Yarış sabahı telefonun yön kilidini aç** (uygulamadaki kilit çalışmıyor)
 - [ ] iPhone'u olan bir arkadaş test listesindeki iPhone bölümünü denesin
@@ -71,11 +71,12 @@
 
 ## Günlük (en yeni en üstte) {#gunluk}
 
-### 11 Ekim (devam): v0.21, yarış ekranı taşma düzeltmesi (yerelde)
+### 11 Ekim (devam): v0.21, yarış ekranı taşma düzeltmesi (test dalında)
 - **Karar (kullanıcı):** taşma düzeltilsin, "koda uygula". Kapsam yalnızca bu; kontrol listesi maddesi ve `orient` kodunun kaldırılması istenmedi
 - **Yapılan (Opus ajanı + benim ayarım):** kök neden `.kpi b { font-size: 44px }` sabit boyut (360 px'te kutu 131, sayı 164 px). Çözüm yalnızca CSS: `.kpi` ve `.rtime` kapsayıcı, sayı `min(44px, 22cqi)` ve `min(52px, 19cqi)`, son çare satır kırılması. Ajan 20cqi önermişti (8 karakterlik değere göre); gerçekte sayı en çok 7 karakter (kesimler arası en çok 4 saat), 22cqi yaptım. 360 px'te sayı 44 → 28,8 px
 - **Doğrulama:** 44/44, akış, harita, tahmin; Chrome'da 14 birleşim x 18 ölçüm, 248/252 (kalan 4: gerçekte oluşmayan "11:59:58", geniş yazı tipinde alt satıra kırılıyor, taşmıyor). Eski CSS aynı testte kalıyor
 - **Denenmeyen:** gerçek telefon. Yatayda büyük düğme kutuları örtüyor (düzeltilmedi)
+- **Gönderim:** kullanıcı "github a commit et" dedi; `d1b8c77` ve bekleyen beş belge commit'i test dalına push edildi
 
 ### 11 Ekim (devam): commit öncesi genel kontrol
 - **Kural (kullanıcı):** kullanıcı demeden commit yok (yerel de). Önceden atılmış beş yerel commit duruyor, push edilmedi
