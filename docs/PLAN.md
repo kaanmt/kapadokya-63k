@@ -1,14 +1,15 @@
 # Kapadokya Trail Uygulaması
 
-*11 Ekim 2026. Ana adres: **v0.17 (M2)**. Test dalı: **v0.21** (yarış ekranı taşma düzeltmesi; 11 Ekim'de gönderildi), [test listesi](test-listeleri/v0.21.md). Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
+*11 Ekim 2026. **v1.0 = M3** (v0.21 ile aynı kod), ana adrese çıkış sürecinde; [test listesi](test-listeleri/v1.0.md). Geliştirme Claude Code'da, yerelde. Yarış: 17 Ekim, 07:00, Ürgüp.*
 
-*M = milestone (kilometre taşı): ana adrese (herkese açık sürüm) çıkan sürüm; M1 = v0.12.1, M2 = v0.17; sonraki kilometre taşı kullanıcı söyleyince. Ara sürümler yalnızca test dalına gider.*
+*M = milestone (kilometre taşı): ana adrese (herkese açık sürüm) çıkan sürüm; M1 = v0.12.1, M2 = v0.17, M3 = v1.0; sonraki kilometre taşı kullanıcı söyleyince. Ara sürümler yalnızca test dalına gider.*
 
 <nav class="top"><a href="#yapilacaklar">Yapılacaklar</a> | <a href="#gunluk">Günlük</a> | <a href="#basvuru">Başvuru</a></nav>
 
 ## Yapılacaklar {#yapilacaklar}
 
 ### Sende
+- [ ] **Ana adreste kısa kontrol** (`docs/test-listeleri/v1.0.md`): başlıkta "sürüm 1.0", verilerin yerinde, 3B açılıyor
 - [ ] **Sunuma bak** (`docs/tanıtım-sunumu/`, 13 sayfa; özellikle yeni 5. sayfa) ve PowerPoint'te bir kez aç (yerleşim yalnızca Keynote çıktısıyla denetlendi)
 - [ ] **Yarış sabahı telefonun yön kilidini aç** (uygulamadaki kilit çalışmıyor)
 - [ ] iPhone'u olan bir arkadaş test listesindeki iPhone bölümünü denesin
@@ -23,7 +24,6 @@
 
 ### Karar bekleyen
 - [ ] (İsteğe bağlı, kod) Kontrol listesine "telefonun yön kilidini aç" maddesi ve etkisiz `orient` kodunun kaldırılması; "koda uygula" denirse v0.21
-- [ ] M3 = v1.0: kullanıcı söyleyene kadar yok, önerilmez (11 Ekim kuralı)
 
 ### Bende (Claude)
 - [ ] İ9 (iPhone'da bağlam geri gelmezse takılma): cihaz denemesinin sonucuna göre
@@ -70,6 +70,11 @@
 - **17 Ekim:** yarış, start 07:00 (start alanı en geç 06:30)
 
 ## Günlük (en yeni en üstte) {#gunluk}
+
+### 11 Ekim (devam): v1.0 = M3
+- **Karar (kullanıcı):** v0.21 artık M3 = v1.0 olarak ana dala; sunum da v1.0'a; önce sunum, sonra gönderim
+- **Yapılan:** `BUILD` 1.0, `k63-1.0`; 44/44, akış, harita, tahmin geçti. Sunum v1.0: kapak, s4 ve s5 telefon ekranları "sürüm 1.0", kapakta "SÜRÜM 1.0", alt bilgide "sürüm 1.0" ("deneme" kalktı); pptx + pdf klasörde
+- **Birleştirme notu:** `main`'deki v0.17 tek commit'e sıkıştırılmıştı, `test` ile çakışıyordu (app.js, sw.js, tools.js). `test`'te `main` geçmişi içerik değiştirmeden birleştirildi (`-s ours`); PR birleştirme commit'iyle kapatılır ki sonraki kilometre taşında çakışma olmasın
 
 ### 11 Ekim (devam): v0.21 test sonucu
 - **Test (kullanıcı, Android):** "tüm kontrolleri tamamladım sorun yok". Yeni geri bildirim yok; iPhone denenmedi
