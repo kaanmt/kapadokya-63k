@@ -9,7 +9,6 @@
 ## Yapılacaklar {#yapilacaklar}
 
 ### Sende
-- [ ] **v0.21'i test adresinde dene** (`docs/test-listeleri/v0.21.md`); en önemlisi yarış ekranındaki sayılar kutusunda mı, yeterince büyük mü
 - [ ] **Sunuma bak** (`docs/tanıtım-sunumu/`, 13 sayfa; özellikle yeni 5. sayfa) ve PowerPoint'te bir kez aç (yerleşim yalnızca Keynote çıktısıyla denetlendi)
 - [ ] **Yarış sabahı telefonun yön kilidini aç** (uygulamadaki kilit çalışmıyor)
 - [ ] iPhone'u olan bir arkadaş test listesindeki iPhone bölümünü denesin
@@ -32,6 +31,7 @@
 - [ ] Karar yok: kalan 8 yiyeceğin değerleri; Mocha jelin 0,06 g tuzu (ambalajdan doğrulanmadı)
 
 ### Tamamlananlar
+- [x] **v0.21 denendi, test listesinin tamamı tamam** (11 Ekim, Android)
 - [x] **v0.21 yazıldı, doğrulandı, yerelde** (11 Ekim): yarış ekranında "kesimine kalan" ve "geçen süre" sayıları kutusuna göre küçülüyor, taşmıyor
 - [x] Kararlar (11 Ekim): "85 kg" örneği depoda kalabilir; yeni 404 kuralları kullanıcıda çalıştı; kullanıcı "commit" derken GitHub'a göndermeyi kastediyor (yerel commit serbest, push kullanıcı deyince)
 - [x] Commit öncesi genel kontrol (11 Ekim, 3 ajan): doğrulama, gizlilik / yayın, tarayıcı; engel yok, bir arayüz hatası bulundu
@@ -70,6 +70,10 @@
 - **17 Ekim:** yarış, start 07:00 (start alanı en geç 06:30)
 
 ## Günlük (en yeni en üstte) {#gunluk}
+
+### 11 Ekim (devam): v0.21 test sonucu
+- **Test (kullanıcı, Android):** "tüm kontrolleri tamamladım sorun yok". Yeni geri bildirim yok; iPhone denenmedi
+- **Oturum notu:** statusline'a 5 saat / 7 gün çubukları ve dolar maliyeti eklendi; telefon bildirimi için Remote Control bağlandı (depo dışı ayarlar)
 
 ### 11 Ekim (devam): v0.21, yarış ekranı taşma düzeltmesi (test dalında)
 - **Karar (kullanıcı):** taşma düzeltilsin, "koda uygula". Kapsam yalnızca bu; kontrol listesi maddesi ve `orient` kodunun kaldırılması istenmedi
